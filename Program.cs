@@ -1,6 +1,5 @@
-var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
+using IdiomasAPI.Source.Infrastructure.Http;
 
-app.MapGet("/", () => "Hello World!");
+App app = new();
 
-app.Run();
+app.Start();
