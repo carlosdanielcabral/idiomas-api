@@ -4,7 +4,7 @@ namespace IdiomasAPI.Source.Presentation.Http.Controller;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddControllers(this IServiceCollection services)
+    public static IServiceCollection AddPresentationControllers(this IServiceCollection services)
     {
         services.AddScoped<IUserController, UserController>();
 
