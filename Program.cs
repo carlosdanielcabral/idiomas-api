@@ -1,5 +1,18 @@
-using IdiomasAPI.Source.Infrastructure.Http;
+using IdiomasAPI.Source.Infrastructure;
+using IdiomasAPI.Source.Presentation;
+using IdiomasAPI.Source.Presentation.Http;
 
-App app = new();
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-app.Start();
+builder.Services
+    .AddInfrastructure(builder.Configuration)
+    .AddPresentation();
+
+WebApplication app = builder.Build();
+
+var router = app.Services.GetRequiredService<Router>();
+
+router.Register(app);
+
+app.Run();
+
