@@ -15,9 +15,9 @@ public class CreateUser(IUserRepository userRepository, IHash hash)
 
     public async Task<User> Execute(CreateUserDTO dto)
     {
-        var existingUser = await this._userRepository.GetByEmail(dto.Email);
+        User? previousUser = await this._userRepository.GetByEmail(dto.Email);
 
-        if (existingUser != null)
+        if (previousUser != null)
         {
             throw new ApiException("E-mail já cadastrado", HttpStatusCode.Conflict);
         }
