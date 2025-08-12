@@ -9,10 +9,12 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddInfrastructure(builder.Configuration)
     .AddApplication()
-    .AddPresentation();
-
+    .AddPresentation()
+    .AddAPIDocumentation();
 
 WebApplication app = builder.Build();
+
+app.AddAPIDocumentation();
 
 app.UseMiddleware<ApiExceptionMiddleware>();
 
