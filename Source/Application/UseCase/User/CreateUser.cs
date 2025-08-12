@@ -6,7 +6,7 @@ using IdiomasAPI.Source.Interface.Service;
 using IdiomasAPI.Source.Application.Error;
 using System.Net;
 
-namespace IdiomasAPI.Source.Application.UseCase;
+namespace IdiomasAPI.Source.Application.UseCase.User;
 
 public class CreateUser(IUserRepository userRepository, IHash hash)
 {
