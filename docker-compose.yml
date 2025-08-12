@@ -3,14 +3,15 @@ services:
     build: .
     container_name: idiomas-api
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     env_file:
       - .env
     ports:
       - 5076:5076
 
   database:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    build: ./database
     container_name: idiomas-database
     environment:
       ACCEPT_EULA: ${ACCEPT_EULA}
@@ -19,12 +20,25 @@ services:
     ports:
       - "1433:1433"
     volumes:
-      - ./database:/var/opt/mssql
+      - database:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${MSSQL_SA_PASSWORD}", "-Q", "SELECT 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
 
   migration:
-    build: .
+    build:
+      context: .
+      target: build
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     entrypoint: ["dotnet", "ef", "database", "update"]
     env_file:
       - .env
+    
+volumes:
+  database:

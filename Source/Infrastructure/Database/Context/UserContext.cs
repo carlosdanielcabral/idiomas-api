@@ -1,5 +1,7 @@
-using IdiomasAPI.Source.Domain.Entity;
-using IdiomasAPI.Source.Infrastructure.Database.Model;
+// UserContext.cs
+
+using IdiomasAPI.Source.Domain.Entity; // Esta linha pode até ser removida se 'User' não for mais usada aqui
+using IdiomasAPI.Source.Infrastructure.Database.Model; // Garanta que este using está presente
 using Microsoft.EntityFrameworkCore;
 
 namespace IdiomasAPI.Source.Infrastructure.Database.Context;
@@ -16,28 +18,28 @@ public class UserContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<User>(entity =>
+        modelBuilder.Entity<UserModel>(entity =>
         {
             entity.ToTable("user");
 
-            entity.HasKey(e => e.Id);
-
+            entity.HasKey(e => e.Id); 
+            
             entity.Property(p => p.Id)
-                    .HasColumnName("user")
-                    .ValueGeneratedNever();
+                  .HasColumnName("id")
+                  .ValueGeneratedNever();
 
             entity.Property(p => p.Name)
-                    .HasColumnName("name")
-                    .HasMaxLength(150)
-                    .IsRequired();
+                  .HasColumnName("name")
+                  .HasMaxLength(150)
+                  .IsRequired();
 
             entity.HasIndex(e => e.Email)
-                .IsUnique();
+                  .IsUnique();
 
             entity.Property(p => p.Email)
-                    .HasColumnName("email")
-                    .HasMaxLength(255)
-                    .IsRequired();
+                  .HasColumnName("email")
+                  .HasMaxLength(255)
+                  .IsRequired();
                   
             entity.Property(p => p.Password)
                   .HasColumnName("password");
