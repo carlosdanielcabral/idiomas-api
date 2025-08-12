@@ -9,13 +9,12 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddInfrastructure(builder.Configuration)
     .AddApplication()
-    .AddPresentation()
-    .AddAPIDocumentation();
+    .AddPresentation();
 
 WebApplication app = builder.Build();
 
+app.UseRateLimiter();
 app.AddAPIDocumentation();
-
 app.UseMiddleware<ApiExceptionMiddleware>();
 
 var router = app.Services.GetRequiredService<Router>();
