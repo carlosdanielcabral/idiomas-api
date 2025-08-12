@@ -3,6 +3,8 @@ using IdiomasAPI.Source.Domain.Entity;
 using IdiomasAPI.Source.Infrastructure.Service;
 using IdiomasAPI.Source.Interface.Repository;
 using IdiomasAPI.Source.Interface.Service;
+using IdiomasAPI.Source.Application.Error;
+using System.Net;
 
 namespace IdiomasAPI.Source.Application.UseCase;
 
@@ -17,7 +19,7 @@ public class CreateUser(IUserRepository userRepository, IHash hash)
 
         if (existingUser != null)
         {
-            throw new InvalidOperationException("E-mail já cadastrado");
+            throw new ApiException("E-mail já cadastrado", HttpStatusCode.Conflict);
         }
 
         User user = new(

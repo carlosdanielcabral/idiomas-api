@@ -4,9 +4,10 @@ using IdiomasAPI.Source.Application.Error;
 
 namespace IdiomasAPI.Source.Presentation.Http.Middleware;
 
-public class ApiExceptionMiddleware(RequestDelegate next)
+public class ApiExceptionMiddleware(RequestDelegate next, ILogger<ApiExceptionMiddleware> logger)
 {
     private readonly RequestDelegate _next = next;
+    private readonly ILogger<ApiExceptionMiddleware> _logger = logger;
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -16,21 +17,23 @@ public class ApiExceptionMiddleware(RequestDelegate next)
         }
         catch (ApiException ex)
         {
-            context.Response.StatusCode = (int) ex.StatusCode;
-            context.Response.ContentType = "application/json";
-
-            var result = JsonSerializer.Serialize(new { error = ex.Message });
-    
-            await context.Response.WriteAsync(result);
+            _logger.LogWarning(ex, "API exception: {Message}", ex.Message);
+            await HandleExceptionAsync(context, ex.StatusCode, new { error = ex.Message });
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            context.Response.ContentType = "application/json";
-
-            var result = JsonSerializer.Serialize(new { error = "Internal server error" });
-
-            await context.Response.WriteAsync(result);
+            _logger.LogError(ex, "Internal server error.");
+            await HandleExceptionAsync(context, HttpStatusCode.InternalServerError, new { error = "Internal server error" });
         }
+    }
+
+    private static Task HandleExceptionAsync(HttpContext context, HttpStatusCode statusCode, object response)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)statusCode;
+
+        var result = JsonSerializer.Serialize(response);
+
+        return context.Response.WriteAsync(result);
     }
 }

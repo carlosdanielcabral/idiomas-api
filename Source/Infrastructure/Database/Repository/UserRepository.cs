@@ -26,6 +26,7 @@ public class UserRepository(UserContext database) : IUserRepository
     public async Task<User?> GetByEmail(string email)
     {
         var model = await this._database.User.FirstOrDefaultAsync(u => u.Email == email);
+
         return model?.ToEntity();
     }
 }
