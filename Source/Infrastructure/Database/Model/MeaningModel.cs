@@ -21,8 +21,8 @@ public class MeaningModel
 
     [Required]
     [Column("word_id")]
-    public int WordId { get; set; }
+    public int? WordId { get; set; }
 
     [ForeignKey("WordId")]
-    public required WordModel Word { get; set; }
+    public WordModel? Word { get; set; }
 }
