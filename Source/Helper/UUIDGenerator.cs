@@ -1,4 +1,4 @@
-namespace IdiomasAPI.Source.Infrastructure.Service;
+namespace IdiomasAPI.Source.Infrastructure.Helper;
 
 public static class UUIDGenerator
 {

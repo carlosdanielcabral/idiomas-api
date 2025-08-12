@@ -1,6 +1,6 @@
 using IdiomasAPI.Source.Application.DTO.User;
 using IdiomasAPI.Source.Domain.Entity;
-using IdiomasAPI.Source.Infrastructure.Service;
+using IdiomasAPI.Source.Infrastructure.Helper;
 using IdiomasAPI.Source.Interface.Repository;
 using IdiomasAPI.Source.Interface.Service;
 using IdiomasAPI.Source.Application.Error;
