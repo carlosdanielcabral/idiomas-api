@@ -8,7 +8,8 @@ public class MeaningModel
 {
     [Key]
     [Column("id")]
-    public int Id { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)] 
+    public required Guid Id { get; set; }
 
     [Required]
     [MaxLength(512)]
@@ -21,7 +22,7 @@ public class MeaningModel
 
     [Required]
     [Column("word_id")]
-    public int? WordId { get; set; }
+    public Guid? WordId { get; set; }
 
     [ForeignKey("WordId")]
     public WordModel? Word { get; set; }

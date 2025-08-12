@@ -8,6 +8,7 @@ public class UserModel
 {
     [Key]
     [Column("id")]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)] 
     public required Guid Id { get; set; }
 
     [Required]

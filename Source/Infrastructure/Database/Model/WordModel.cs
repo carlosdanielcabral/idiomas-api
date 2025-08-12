@@ -8,7 +8,8 @@ public class WordModel
 {
     [Key]
     [Column("id")]
-    public required int Id { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)] 
+    public required Guid Id { get; set; }
 
     [Required]
     [MaxLength(255)]

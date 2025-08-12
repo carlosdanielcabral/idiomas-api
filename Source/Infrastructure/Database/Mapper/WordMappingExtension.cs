@@ -7,12 +7,12 @@ public static class WordMappingExtension
 {
     public static Word ToEntity(this WordModel model)
     {
-        return new Word(model.Id, model.Word, model.Ipa, model.UserId.ToString(), model.Meanings.ToEntities());
+        return new Word(model.Id.ToString(), model.Word, model.Ipa, model.UserId.ToString(), model.Meanings.ToEntities());
     }
 
     public static WordModel ToModel(this Word entity)
     {
-        return new WordModel() { Id = entity.Id, Word = entity.Name, Ipa = entity.Ipa, UserId = Guid.Parse(entity.UserId), Meanings = entity.Meanings.ToModels() };
+        return new WordModel() { Id = Guid.Parse(entity.Id), Word = entity.Name, Ipa = entity.Ipa, UserId = Guid.Parse(entity.UserId), Meanings = entity.Meanings.ToModels() };
     }
 
     public static IEnumerable<Word> ToEntities(this IEnumerable<WordModel> models)
