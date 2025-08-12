@@ -1,5 +1,5 @@
 using IdiomasAPI.Source.Application.DTO.User;
-using IdiomasAPI.Source.Application.UseCase;
+using IdiomasAPI.Source.Application.UseCase.UserCase;
 using IdiomasAPI.Source.Domain.Entity;
 using IdiomasAPI.Source.Interface.Controller;
 

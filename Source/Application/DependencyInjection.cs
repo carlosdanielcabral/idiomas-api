@@ -1,4 +1,4 @@
-using IdiomasAPI.Source.Application.UseCase;
+using IdiomasAPI.Source.Application.UseCase.UserCase;
 
 namespace IdiomasAPI.Source.Application;
 
