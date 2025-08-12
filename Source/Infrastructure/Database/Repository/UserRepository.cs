@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdiomasAPI.Source.Infrastructure.Database.Repository;
 
-public class UserRepository(UserContext database) : IUserRepository
+public class UserRepository(ApplicationContext database) : IUserRepository
 {
-    private readonly UserContext _database = database;
+    private readonly ApplicationContext _database = database;
 
     public async Task Insert(User user)
     {

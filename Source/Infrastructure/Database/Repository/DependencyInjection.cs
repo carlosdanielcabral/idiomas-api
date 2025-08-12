@@ -11,7 +11,7 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        services.AddDbContext<UserContext>(options =>
+        services.AddDbContext<ApplicationContext>(options =>
             options.UseSqlServer(connectionString));
 
         services.AddScoped<IUserRepository, UserRepository>();
