@@ -1,6 +1,6 @@
 namespace IdiomasAPI.Source.Interface.Route;
 
-public interface IUserRoute
+public interface IRoute
 {
     public void Register(WebApplication app);
 }

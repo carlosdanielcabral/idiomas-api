@@ -1,15 +1,17 @@
-using IdiomasAPI.Source.Interface.Route;
+using IdiomasAPI.Source.Presentation.Http.Route;
 
 namespace IdiomasAPI.Source.Presentation.Http;
 
-public class Router(IUserRoute userRoute)
+public class Router(UserRoute userRoute, AuthRoute authRoute)
 {
-    private readonly IUserRoute _userRoute = userRoute;
+    private readonly UserRoute _userRoute = userRoute;
+    private readonly AuthRoute _authRoute = authRoute;
 
     public void Register(WebApplication app)
     {
         app.MapGet("/", () => "Online");
 
         this._userRoute.Register(app);
+        this._authRoute.Register(app);
     }
 }

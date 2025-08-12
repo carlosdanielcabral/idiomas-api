@@ -9,8 +9,8 @@ namespace IdiomasAPI.Source.Application.UseCase.AuthCase;
 
 public class MailPasswordLogin(IUserRepository userRepository, IHash hash)
 {
-    private IUserRepository _userRepository = userRepository;
-    private IHash _hash = hash;
+    private readonly IUserRepository _userRepository = userRepository;
+    private readonly IHash _hash = hash;
 
     public async Task<User> Execute(MailPasswordLoginDTO dto)
     {

@@ -4,12 +4,12 @@ using IdiomasAPI.Source.Interface.Route;
 
 namespace IdiomasAPI.Source.Presentation.Http.Route;
 
-public class UserRoute(IUserController controller) : IRoute
+public class AuthRoute(IAuthController controller) : IRoute
 {
-    private readonly IUserController _controller = controller;
+    private readonly IAuthController _controller = controller;
 
     public void Register(WebApplication app)
     {
-        app.MapPost("/user", _controller.SaveUser);
+        app.MapPost("/auth/login", this._controller.MailPasswordLogin);
     }
 }
