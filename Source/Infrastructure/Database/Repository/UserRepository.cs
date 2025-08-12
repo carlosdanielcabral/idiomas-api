@@ -12,7 +12,7 @@ public class UserRepository(ApplicationContext database) : IUserRepository
 
     public async Task Insert(User user)
     {
-        this._database.Add(user.ToModel());
+        this._database.User.Add(user.ToModel());
 
         await this._database.SaveChangesAsync();
     }

@@ -11,7 +11,7 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
 
     public async Task Insert(Word word)
     {
-        this._database.Add(word.ToModel());
+        await this._database.Word.AddAsync(word.ToModel());
 
         await this._database.SaveChangesAsync();
     }
