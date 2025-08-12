@@ -2,6 +2,7 @@ using IdiomasAPI.Source.Application;
 using IdiomasAPI.Source.Infrastructure;
 using IdiomasAPI.Source.Presentation;
 using IdiomasAPI.Source.Presentation.Http;
+using IdiomasAPI.Source.Presentation.Http.Middleware;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,10 @@ builder.Services
     .AddApplication()
     .AddPresentation();
 
+
 WebApplication app = builder.Build();
+
+app.UseMiddleware<ApiExceptionMiddleware>();
 
 var router = app.Services.GetRequiredService<Router>();
 

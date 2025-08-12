@@ -13,6 +13,13 @@ public class CreateUser(IUserRepository userRepository, IHash hash)
 
     public async Task<User> Execute(CreateUserDTO dto)
     {
+        var existingUser = await this._userRepository.GetByEmail(dto.Email);
+
+        if (existingUser != null)
+        {
+            throw new InvalidOperationException("E-mail já cadastrado");
+        }
+
         User user = new(
             UUIDGenerator.Generate(),
             dto.Name,

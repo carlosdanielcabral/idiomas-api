@@ -2,17 +2,29 @@ services:
   api:
     build: .
     container_name: idiomas-api
+    depends_on:
+      - database
     env_file:
       - .env
     ports:
       - 5076:5076
 
   database:
-    image: mcr.microsoft.com/mssql/server:2025-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: idiomas-database
+    environment:
+      ACCEPT_EULA: ${ACCEPT_EULA}
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      MSSQL_TCP_PORT: 1433
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./database:/var/opt/mssql
+
+  migration:
+    build: .
+    depends_on:
+      - database
+    entrypoint: ["dotnet", "ef", "database", "update"]
     env_file:
       - .env
-    ports:
-      - 1433:1433
-    volumes:
-      - /database
