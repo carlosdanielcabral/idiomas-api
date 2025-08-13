@@ -7,13 +7,11 @@ using IdiomasAPI.Source.Presentation.Mapper;
 
 namespace IdiomasAPI.Source.Presentation.Http.Controller;
 
-public class UserController(CreateUser createUserUseCase) : IUserController
+public class UserController() : IUserController
 {
-    private readonly CreateUser _createUserUseCase = createUserUseCase;
-
-    public async Task<IResult> SaveUser(CreateUserDTO dto)
+    public async Task<IResult> SaveUser(CreateUserDTO dto, CreateUser useCase)
     {
-        User user = await this._createUserUseCase.Execute(dto);
+        User user = await useCase.Execute(dto);
 
         CreateUserResponseDTO response = new() { User = user.ToResponseDTO() };
 

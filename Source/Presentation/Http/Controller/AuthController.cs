@@ -8,14 +8,13 @@ using IdiomasAPI.Source.Presentation.Mapper;
 
 namespace IdiomasAPI.Source.Presentation.Http.Controller;
 
-public class AuthController(MailPasswordLogin mailPasswordUseCase, IToken tokenGenerator) : IAuthController
+public class AuthController(IToken tokenGenerator) : IAuthController
 {
-    private readonly MailPasswordLogin _mailPasswordUseCase = mailPasswordUseCase;
     private readonly IToken _tokenGenerator = tokenGenerator;
 
-    public async Task<IResult> MailPasswordLogin(MailPasswordLoginDTO dto)
+    public async Task<IResult> MailPasswordLogin(MailPasswordLoginDTO dto, MailPasswordLogin useCase)
     {
-        User user = await this._mailPasswordUseCase.Execute(dto);
+        User user = await useCase.Execute(dto);
 
         MailPasswordLoginResponseDTO response = new()
         {
