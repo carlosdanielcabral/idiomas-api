@@ -9,4 +9,5 @@ public interface IDictionaryController
     public Task<IResult> SaveWord(CreateWordDTO dto, ClaimsPrincipal user);
     public Task<IResult> ListWords(ClaimsPrincipal user, ListWords listWordsUseCase);
     public Task<IResult> UpdateWord(string id, UpdateWordDTO dto, ClaimsPrincipal user);
+    public Task<IResult> DeleteWord(string id, ClaimsPrincipal user);
 }

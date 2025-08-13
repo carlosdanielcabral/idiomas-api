@@ -70,7 +70,7 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
         outdatedWord.UpdatedAt = DateTime.UtcNow;
 
         outdatedWord.Meanings.Clear();
-        
+
         foreach (var newMeaning in updatedWord.Meanings)
         {
             outdatedWord.Meanings.Add(newMeaning.ToModel());
@@ -79,5 +79,23 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
         await this._database.SaveChangesAsync();
 
         return outdatedWord.ToEntity();
+    }
+    
+    public async Task Delete(string id)
+    {
+        Guid wordId = Guid.Parse(id);
+
+        var model = await this._database.Word
+            .Include(w => w.Meanings)
+            .FirstOrDefaultAsync(w => w.Id == wordId);
+
+        if (model is null)
+        {
+            throw new KeyNotFoundException($"Word with ID {wordId} not found.");
+        }
+
+        this._database.Word.Remove(model);
+
+        await this._database.SaveChangesAsync();
     }
 }

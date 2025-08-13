@@ -9,10 +9,11 @@ using IdiomasAPI.Source.Presentation.Mapper;
 
 namespace IdiomasAPI.Source.Presentation.Http.Controller;
 
-public class DictionaryController(CreateWord createWordUseCase, UpdateWord updateWordUseCase) : IDictionaryController
+public class DictionaryController(CreateWord createWordUseCase, UpdateWord updateWordUseCase, DeleteWord deleteWord) : IDictionaryController
 {
     private readonly CreateWord _createWordUseCase = createWordUseCase;
     private readonly UpdateWord _updateWordUseCase = updateWordUseCase;
+    private readonly DeleteWord deleteWordUseCase = deleteWord;
 
     public async Task<IResult> SaveWord(CreateWordDTO dto, ClaimsPrincipal user)
     {
@@ -35,15 +36,24 @@ public class DictionaryController(CreateWord createWordUseCase, UpdateWord updat
 
         return TypedResults.Ok(response);
     }
-    
+
     public async Task<IResult> UpdateWord(string id, UpdateWordDTO dto, ClaimsPrincipal user)
     {
         string userIdString = user.GetUserId().ToString();
-        
+
         Word updatedWord = await this._updateWordUseCase.Execute(id, dto, userIdString);
 
         UpdateWordResponseDTO response = new() { Word = updatedWord.ToResponseDTO() };
 
         return TypedResults.Ok(response);
+    }
+    
+    public async Task<IResult> DeleteWord(string id, ClaimsPrincipal user)
+    {
+        string userIdString = user.GetUserId().ToString();
+
+        await deleteWordUseCase.Execute(id, userIdString);
+
+        return TypedResults.NoContent();
     }
 }

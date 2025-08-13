@@ -13,6 +13,7 @@ public static class DependencyInjection
         services.AddScoped<CreateWord>();
         services.AddScoped<ListWords>();
         services.AddScoped<UpdateWord>();
+        services.AddScoped<DeleteWord>();
 
         return services;
     }

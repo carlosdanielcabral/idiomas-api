@@ -22,6 +22,12 @@ public class DictionaryRoute(IDictionaryController controller) : IRoute
         dictionary.MapPut("/word/{id}", _controller.UpdateWord)
             .Produces<UpdateWordResponseDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status409Conflict);
+            .Produces(StatusCodes.Status409Conflict)
+            .Produces(StatusCodes.Status401Unauthorized);
+
+        dictionary.MapDelete("/word/{id}", _controller.DeleteWord)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status401Unauthorized);
     }
 }
