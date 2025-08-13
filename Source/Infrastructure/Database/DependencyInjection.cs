@@ -1,9 +1,10 @@
 
 using IdiomasAPI.Source.Infrastructure.Database.Context;
+using IdiomasAPI.Source.Infrastructure.Database.Repository;
 using IdiomasAPI.Source.Interface.Repository;
 using Microsoft.EntityFrameworkCore;
 
-namespace IdiomasAPI.Source.Infrastructure.Database.Repository;
+namespace IdiomasAPI.Source.Infrastructure.Database;
 
 public static class DependencyInjection
 {

@@ -1,4 +1,4 @@
-using IdiomasAPI.Source.Infrastructure.Database.Repository;
+using IdiomasAPI.Source.Infrastructure.Database;
 using IdiomasAPI.Source.Infrastructure.Service;
 using IdiomasAPI.Source.Infrastructure.Storage;
 
