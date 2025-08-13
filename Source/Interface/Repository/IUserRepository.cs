@@ -4,6 +4,6 @@ namespace IdiomasAPI.Source.Interface.Repository;
 
 public interface IUserRepository
 {
-    Task Insert(User user);
-    Task<User?> GetByEmail(string email);
+    public Task<User> Insert(User user);
+    public Task<User?> GetByEmail(string email);
 }

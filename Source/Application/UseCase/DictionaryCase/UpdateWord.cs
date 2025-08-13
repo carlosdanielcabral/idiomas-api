@@ -13,12 +13,12 @@ public class UpdateWord(IDictionaryRepository dictionaryRepository)
 
     public async Task<Word> Execute(UpdateWordDTO dto, string userId)
     {
-        this.ValidateWord(dto, userId);
+        await this.ValidateWord(dto, userId);
 
         return await this._dictionaryRepository.Update(dto.ToEntity(userId));
     }
     
-    private async void ValidateWord(UpdateWordDTO dto, string userId)
+    private async Task ValidateWord(UpdateWordDTO dto, string userId)
     {
         Word? previousWord = await this._dictionaryRepository.GetById(dto.Id);
 

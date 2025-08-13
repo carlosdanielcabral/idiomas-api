@@ -10,11 +10,13 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
 {
     private readonly ApplicationContext _database = database;
 
-    public async Task Insert(Word word)
+    public async Task<Word> Insert(Word word)
     {
         await this._database.Word.AddAsync(word.ToModel());
 
         await this._database.SaveChangesAsync();
+
+        return word;
     }
 
     public async Task<IEnumerable<Word>> GetAll(string userId)

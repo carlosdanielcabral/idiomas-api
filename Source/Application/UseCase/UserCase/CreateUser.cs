@@ -5,6 +5,7 @@ using IdiomasAPI.Source.Interface.Service;
 using IdiomasAPI.Source.Application.Error;
 using System.Net;
 using IdiomasAPI.Source.Domain.Entity;
+using IdiomasAPI.Source.Application.Mapper;
 
 namespace IdiomasAPI.Source.Application.UseCase.UserCase;
 
@@ -15,22 +16,21 @@ public class CreateUser(IUserRepository userRepository, IHash hash)
 
     public async Task<User> Execute(CreateUserDTO dto)
     {
-        User? previousUser = await this._userRepository.GetByEmail(dto.Email);
+        await this.ValidateUser(dto);
 
-        if (previousUser != null)
+        User user = dto.ToEntity();
+        user.Password = this._hash.Hash(dto.Password);
+
+        return await this._userRepository.Insert(user);
+    }
+
+    private async Task ValidateUser(CreateUserDTO dto)
+    {
+        User? existingUser = await this._userRepository.GetByEmail(dto.Email);
+
+        if (existingUser != null)
         {
             throw new ApiException("E-mail já cadastrado", HttpStatusCode.Conflict);
         }
-
-        User user = new(
-            UUIDGenerator.Generate(),
-            dto.Name,
-            dto.Email,
-            this._hash.Hash(dto.Password)
-        );
-
-        await this._userRepository.Insert(user);
-
-        return user;
     }
 }

@@ -10,11 +10,13 @@ public class UserRepository(ApplicationContext database) : IUserRepository
 {
     private readonly ApplicationContext _database = database;
 
-    public async Task Insert(User user)
+    public async Task<User> Insert(User user)
     {
         this._database.User.Add(user.ToModel());
 
         await this._database.SaveChangesAsync();
+
+        return user;
     }
 
     public async Task<IEnumerable<User>> GetAll()
