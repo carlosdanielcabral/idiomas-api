@@ -28,4 +28,35 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
 
         return models.ToEntities();
     }
+
+    public async Task<Word?> GetById(string id)
+    {
+        Guid wordId = Guid.Parse(id);
+
+        var model = await this._database.Word
+            .Include(w => w.Meanings)
+            .FirstOrDefaultAsync(w => w.Id == wordId);
+
+        return model?.ToEntity();
+    }
+
+    public async Task<Word?> GetByWord(string word, string userId)
+    {
+        Guid userGuid = Guid.Parse(userId);
+
+        var model = await this._database.Word
+            .Include(w => w.Meanings)
+            .FirstOrDefaultAsync(w => w.Word == word && w.UserId == userGuid);
+
+        return model?.ToEntity();
+    }
+
+    public async Task<Word> Update(Word word)
+    {
+        this._database.Word.Update(word.ToModel());
+
+        await this._database.SaveChangesAsync();
+
+        return word;
+    }
 }
