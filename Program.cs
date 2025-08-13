@@ -1,4 +1,5 @@
 using IdiomasAPI.Source.Application;
+using IdiomasAPI.Source.Helper;
 using IdiomasAPI.Source.Infrastructure;
 using IdiomasAPI.Source.Presentation;
 using IdiomasAPI.Source.Presentation.Http;
@@ -7,7 +8,8 @@ using IdiomasAPI.Source.Presentation.Http.Middleware;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services
-    .AddInfrastructure(builder.Configuration)
+    .AddHelpers()
+    .AddInfrastructure(builder.Configuration, builder.Environment)
     .AddApplication()
     .AddPresentation()
     .AddAuthorization();
@@ -19,9 +21,11 @@ app.AddMiddlewares();
 app.UseAuthentication();
 app.UseAuthorization();
 
-var router = app.Services.GetRequiredService<Router>();
-
-router.Register(app);
+using (var scope = app.Services.CreateScope())
+{
+    var router = scope.ServiceProvider.GetRequiredService<Router>();
+    router.Register(app);
+}
 
 var apiUrl = Environment.GetEnvironmentVariable("API_URL");
 

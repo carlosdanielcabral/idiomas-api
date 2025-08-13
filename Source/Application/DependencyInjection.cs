@@ -1,5 +1,6 @@
 using IdiomasAPI.Source.Application.UseCase.AuthCase;
 using IdiomasAPI.Source.Application.UseCase.DictionaryCase;
+using IdiomasAPI.Source.Application.UseCase.File;
 using IdiomasAPI.Source.Application.UseCase.UserCase;
 
 namespace IdiomasAPI.Source.Application;
@@ -14,6 +15,9 @@ public static class DependencyInjection
         services.AddScoped<ListWords>();
         services.AddScoped<UpdateWord>();
         services.AddScoped<DeleteWord>();
+        services.AddScoped<RequestFileUpload>();
+        services.AddScoped<ConfirmFileUpload>();
+        services.AddScoped<FailFileUpload>();
 
         return services;
     }

@@ -8,7 +8,7 @@ public class UserModel
 {
     [Key]
     [Column("id")]
-    [DatabaseGenerated(DatabaseGeneratedOption.None)] 
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public required Guid Id { get; set; }
 
     [Required]
@@ -26,4 +26,5 @@ public class UserModel
     public required string Password { get; set; }
 
     public ICollection<WordModel> Dictionary { get; set; } = [];
+    public ICollection<FileModel> Files { get; set; } = [];
 }

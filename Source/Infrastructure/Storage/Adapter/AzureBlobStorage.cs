@@ -5,10 +5,11 @@ using IdiomasAPI.Source.Interface.Storage;
 
 namespace IdiomasAPI.Source.Infrastructure.Storage.Adapter;
 
-public class AzureBlobStorage(BlobServiceClient client, IConfiguration configuration) : IFileStorage
+public class AzureBlobStorage(BlobServiceClient client, IConfiguration configuration, IWebHostEnvironment environment) : IFileStorageAdapter
 {
     private readonly BlobServiceClient _client = client;
     private readonly IConfiguration _configuration = configuration;
+    private readonly IWebHostEnvironment _environment = environment;
 
     public async Task<string> GenerateUrlToUpload(string filename)
     {
@@ -16,12 +17,7 @@ public class AzureBlobStorage(BlobServiceClient client, IConfiguration configura
 
         sasBuilder.SetPermissions(BlobSasPermissions.Create | BlobSasPermissions.Write);
 
-        BlobSasQueryParameters blobSasQueryParameters = sasBuilder.ToSasQueryParameters(
-            await this.GetDelegationKey(),
-            this._client.AccountName
-        );
-
-        return this.GetBlobContainerUriBuilder(filename, blobSasQueryParameters).Uri.ToString();
+        return await this.GetBlobContainerUri(filename, sasBuilder);
     }
 
     private async Task<Azure.Response<UserDelegationKey>> GetDelegationKey()
@@ -49,11 +45,28 @@ public class AzureBlobStorage(BlobServiceClient client, IConfiguration configura
         return this._client.GetBlobContainerClient(this.GetContainerName());
     }
 
-    private UriBuilder GetBlobContainerUriBuilder(string filename, BlobSasQueryParameters blobSasQueryParameters)
+    private async Task<string> GetBlobContainerUri(string filename, BlobSasBuilder sasBuilder)
     {
         BlobClient blobClient = this.GetBlobContainerClient().GetBlobClient(filename);
 
-        return new UriBuilder(blobClient.Uri) { Query = blobSasQueryParameters.ToString() };
+        if (this._environment.IsDevelopment())
+        {
+            return blobClient.GenerateSasUri(sasBuilder).ToString();
+        }
+
+        UserDelegationKey userDelegationKey = await this._client.GetUserDelegationKeyAsync(
+            startsOn: DateTimeOffset.UtcNow,
+            expiresOn: DateTimeOffset.UtcNow.AddMinutes(5)
+        );
+
+        BlobSasQueryParameters sasQueryParameters = sasBuilder.ToSasQueryParameters(userDelegationKey, _client.AccountName);
+
+        var uriBuilder = new UriBuilder(blobClient.Uri)
+        {
+            Query = sasQueryParameters.ToString()
+        };
+
+        return uriBuilder.ToString();
     }
     
     private string GetContainerName()
