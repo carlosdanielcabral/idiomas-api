@@ -11,7 +11,7 @@ services:
       - 5076:5076
 
   database:
-    build: ./database
+    build: ./Source/Infrastructure/Database/Docker
     container_name: idiomas-database
     environment:
       ACCEPT_EULA: ${ACCEPT_EULA}
