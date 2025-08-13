@@ -20,7 +20,7 @@ services:
     ports:
       - "1433:1433"
     volumes:
-      - database:/var/opt/mssql
+      - mssql_data:/var/opt/mssql
     healthcheck:
       test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${MSSQL_SA_PASSWORD}", "-Q", "SELECT 1"]
       interval: 15s
@@ -41,4 +41,4 @@ services:
       - .env
     
 volumes:
-  database:
+  mssql_data:
