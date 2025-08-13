@@ -20,4 +20,13 @@ public class DictionaryController(CreateWord createWordUseCase) : IDictionaryCon
 
         return TypedResults.Created($"/dictionary/word/{word.Id}", word.ToResponseDTO());
     }
+
+    public async Task<IResult> ListWords(ClaimsPrincipal user, ListWords listWordsUseCase)
+    {
+        string userIdString = user.GetUserId().ToString();
+
+        IEnumerable<Word> words = await listWordsUseCase.Execute(userIdString);
+
+        return TypedResults.Ok(words.ToResponseDTO());
+    }
 }

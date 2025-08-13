@@ -4,5 +4,6 @@ namespace IdiomasAPI.Source.Interface.Repository;
 
 public interface IDictionaryRepository
 {
-    Task Insert(Word user);
+    public Task Insert(Word user);
+    public Task<IEnumerable<Word>> GetAll(string userId);
 }

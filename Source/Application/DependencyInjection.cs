@@ -11,6 +11,7 @@ public static class DependencyInjection
         services.AddScoped<CreateUser>();
         services.AddScoped<MailPasswordLogin>();
         services.AddScoped<CreateWord>();
+        services.AddScoped<ListWords>();
 
         return services;
     }

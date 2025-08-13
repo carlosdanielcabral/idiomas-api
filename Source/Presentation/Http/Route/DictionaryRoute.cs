@@ -13,5 +13,6 @@ public class DictionaryRoute(IDictionaryController controller) : IRoute
         var dictionary = app.MapGroup("/dictionary").RequireAuthorization();
 
         dictionary.MapPost("/word", _controller.SaveWord);
+        dictionary.MapGet("/word", _controller.ListWords);
     }
 }

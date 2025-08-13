@@ -9,4 +9,9 @@ public static class WordMappingExtension
     {
         return new WordResponseDTO() { Id = model.Id.ToString(), Word = model.Name, Ipa = model.Ipa, Meanings = [.. model.Meanings.Select(m => m.ToResponseDTO())] };
     }
+
+    public static IEnumerable<WordResponseDTO> ToResponseDTO(this IEnumerable<Word> models)
+    {
+        return models.Select(model => model.ToResponseDTO());
+    }
 }
