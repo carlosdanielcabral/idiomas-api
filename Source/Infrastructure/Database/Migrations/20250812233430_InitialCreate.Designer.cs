@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IdiomasAPI.Source.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250812202905_RenameTableUser")]
-    partial class RenameTableUser
+    [Migration("20250812233430_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,12 +27,9 @@ namespace IdiomasAPI.Source.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("IdiomasAPI.Source.Infrastructure.Database.Model.MeaningModel", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Example")
                         .HasMaxLength(512)
@@ -45,8 +42,8 @@ namespace IdiomasAPI.Source.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(512)")
                         .HasColumnName("meaning");
 
-                    b.Property<int>("WordId")
-                        .HasColumnType("int")
+                    b.Property<Guid>("WordId")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("word_id");
 
                     b.HasKey("Id");
@@ -59,7 +56,6 @@ namespace IdiomasAPI.Source.Infrastructure.Database.Migrations
             modelBuilder.Entity("IdiomasAPI.Source.Infrastructure.Database.Model.UserModel", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
@@ -87,12 +83,9 @@ namespace IdiomasAPI.Source.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("IdiomasAPI.Source.Infrastructure.Database.Model.WordModel", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")

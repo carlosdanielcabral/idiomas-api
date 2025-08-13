@@ -2,10 +2,11 @@ using IdiomasAPI.Source.Presentation.Http.Route;
 
 namespace IdiomasAPI.Source.Presentation.Http;
 
-public class Router(UserRoute userRoute, AuthRoute authRoute)
+public class Router(UserRoute userRoute, AuthRoute authRoute, DictionaryRoute dictionaryRoute)
 {
     private readonly UserRoute _userRoute = userRoute;
     private readonly AuthRoute _authRoute = authRoute;
+    private readonly DictionaryRoute _dictionaryRoute = dictionaryRoute;
 
     public void Register(WebApplication app)
     {
@@ -13,5 +14,6 @@ public class Router(UserRoute userRoute, AuthRoute authRoute)
 
         this._userRoute.Register(app);
         this._authRoute.Register(app);
+        this._dictionaryRoute.Register(app);
     }
 }

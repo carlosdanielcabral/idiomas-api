@@ -6,6 +6,7 @@ public static class DependencyInjection
     {
         services.AddScoped<UserRoute>();
         services.AddScoped<AuthRoute>();
+        services.AddScoped<DictionaryRoute>();
 
         return services;
     }

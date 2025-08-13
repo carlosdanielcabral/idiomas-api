@@ -9,6 +9,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IUserController, UserController>();
         services.AddScoped<IAuthController, AuthController>();
+        services.AddScoped<IDictionaryController, DictionaryController>();
         services.ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;

@@ -15,11 +15,11 @@ public class JWT(IConfiguration configuration) : IToken
     {
         JwtSecurityTokenHandler tokenHandler = new();
         
-        byte[] key = Encoding.ASCII.GetBytes(this._configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is not configured."));
+        byte[] key = Encoding.UTF8.GetBytes(this._configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is not configured."));
 
         Claim[] claims = {
             new(JwtRegisteredClaimNames.Sub, user.Id),
-            new(JwtRegisteredClaimNames.Sub, user.Name),
+            new(JwtRegisteredClaimNames.Name, user.Name),
             new(JwtRegisteredClaimNames.Email, user.Email),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };

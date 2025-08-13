@@ -1,0 +1,17 @@
+namespace IdiomasAPI.Source.Presentation.DTO.Dictionary;
+
+public record MeaningResponseDTO
+{
+    public required string Id { get; init; }
+    public required string Meaning { get; init; }
+    public required string? Example { get; init; }
+}
+
+public record WordResponseDTO
+{
+    public required string Id { get; init; }
+    public required string Word { get; init; }
+    public required string Ipa { get; init; }
+
+    public required IList<MeaningResponseDTO> Meanings { get; init; }
+}

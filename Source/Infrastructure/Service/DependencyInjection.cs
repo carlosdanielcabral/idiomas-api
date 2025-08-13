@@ -42,7 +42,7 @@ public static class DependencyInjection
 
                 ValidateLifetime = true,
 
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.FromSeconds(30) 
             };
         });
 

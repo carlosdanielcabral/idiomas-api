@@ -6,34 +6,30 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IdiomasAPI.Source.Infrastructure.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class AddDictionaryEntities : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_user",
-                table: "user");
-
-            migrationBuilder.DropIndex(
-                name: "IX_user_email",
-                table: "user");
-
-            migrationBuilder.RenameTable(
+            migrationBuilder.CreateTable(
                 name: "user",
-                newName: "User");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_User",
-                table: "User",
-                column: "id");
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_user", x => x.id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "word",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     word = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     ipa = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -44,9 +40,9 @@ namespace IdiomasAPI.Source.Infrastructure.Database.Migrations
                 {
                     table.PrimaryKey("PK_word", x => x.id);
                     table.ForeignKey(
-                        name: "FK_word_User_user_id",
+                        name: "FK_word_user_user_id",
                         column: x => x.user_id,
-                        principalTable: "User",
+                        principalTable: "user",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -55,11 +51,10 @@ namespace IdiomasAPI.Source.Infrastructure.Database.Migrations
                 name: "meaning",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     meaning = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
                     example = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
-                    word_id = table.Column<int>(type: "int", nullable: false)
+                    word_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -92,24 +87,8 @@ namespace IdiomasAPI.Source.Infrastructure.Database.Migrations
             migrationBuilder.DropTable(
                 name: "word");
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_User",
-                table: "User");
-
-            migrationBuilder.RenameTable(
-                name: "User",
-                newName: "user");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_user",
-                table: "user",
-                column: "id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_user_email",
-                table: "user",
-                column: "email",
-                unique: true);
+            migrationBuilder.DropTable(
+                name: "user");
         }
     }
 }
