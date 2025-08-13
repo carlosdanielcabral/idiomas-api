@@ -3,6 +3,7 @@ using IdiomasAPI.Source.Application.DTO.Dictionary;
 using IdiomasAPI.Source.Application.UseCase.DictionaryCase;
 using IdiomasAPI.Source.Domain.Entity;
 using IdiomasAPI.Source.Interface.Controller;
+using IdiomasAPI.Source.Presentation.DTO.Dictionary;
 using IdiomasAPI.Source.Presentation.Extensions;
 using IdiomasAPI.Source.Presentation.Mapper;
 
@@ -18,7 +19,9 @@ public class DictionaryController(CreateWord createWordUseCase) : IDictionaryCon
 
         Word word = await this._createWordUseCase.Execute(dto, userIdString);
 
-        return TypedResults.Created($"/dictionary/word/{word.Id}", word.ToResponseDTO());
+        CreateWordResponseDTO response = new(){ Word = word.ToResponseDTO() };
+
+        return TypedResults.Created($"/dictionary/word/{word.Id}", response);
     }
 
     public async Task<IResult> ListWords(ClaimsPrincipal user, ListWords listWordsUseCase)
@@ -27,6 +30,8 @@ public class DictionaryController(CreateWord createWordUseCase) : IDictionaryCon
 
         IEnumerable<Word> words = await listWordsUseCase.Execute(userIdString);
 
-        return TypedResults.Ok(words.ToResponseDTO());
+        ListWordsResponseDTO response = new() { Words = words.ToResponseDTO() };
+
+        return TypedResults.Ok(response);
     }
 }

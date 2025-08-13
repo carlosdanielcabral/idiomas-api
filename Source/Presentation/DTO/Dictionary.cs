@@ -15,3 +15,13 @@ public record WordResponseDTO
 
     public required IList<MeaningResponseDTO> Meanings { get; init; }
 }
+
+public record CreateWordResponseDTO
+{
+    public required WordResponseDTO Word { get; init; }
+}
+
+public record ListWordsResponseDTO
+{
+    public required IEnumerable<WordResponseDTO> Words { get; init; }
+}

@@ -6,3 +6,8 @@ public record UserResponseDTO
     public required string Name { get; init; }
     public required string Email { get; init; }
 }
+
+public record CreateUserResponseDTO
+{
+    public required UserResponseDTO User { get; init; }
+}
