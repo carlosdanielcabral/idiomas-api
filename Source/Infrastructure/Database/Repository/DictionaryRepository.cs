@@ -13,7 +13,6 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
     public async Task<Word> Insert(Word word)
     {
         await this._database.Word.AddAsync(word.ToModel());
-
         await this._database.SaveChangesAsync();
 
         return word;
@@ -53,12 +52,32 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
         return model?.ToEntity();
     }
 
-    public async Task<Word> Update(Word word)
+    public async Task<Word> Update(Word updatedWord)
     {
-        this._database.Word.Update(word.ToModel());
+        Guid wordId = Guid.Parse(updatedWord.Id);
+
+        var outdatedWord = await this._database.Word
+            .Include(w => w.Meanings)
+            .FirstOrDefaultAsync(w => w.Id == wordId);
+
+        if (outdatedWord is null)
+        {
+            throw new KeyNotFoundException($"Word with ID {wordId} not found.");
+        }
+
+        outdatedWord.Word = updatedWord.Name;
+        outdatedWord.Ipa = updatedWord.Ipa;
+        outdatedWord.UpdatedAt = DateTime.UtcNow;
+
+        outdatedWord.Meanings.Clear();
+        
+        foreach (var newMeaning in updatedWord.Meanings)
+        {
+            outdatedWord.Meanings.Add(newMeaning.ToModel());
+        }
 
         await this._database.SaveChangesAsync();
 
-        return word;
+        return outdatedWord.ToEntity();
     }
 }

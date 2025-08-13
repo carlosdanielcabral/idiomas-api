@@ -25,3 +25,7 @@ public record ListWordsResponseDTO
 {
     public required IEnumerable<WordResponseDTO> Words { get; init; }
 }
+public record UpdateWordResponseDTO
+{
+    public required WordResponseDTO Word { get; init; }
+}

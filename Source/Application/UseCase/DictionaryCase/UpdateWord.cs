@@ -11,20 +11,25 @@ public class UpdateWord(IDictionaryRepository dictionaryRepository)
 {
     private IDictionaryRepository _dictionaryRepository = dictionaryRepository;
 
-    public async Task<Word> Execute(UpdateWordDTO dto, string userId)
+    public async Task<Word> Execute(string id, UpdateWordDTO dto, string userId)
     {
-        await this.ValidateWord(dto, userId);
+        await this.ValidateWord(id, dto, userId);
 
-        return await this._dictionaryRepository.Update(dto.ToEntity(userId));
+        return await this._dictionaryRepository.Update(dto.ToEntity(id, userId));
     }
     
-    private async Task ValidateWord(UpdateWordDTO dto, string userId)
+    private async Task ValidateWord(string id, UpdateWordDTO dto, string userId)
     {
-        Word? previousWord = await this._dictionaryRepository.GetById(dto.Id);
+        Word? previousWord = await this._dictionaryRepository.GetById(id);
 
         if (previousWord is null)
         {
             throw new ApiException("Palavra não encontrada", HttpStatusCode.NotFound);
+        }
+
+        if (previousWord.UserId != userId)
+        {
+            throw new ApiException("Você não tem permissão para atualizar esta palavra", HttpStatusCode.Forbidden);
         }
 
         bool isWordChanged = dto.Word != previousWord.Name;

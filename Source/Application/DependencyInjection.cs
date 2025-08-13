@@ -12,6 +12,7 @@ public static class DependencyInjection
         services.AddScoped<MailPasswordLogin>();
         services.AddScoped<CreateWord>();
         services.AddScoped<ListWords>();
+        services.AddScoped<UpdateWord>();
 
         return services;
     }

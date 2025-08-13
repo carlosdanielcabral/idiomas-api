@@ -15,8 +15,13 @@ public class DictionaryRoute(IDictionaryController controller) : IRoute
 
         dictionary.MapPost("/word", _controller.SaveWord)
             .Produces<CreateWordResponseDTO>(StatusCodes.Status201Created);
-    
+
         dictionary.MapGet("/word", _controller.ListWords)
             .Produces<ListWordsResponseDTO>(StatusCodes.Status200OK);
+
+        dictionary.MapPut("/word/{id}", _controller.UpdateWord)
+            .Produces<UpdateWordResponseDTO>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status409Conflict);
     }
 }

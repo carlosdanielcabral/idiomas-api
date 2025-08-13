@@ -6,9 +6,9 @@ namespace IdiomasAPI.Source.Application.Mapper;
 
 public static class WordMappingExtension
 {
-    public static Word ToEntity(this UpdateWordDTO dto, string userId)
+    public static Word ToEntity(this UpdateWordDTO dto, string id, string userId)
     {
-        return new Word(dto.Id.ToString(), dto.Word, dto.Ipa, userId, dto.Meanings.ToEntities());
+        return new Word(id, dto.Word, dto.Ipa, userId, dto.Meanings.ToEntities());
     }
 
     public static Word ToEntity(this CreateWordDTO dto, string userId)

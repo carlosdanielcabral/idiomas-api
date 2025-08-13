@@ -9,9 +9,10 @@ using IdiomasAPI.Source.Presentation.Mapper;
 
 namespace IdiomasAPI.Source.Presentation.Http.Controller;
 
-public class DictionaryController(CreateWord createWordUseCase) : IDictionaryController
+public class DictionaryController(CreateWord createWordUseCase, UpdateWord updateWordUseCase) : IDictionaryController
 {
     private readonly CreateWord _createWordUseCase = createWordUseCase;
+    private readonly UpdateWord _updateWordUseCase = updateWordUseCase;
 
     public async Task<IResult> SaveWord(CreateWordDTO dto, ClaimsPrincipal user)
     {
@@ -19,7 +20,7 @@ public class DictionaryController(CreateWord createWordUseCase) : IDictionaryCon
 
         Word word = await this._createWordUseCase.Execute(dto, userIdString);
 
-        CreateWordResponseDTO response = new(){ Word = word.ToResponseDTO() };
+        CreateWordResponseDTO response = new() { Word = word.ToResponseDTO() };
 
         return TypedResults.Created($"/dictionary/word/{word.Id}", response);
     }
@@ -31,6 +32,17 @@ public class DictionaryController(CreateWord createWordUseCase) : IDictionaryCon
         IEnumerable<Word> words = await listWordsUseCase.Execute(userIdString);
 
         ListWordsResponseDTO response = new() { Words = words.ToResponseDTO() };
+
+        return TypedResults.Ok(response);
+    }
+    
+    public async Task<IResult> UpdateWord(string id, UpdateWordDTO dto, ClaimsPrincipal user)
+    {
+        string userIdString = user.GetUserId().ToString();
+        
+        Word updatedWord = await this._updateWordUseCase.Execute(id, dto, userIdString);
+
+        UpdateWordResponseDTO response = new() { Word = updatedWord.ToResponseDTO() };
 
         return TypedResults.Ok(response);
     }
