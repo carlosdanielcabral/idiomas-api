@@ -1,5 +1,6 @@
 using IdiomasAPI.Source.Infrastructure.Database.Repository;
 using IdiomasAPI.Source.Infrastructure.Service;
+using IdiomasAPI.Source.Infrastructure.Storage;
 
 namespace IdiomasAPI.Source.Infrastructure;
 
@@ -9,6 +10,7 @@ public static class DependencyInjection
     {
         services.AddDatabase(configuration);
         services.AddServices(configuration);
+        services.AddStorage();
 
         return services;
     }
