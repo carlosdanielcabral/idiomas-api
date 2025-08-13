@@ -40,8 +40,11 @@ public static class DependencyInjection
 
     public static WebApplication AddAPIDocumentation(this WebApplication app)
     {
-        app.UseSwagger();
-        app.UseSwaggerUI();
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
 
         return app;
     }
