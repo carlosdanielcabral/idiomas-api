@@ -14,8 +14,8 @@ builder.Services
 
 WebApplication app = builder.Build();
 
-// app.AddAPIDocumentation();
-// app.UseMiddleware<ApiExceptionMiddleware>();
+app.AddAPIDocumentation();
+app.UseMiddleware<ApiExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
