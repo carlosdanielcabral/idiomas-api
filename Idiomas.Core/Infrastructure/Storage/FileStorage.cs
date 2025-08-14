@@ -1,6 +1,6 @@
-using Idiomas.Source.Interface.Storage;
+using Idiomas.Core.Interface.Storage;
 
-namespace Idiomas.Source.Infrastructure.Storage;
+namespace Idiomas.Core.Infrastructure.Storage;
 
 public class FileStorage(IFileStorageAdapter adapter) : IFileStorage
 {

@@ -1,7 +1,7 @@
-using Idiomas.Source.Domain.Entity;
-using Idiomas.Source.Infrastructure.Database.Model;
+using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Infrastructure.Database.Model;
 
-namespace Idiomas.Source.Infrastructure.Database.Mapper;
+namespace Idiomas.Core.Infrastructure.Database.Mapper;
 
 public static class CFileMappingExtension
 {

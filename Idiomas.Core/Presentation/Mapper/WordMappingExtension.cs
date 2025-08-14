@@ -1,7 +1,7 @@
-using Idiomas.Source.Domain.Entity;
-using Idiomas.Source.Presentation.DTO.Dictionary;
+using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Presentation.DTO.Dictionary;
 
-namespace Idiomas.Source.Presentation.Mapper;
+namespace Idiomas.Core.Presentation.Mapper;
 
 public static class WordMappingExtension
 {

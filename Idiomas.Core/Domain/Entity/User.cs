@@ -1,4 +1,4 @@
-namespace Idiomas.Source.Domain.Entity;
+namespace Idiomas.Core.Domain.Entity;
 
 public class User(string id, string name, string email, string password)
 {

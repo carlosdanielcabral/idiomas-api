@@ -1,8 +1,8 @@
-using Idiomas.Source.Infrastructure.Database;
-using Idiomas.Source.Infrastructure.Service;
-using Idiomas.Source.Infrastructure.Storage;
+using Idiomas.Core.Infrastructure.Database;
+using Idiomas.Core.Infrastructure.Service;
+using Idiomas.Core.Infrastructure.Storage;
 
-namespace Idiomas.Source.Infrastructure;
+namespace Idiomas.Core.Infrastructure;
 
 public static class DependencyInjection
 {

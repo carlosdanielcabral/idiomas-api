@@ -1,4 +1,4 @@
-namespace Idiomas.Source.Infrastructure.Helper;
+namespace Idiomas.Core.Infrastructure.Helper;
 
 public static class UUIDGenerator
 {

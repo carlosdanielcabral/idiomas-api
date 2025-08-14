@@ -1,4 +1,4 @@
-namespace Idiomas.Source.Interface.Service;
+namespace Idiomas.Core.Interface.Service;
 
 public interface IHash
 {

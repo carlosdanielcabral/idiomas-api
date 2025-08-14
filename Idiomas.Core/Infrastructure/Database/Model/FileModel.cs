@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Idiomas.Source.Domain.Entity;
-using Idiomas.Source.Domain.Enum;
+using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Domain.Enum;
 
-namespace Idiomas.Source.Infrastructure.Database.Model;
+namespace Idiomas.Core.Infrastructure.Database.Model;
 
 [Table("file")]
 public class FileModel

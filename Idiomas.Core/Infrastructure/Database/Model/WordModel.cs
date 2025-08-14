@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Idiomas.Source.Infrastructure.Database.Model;
+namespace Idiomas.Core.Infrastructure.Database.Model;
 
 [Table("word")]
 public class WordModel

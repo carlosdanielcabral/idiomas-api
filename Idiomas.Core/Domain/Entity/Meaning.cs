@@ -1,4 +1,4 @@
-namespace Idiomas.Source.Domain.Entity;
+namespace Idiomas.Core.Domain.Entity;
 
 public class Meaning(string id, string definition, string? example)
 {

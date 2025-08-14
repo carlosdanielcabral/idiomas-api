@@ -1,9 +1,9 @@
 using Idiomas.Application.DTO.File;
-using Idiomas.Source.Application.DTO.Dictionary;
-using Idiomas.Source.Domain.Entity;
-using Idiomas.Source.Infrastructure.Helper;
+using Idiomas.Core.Application.DTO.Dictionary;
+using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Infrastructure.Helper;
 
-namespace Idiomas.Source.Application.Mapper;
+namespace Idiomas.Core.Application.Mapper;
 
 public static class FileMappingExtension
 {

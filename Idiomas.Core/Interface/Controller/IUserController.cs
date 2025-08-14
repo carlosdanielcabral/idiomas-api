@@ -1,7 +1,7 @@
-using Idiomas.Source.Application.DTO.User;
-using Idiomas.Source.Application.UseCase.UserCase;
+using Idiomas.Core.Application.DTO.User;
+using Idiomas.Core.Application.UseCase.UserCase;
 
-namespace Idiomas.Source.Interface.Controller;
+namespace Idiomas.Core.Interface.Controller;
 
 public interface IUserController
 {

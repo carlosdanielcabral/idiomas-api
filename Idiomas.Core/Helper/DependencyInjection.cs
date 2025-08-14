@@ -1,4 +1,4 @@
-namespace Idiomas.Source.Helper;
+namespace Idiomas.Core.Helper;
 
 public static class DependencyInjection
 {

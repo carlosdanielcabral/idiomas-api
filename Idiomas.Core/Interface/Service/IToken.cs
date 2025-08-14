@@ -1,6 +1,6 @@
-using Idiomas.Source.Domain.Entity;
+using Idiomas.Core.Domain.Entity;
 
-namespace Idiomas.Source.Interface.Service;
+namespace Idiomas.Core.Interface.Service;
 
 public interface IToken
 {

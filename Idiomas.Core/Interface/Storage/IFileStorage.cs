@@ -1,4 +1,4 @@
-namespace Idiomas.Source.Interface.Storage;
+namespace Idiomas.Core.Interface.Storage;
 
 public interface IFileStorage
 {

@@ -1,10 +1,10 @@
 using System.Net;
-using Idiomas.Source.Application.Error;
-using Idiomas.Source.Domain.Entity;
-using Idiomas.Source.Domain.Enum;
-using Idiomas.Source.Interface.Repository;
+using Idiomas.Core.Application.Error;
+using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Domain.Enum;
+using Idiomas.Core.Interface.Repository;
 
-namespace Idiomas.Source.Application.UseCase.File;
+namespace Idiomas.Core.Application.UseCase.File;
 
 public class ConfirmFileUpload(IFileRepository fileRepository)
 {

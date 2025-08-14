@@ -1,9 +1,9 @@
-using Idiomas.Source.Application;
-using Idiomas.Source.Helper;
-using Idiomas.Source.Infrastructure;
-using Idiomas.Source.Presentation;
-using Idiomas.Source.Presentation.Http;
-using Idiomas.Source.Presentation.Http.Middleware;
+using Idiomas.Core.Application;
+using Idiomas.Core.Helper;
+using Idiomas.Core.Infrastructure;
+using Idiomas.Core.Presentation;
+using Idiomas.Core.Presentation.Http;
+using Idiomas.Core.Presentation.Http.Middleware;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

@@ -1,11 +1,11 @@
-using Idiomas.Source.Interface.Repository;
-using Idiomas.Source.Domain.Entity;
-using Idiomas.Source.Application.DTO.Dictionary;
-using Idiomas.Source.Application.Error;
+using Idiomas.Core.Interface.Repository;
+using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Application.DTO.Dictionary;
+using Idiomas.Core.Application.Error;
 using System.Net;
-using Idiomas.Source.Application.Mapper;
+using Idiomas.Core.Application.Mapper;
 
-namespace Idiomas.Source.Application.UseCase.DictionaryCase;
+namespace Idiomas.Core.Application.UseCase.DictionaryCase;
 
 public class UpdateWord(IDictionaryRepository dictionaryRepository)
 {

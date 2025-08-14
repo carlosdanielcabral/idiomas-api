@@ -1,9 +1,9 @@
 using Azure.Identity;
 using Azure.Storage.Blobs;
-using Idiomas.Source.Infrastructure.Storage.Adapter;
-using Idiomas.Source.Interface.Storage;
+using Idiomas.Core.Infrastructure.Storage.Adapter;
+using Idiomas.Core.Interface.Storage;
 
-namespace Idiomas.Source.Infrastructure.Storage;
+namespace Idiomas.Core.Infrastructure.Storage;
 
 public static class DependencyInjection
 {

@@ -1,4 +1,4 @@
-namespace Idiomas.Source.Interface.Route;
+namespace Idiomas.Core.Interface.Route;
 
 public interface IRoute
 {

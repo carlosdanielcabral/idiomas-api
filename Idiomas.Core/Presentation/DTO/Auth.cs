@@ -1,6 +1,6 @@
-using Idiomas.Source.Presentation.DTO.User;
+using Idiomas.Core.Presentation.DTO.User;
 
-namespace Idiomas.Source.Presentation.DTO.Auth;
+namespace Idiomas.Core.Presentation.DTO.Auth;
 
 public record MailPasswordLoginResponseDTO
 {

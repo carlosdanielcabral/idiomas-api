@@ -1,6 +1,6 @@
-using Idiomas.Source.Domain.Entity;
+using Idiomas.Core.Domain.Entity;
 
-namespace Idiomas.Source.Interface.Repository;
+namespace Idiomas.Core.Interface.Repository;
 
 public interface IFileRepository
 {

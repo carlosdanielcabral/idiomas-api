@@ -1,4 +1,4 @@
-using Idiomas.Source.Domain.Enum;
+using Idiomas.Core.Domain.Enum;
 
 namespace Idiomas.Application.DTO.File;
 

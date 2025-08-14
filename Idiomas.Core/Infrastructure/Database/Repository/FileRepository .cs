@@ -1,12 +1,12 @@
-using Idiomas.Source.Domain.Entity;
-using Idiomas.Source.Domain.Enum;
-using Idiomas.Source.Infrastructure.Database.Context;
-using Idiomas.Source.Infrastructure.Database.Mapper;
-using Idiomas.Source.Infrastructure.Database.Model;
-using Idiomas.Source.Interface.Repository;
+using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Domain.Enum;
+using Idiomas.Core.Infrastructure.Database.Context;
+using Idiomas.Core.Infrastructure.Database.Mapper;
+using Idiomas.Core.Infrastructure.Database.Model;
+using Idiomas.Core.Interface.Repository;
 using Microsoft.EntityFrameworkCore;
 
-namespace Idiomas.Source.Infrastructure.Database.Repository;
+namespace Idiomas.Core.Infrastructure.Database.Repository;
 
 public class FileRepository(ApplicationContext database) : IFileRepository
 {

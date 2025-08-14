@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text.Json;
-using Idiomas.Source.Application.Error;
+using Idiomas.Core.Application.Error;
 
-namespace Idiomas.Source.Presentation.Http.Middleware;
+namespace Idiomas.Core.Presentation.Http.Middleware;
 
 public class ApiExceptionMiddleware(RequestDelegate next, ILogger<ApiExceptionMiddleware> logger)
 {

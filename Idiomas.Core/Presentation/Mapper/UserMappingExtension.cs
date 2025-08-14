@@ -1,7 +1,7 @@
-using Idiomas.Source.Domain.Entity;
-using Idiomas.Source.Presentation.DTO.User;
+using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Presentation.DTO.User;
 
-namespace Idiomas.Source.Presentation.Mapper;
+namespace Idiomas.Core.Presentation.Mapper;
 
 public static class UserMappingExtension
 {

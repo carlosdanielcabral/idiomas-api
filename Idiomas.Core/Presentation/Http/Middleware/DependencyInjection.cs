@@ -1,4 +1,4 @@
-namespace Idiomas.Source.Presentation.Http.Middleware;
+namespace Idiomas.Core.Presentation.Http.Middleware;
 
 public static class DependencyInjection
 {

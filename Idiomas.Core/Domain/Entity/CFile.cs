@@ -1,6 +1,6 @@
-using Idiomas.Source.Domain.Enum;
+using Idiomas.Core.Domain.Enum;
 
-namespace Idiomas.Source.Domain.Entity;
+namespace Idiomas.Core.Domain.Entity;
 
 public class CFile(string id, string originalName, string key, string mimeType, long size, string userId, FileStatus status = FileStatus.Pending)
 {
