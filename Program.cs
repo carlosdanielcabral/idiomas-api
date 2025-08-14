@@ -16,10 +16,10 @@ builder.Services
 
 WebApplication app = builder.Build();
 
-app.AddAPIDocumentation();
-app.AddMiddlewares();
-app.UseAuthentication();
-app.UseAuthorization();
+app.AddAPIDocumentation()
+    .AddMiddlewares()
+    .UseAuthentication()
+    .UseAuthorization();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -27,14 +27,8 @@ using (var scope = app.Services.CreateScope())
     router.Register(app);
 }
 
-string? apiUrl = Environment.GetEnvironmentVariable("API_URL");
+string apiUrl = Environment.GetEnvironmentVariable("API_URL")
+    ?? throw new InvalidOperationException("API url is not configured");
 
-if (!string.IsNullOrEmpty(apiUrl))
-{
-    app.Run(apiUrl);
-}
-else
-{
-    app.Run();
-}
 
+app.Run(apiUrl);
