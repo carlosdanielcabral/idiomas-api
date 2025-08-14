@@ -1,10 +1,3 @@
-using Idiomas.Core.Application;
-using Idiomas.Core.Helper;
-using Idiomas.Core.Infrastructure;
-using Idiomas.Core.Presentation;
-using Idiomas.Core.Presentation.Http;
-using Idiomas.Core.Presentation.Http.Middleware;
-
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services
