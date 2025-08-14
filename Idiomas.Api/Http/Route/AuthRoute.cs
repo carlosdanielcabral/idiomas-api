@@ -1,9 +1,9 @@
 
-using Idiomas.Core.Interface.Controller;
-using Idiomas.Core.Interface.Route;
-using Idiomas.Core.Presentation.DTO.Auth;
+using Idiomas.Api.Interface.Controller;
+using Idiomas.Api.Interface.Route;
+using Idiomas.Api.DTO.Auth;
 
-namespace Idiomas.Core.Presentation.Http.Route;
+namespace Idiomas.Api.Http.Route;
 
 public class AuthRoute(IAuthController controller) : IRoute
 {

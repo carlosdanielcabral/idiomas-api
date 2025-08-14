@@ -1,8 +1,8 @@
 using System.Security.Claims;
-using Idiomas.Application.DTO.File;
+using Idiomas.Core.Application.DTO.File;
 using Idiomas.Core.Application.UseCase.File;
 
-namespace Idiomas.Core.Interface.Controller;
+namespace Idiomas.Api.Interface.Controller;
 
 public interface IFileController
 {

@@ -1,11 +1,11 @@
 using System.Security.Claims;
-using Idiomas.Application.DTO.File;
+using Idiomas.Core.Application.DTO.File;
 using Idiomas.Core.Application.DTO.File;
 using Idiomas.Core.Application.UseCase.File;
-using Idiomas.Core.Interface.Controller;
-using Idiomas.Core.Presentation.Extensions;
+using Idiomas.Api.Interface.Controller;
+using Idiomas.Api.Extensions;
 
-namespace Idiomas.Core.Application.Http.Controller;
+namespace Idiomas.Api.Http.Controller;
 
 public class FileController : IFileController
 {

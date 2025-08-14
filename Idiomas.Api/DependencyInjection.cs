@@ -1,5 +1,5 @@
-using Idiomas.Core.Presentation.Http;
-namespace Idiomas.Core.Presentation;
+using Idiomas.Api.Http;
+namespace Idiomas.Api.Presentation;
 
 public static class DependencyInjection
 {

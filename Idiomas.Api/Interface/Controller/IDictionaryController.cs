@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Idiomas.Core.Application.DTO.Dictionary;
 using Idiomas.Core.Application.UseCase.DictionaryCase;
 
-namespace Idiomas.Core.Interface.Controller;
+namespace Idiomas.Api.Interface.Controller;
 
 public interface IDictionaryController
 {

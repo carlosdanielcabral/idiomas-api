@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Idiomas.Core.Application.Http.Controller;
-using Idiomas.Core.Interface.Controller;
+using Idiomas.Api.Http.Controller;
+using Idiomas.Api.Interface.Controller;
 
-namespace Idiomas.Core.Presentation.Http.Controller;
+namespace Idiomas.Api.Http.Controller;
 
 public static class DependencyInjection
 {

@@ -1,4 +1,4 @@
-namespace Idiomas.Core.Presentation.Http.Route;
+namespace Idiomas.Api.Http.Route;
 
 public static class DependencyInjection
 {

@@ -2,7 +2,7 @@ using System.Net;
 using System.Text.Json;
 using Idiomas.Core.Application.Error;
 
-namespace Idiomas.Core.Presentation.Http.Middleware;
+namespace Idiomas.Api.Http.Middleware;
 
 public class ApiExceptionMiddleware(RequestDelegate next, ILogger<ApiExceptionMiddleware> logger)
 {

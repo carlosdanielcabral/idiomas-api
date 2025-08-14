@@ -1,6 +1,6 @@
-using Idiomas.Core.Presentation.Http.Route;
+using Idiomas.Api.Http.Route;
 
-namespace Idiomas.Core.Presentation.Http;
+namespace Idiomas.Api.Http;
 
 public class Router(UserRoute userRoute, AuthRoute authRoute, DictionaryRoute dictionaryRoute, FileRoute fileRoute)
 {
