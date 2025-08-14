@@ -1,6 +1,6 @@
 services:
   api:
-    build: .
+    build: ./Idiomas.Core
     container_name: idiomas-api
     depends_on:
       database:
@@ -11,7 +11,7 @@ services:
       - 5076:5076
 
   database:
-    build: ./Source/Infrastructure/Database/Docker
+    build: ./Idiomas.Core/Source/Infrastructure/Database/Docker
     container_name: idiomas-database
     environment:
       ACCEPT_EULA: ${ACCEPT_EULA}
@@ -31,7 +31,7 @@ services:
 
   migration:
     build:
-      context: .
+      context: ./Idiomas.Core
       target: build
     depends_on:
       database:
