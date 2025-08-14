@@ -26,4 +26,4 @@ jobs:
       run: dotnet build Idiomas.sln --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test Idiomas.sln --no-build --verbosity normal
+      run: dotnet test Idiomas.sln --no-build --configuration Release --verbosity normal
