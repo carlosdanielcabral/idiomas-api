@@ -1,4 +1,4 @@
-name: Test
+name: Build and Test
 
 on:
   push:
@@ -25,5 +25,26 @@ jobs:
     - name: Build
       run: dotnet build Idiomas.sln --configuration Release --no-restore
 
-    - name: Test
-      run: dotnet test Idiomas.sln --no-build --configuration Release --verbosity normal
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: .
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+    
+    - name: Run tests
+      run: dotnet test Idiomas.sln --configuration Release --no-build --verbosity normal
