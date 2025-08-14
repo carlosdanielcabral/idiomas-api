@@ -23,11 +23,11 @@ app.UseAuthorization();
 
 using (var scope = app.Services.CreateScope())
 {
-    var router = scope.ServiceProvider.GetRequiredService<Router>();
+    Router router = scope.ServiceProvider.GetRequiredService<Router>();
     router.Register(app);
 }
 
-var apiUrl = Environment.GetEnvironmentVariable("API_URL");
+string? apiUrl = Environment.GetEnvironmentVariable("API_URL");
 
 if (!string.IsNullOrEmpty(apiUrl))
 {

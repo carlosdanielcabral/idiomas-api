@@ -2,6 +2,7 @@ using IdiomasAPI.Source.Domain.Entity;
 using IdiomasAPI.Source.Domain.Enum;
 using IdiomasAPI.Source.Infrastructure.Database.Context;
 using IdiomasAPI.Source.Infrastructure.Database.Mapper;
+using IdiomasAPI.Source.Infrastructure.Database.Model;
 using IdiomasAPI.Source.Interface.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,16 +23,16 @@ public class FileRepository(ApplicationContext database) : IFileRepository
 
     public async Task<CFile?> GetByKey(string key)
     {
-        var model = await this._database.File.FirstOrDefaultAsync(f => f.Key == key);
+        FileModel? model = await this._database.File.FirstOrDefaultAsync(f => f.Key == key);
 
         return model?.ToEntity();
     }
 
     public async Task ChangeStatus(string filekey, FileStatus status)
     {
-        var model = await this._database.File.FirstOrDefaultAsync(f => f.Key == filekey);
+        FileModel? model = await this._database.File.FirstOrDefaultAsync(f => f.Key == filekey);
 
-        if (model == null)
+        if (model is null)
         {
             return;
         }

@@ -8,10 +8,7 @@ namespace IdiomasAPI.Source.Application.UseCase.File;
 
 public record struct Response (string UrlToUpload, string FileKey);
 
-public class RequestFileUpload(
-    IFileRepository fileRepository,
-    IFileStorage fileStorage,
-    FileHelper fileHelper)
+public class RequestFileUpload(IFileRepository fileRepository, IFileStorage fileStorage, FileHelper fileHelper)
 {
     private readonly IFileRepository _fileRepository = fileRepository;
     private readonly IFileStorage _fileStorage = fileStorage;
@@ -24,10 +21,6 @@ public class RequestFileUpload(
 
         await this._fileRepository.Insert(dto.ToEntity(fileKey, userId));
 
-        return new()
-        {
-            UrlToUpload = urlToUpload,
-            FileKey = fileKey
-        };
+        return new Response() { UrlToUpload = urlToUpload, FileKey = fileKey };
     }
 }

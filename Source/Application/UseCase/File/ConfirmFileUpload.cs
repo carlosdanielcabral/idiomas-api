@@ -1,5 +1,6 @@
 using System.Net;
 using IdiomasAPI.Source.Application.Error;
+using IdiomasAPI.Source.Domain.Entity;
 using IdiomasAPI.Source.Domain.Enum;
 using IdiomasAPI.Source.Interface.Repository;
 
@@ -9,9 +10,15 @@ public class ConfirmFileUpload(IFileRepository fileRepository)
 {
     private readonly IFileRepository _fileRepository = fileRepository;
 
-    public async Task Execute(string fileKey, string userId)
+    public async Task Execute(string filekey, string userId)
     {
-        var file = await this._fileRepository.GetByKey(fileKey);
+        await this.ValidateFile(filekey, userId);
+        await this._fileRepository.ChangeStatus(filekey, FileStatus.Uploaded);
+    }
+
+    public async Task ValidateFile(string filekey, string userId)
+    {
+        CFile? file = await this._fileRepository.GetByKey(filekey);
 
         if (file is null)
         {
@@ -27,7 +34,5 @@ public class ConfirmFileUpload(IFileRepository fileRepository)
         {
             throw new ApiException("Arquivo já foi processado", HttpStatusCode.Conflict);
         }
-        
-        await this._fileRepository.ChangeStatus(fileKey, FileStatus.Uploaded);
     }
 }   

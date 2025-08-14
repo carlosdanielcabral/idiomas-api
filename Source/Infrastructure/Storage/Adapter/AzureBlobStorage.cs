@@ -61,7 +61,7 @@ public class AzureBlobStorage(BlobServiceClient client, IConfiguration configura
 
         BlobSasQueryParameters sasQueryParameters = sasBuilder.ToSasQueryParameters(userDelegationKey, _client.AccountName);
 
-        var uriBuilder = new UriBuilder(blobClient.Uri)
+        UriBuilder uriBuilder = new(blobClient.Uri)
         {
             Query = sasQueryParameters.ToString()
         };

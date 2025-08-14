@@ -14,20 +14,26 @@ public class MailPasswordLogin(IUserRepository userRepository, IHash hash)
 
     public async Task<User> Execute(MailPasswordLoginDTO dto)
     {
-        User? previousUser = await this._userRepository.GetByEmail(dto.Email);
+        User? user = await this._userRepository.GetByEmail(dto.Email);
 
-        if (previousUser == null)
+        this.ValidateLogin(user, dto);
+
+        return user!;
+    }
+
+    public void ValidateLogin(User? user, MailPasswordLoginDTO dto)
+    {
+        if (user == null)
         {
             throw new ApiException("Email ou senha inválidos", HttpStatusCode.BadRequest);
         }
 
-        bool isPasswordValid = this._hash.Verify(dto.Password, previousUser.Password);
+        bool isPasswordValid = this._hash.Verify(dto.Password, user.Password);
 
         if (!isPasswordValid)
         {
             throw new ApiException("Email ou senha inválidos", HttpStatusCode.BadRequest);
         }
 
-        return previousUser;
     }
 }

@@ -1,6 +1,7 @@
 using IdiomasAPI.Source.Domain.Entity;
 using IdiomasAPI.Source.Infrastructure.Database.Context;
 using IdiomasAPI.Source.Infrastructure.Database.Mapper;
+using IdiomasAPI.Source.Infrastructure.Database.Model;
 using IdiomasAPI.Source.Interface.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,13 +22,13 @@ public class UserRepository(ApplicationContext database) : IUserRepository
 
     public async Task<IEnumerable<User>> GetAll()
     {
-        var models = await this._database.User.ToListAsync();
+        List<UserModel> models = await this._database.User.ToListAsync();
         return models.ToEntities();
     }
 
     public async Task<User?> GetByEmail(string email)
     {
-        var model = await this._database.User.FirstOrDefaultAsync(u => u.Email == email);
+        UserModel? model = await this._database.User.FirstOrDefaultAsync(u => u.Email == email);
 
         return model?.ToEntity();
     }

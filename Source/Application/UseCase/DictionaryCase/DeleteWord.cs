@@ -1,9 +1,7 @@
 using IdiomasAPI.Source.Interface.Repository;
 using IdiomasAPI.Source.Domain.Entity;
-using IdiomasAPI.Source.Application.DTO.Dictionary;
 using IdiomasAPI.Source.Application.Error;
 using System.Net;
-using IdiomasAPI.Source.Application.Mapper;
 
 namespace IdiomasAPI.Source.Application.UseCase.DictionaryCase;
 

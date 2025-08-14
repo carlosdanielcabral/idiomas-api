@@ -1,6 +1,7 @@
 using IdiomasAPI.Source.Domain.Entity;
 using IdiomasAPI.Source.Infrastructure.Database.Context;
 using IdiomasAPI.Source.Infrastructure.Database.Mapper;
+using IdiomasAPI.Source.Infrastructure.Database.Model;
 using IdiomasAPI.Source.Interface.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,7 +23,7 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
     {
         Guid userGuid = Guid.Parse(userId);
 
-        var models = await this._database.Word
+        List<WordModel> models = await this._database.Word
             .Where(w => w.UserId == userGuid)
             .Include(w => w.Meanings)
             .ToListAsync();
@@ -34,7 +35,7 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
     {
         Guid wordId = Guid.Parse(id);
 
-        var model = await this._database.Word
+        WordModel? model = await this._database.Word
             .Include(w => w.Meanings)
             .FirstOrDefaultAsync(w => w.Id == wordId);
 
@@ -45,7 +46,7 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
     {
         Guid userGuid = Guid.Parse(userId);
 
-        var model = await this._database.Word
+        WordModel? model = await this._database.Word
             .Include(w => w.Meanings)
             .FirstOrDefaultAsync(w => w.Word == word && w.UserId == userGuid);
 
@@ -56,7 +57,7 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
     {
         Guid wordId = Guid.Parse(updatedWord.Id);
 
-        var outdatedWord = await this._database.Word
+        WordModel? outdatedWord = await this._database.Word
             .Include(w => w.Meanings)
             .FirstOrDefaultAsync(w => w.Id == wordId);
 
@@ -71,7 +72,7 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
 
         outdatedWord.Meanings.Clear();
 
-        foreach (var newMeaning in updatedWord.Meanings)
+        foreach (Meaning newMeaning in updatedWord.Meanings)
         {
             outdatedWord.Meanings.Add(newMeaning.ToModel());
         }
@@ -85,7 +86,7 @@ public class DictionaryRepository(ApplicationContext database) : IDictionaryRepo
     {
         Guid wordId = Guid.Parse(id);
 
-        var model = await this._database.Word
+        WordModel? model = await this._database.Word
             .Include(w => w.Meanings)
             .FirstOrDefaultAsync(w => w.Id == wordId);
 
