@@ -1,9 +1,9 @@
-using Idiomas.Api.Http.Route;
-using Idiomas.Api.Http.Controller;
+using Idiomas.Core.Presentation.Http.Route;
+using Idiomas.Core.Presentation.Http.Controller;
 using Microsoft.OpenApi.Models;
 using System.Threading.RateLimiting;
 
-namespace Idiomas.Api.Http;
+namespace Idiomas.Core.Presentation.Http;
 
 public static class DependencyInjection
 {

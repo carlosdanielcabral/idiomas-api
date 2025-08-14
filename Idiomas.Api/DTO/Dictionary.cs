@@ -1,4 +1,4 @@
-namespace Idiomas.Api.DTO.Dictionary;
+namespace Idiomas.Core.Presentation.DTO.Dictionary;
 
 public record MeaningResponseDTO
 {

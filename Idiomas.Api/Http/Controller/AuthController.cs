@@ -1,12 +1,12 @@
 using Idiomas.Core.Application.DTO.Auth;
 using Idiomas.Core.Application.UseCase.AuthCase;
 using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Interface.Controller;
 using Idiomas.Core.Interface.Service;
-using Idiomas.Api.Interface.Controller;
-using Idiomas.Api.DTO.Auth;
-using Idiomas.Api.Mapper;
+using Idiomas.Core.Presentation.DTO.Auth;
+using Idiomas.Core.Presentation.Mapper;
 
-namespace Idiomas.Api.Http.Controller;
+namespace Idiomas.Core.Presentation.Http.Controller;
 
 public class AuthController(IToken tokenGenerator) : IAuthController
 {

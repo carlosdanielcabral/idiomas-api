@@ -13,3 +13,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 
 COPY --from=build /app ./
+ENTRYPOINT ["dotnet", "Idiomas.Core.dll"]
+EXPOSE 5076
