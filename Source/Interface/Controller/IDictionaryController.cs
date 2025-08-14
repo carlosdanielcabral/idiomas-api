@@ -1,8 +1,8 @@
 using System.Security.Claims;
-using IdiomasAPI.Source.Application.DTO.Dictionary;
-using IdiomasAPI.Source.Application.UseCase.DictionaryCase;
+using Idiomas.Source.Application.DTO.Dictionary;
+using Idiomas.Source.Application.UseCase.DictionaryCase;
 
-namespace IdiomasAPI.Source.Interface.Controller;
+namespace Idiomas.Source.Interface.Controller;
 
 public interface IDictionaryController
 {

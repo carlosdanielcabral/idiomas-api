@@ -1,7 +1,7 @@
-using IdiomasAPI.Source.Domain.Entity;
-using IdiomasAPI.Source.Infrastructure.Database.Model;
+using Idiomas.Source.Domain.Entity;
+using Idiomas.Source.Infrastructure.Database.Model;
 
-namespace IdiomasAPI.Source.Infrastructure.Database.Mapper;
+namespace Idiomas.Source.Infrastructure.Database.Mapper;
 
 public static class WordMappingExtension
 {

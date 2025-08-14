@@ -1,13 +1,13 @@
 using System.Security.Claims;
-using IdiomasAPI.Source.Application.DTO.Dictionary;
-using IdiomasAPI.Source.Application.UseCase.DictionaryCase;
-using IdiomasAPI.Source.Domain.Entity;
-using IdiomasAPI.Source.Interface.Controller;
-using IdiomasAPI.Source.Presentation.DTO.Dictionary;
-using IdiomasAPI.Source.Presentation.Extensions;
-using IdiomasAPI.Source.Presentation.Mapper;
+using Idiomas.Source.Application.DTO.Dictionary;
+using Idiomas.Source.Application.UseCase.DictionaryCase;
+using Idiomas.Source.Domain.Entity;
+using Idiomas.Source.Interface.Controller;
+using Idiomas.Source.Presentation.DTO.Dictionary;
+using Idiomas.Source.Presentation.Extensions;
+using Idiomas.Source.Presentation.Mapper;
 
-namespace IdiomasAPI.Source.Presentation.Http.Controller;
+namespace Idiomas.Source.Presentation.Http.Controller;
 
 public class DictionaryController() : IDictionaryController
 {

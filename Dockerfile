@@ -4,14 +4,14 @@ WORKDIR /source
 
 RUN dotnet tool install --global dotnet-ef
 ENV PATH="$PATH:/root/.dotnet/tools"
-COPY IdiomasAPI.csproj ./
-RUN dotnet restore IdiomasAPI.csproj
+COPY Idiomas.csproj ./
+RUN dotnet restore Idiomas.csproj
 COPY . .
-RUN dotnet publish IdiomasAPI.csproj -c Release -o /app
+RUN dotnet publish Idiomas.csproj -c Release -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 
 COPY --from=build /app ./
-ENTRYPOINT ["dotnet", "IdiomasAPI.dll"]
+ENTRYPOINT ["dotnet", "Idiomas.dll"]
 EXPOSE 5076

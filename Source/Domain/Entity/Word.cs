@@ -1,4 +1,4 @@
-namespace IdiomasAPI.Source.Domain.Entity;
+namespace Idiomas.Source.Domain.Entity;
 
 public class Word(string id, string word, string ipa, string userId, ICollection<Meaning> meanings)
 {

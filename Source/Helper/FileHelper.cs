@@ -1,4 +1,4 @@
-namespace IdiomasAPI.Source.Helper;
+namespace Idiomas.Source.Helper;
 
 public class FileHelper
 {

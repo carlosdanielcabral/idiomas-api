@@ -1,11 +1,11 @@
-using IdiomasAPI.Source.Domain.Entity;
-using IdiomasAPI.Source.Interface.Repository;
-using IdiomasAPI.Source.Interface.Service;
-using IdiomasAPI.Source.Application.Error;
+using Idiomas.Source.Domain.Entity;
+using Idiomas.Source.Interface.Repository;
+using Idiomas.Source.Interface.Service;
+using Idiomas.Source.Application.Error;
 using System.Net;
-using IdiomasAPI.Source.Application.DTO.Auth;
+using Idiomas.Source.Application.DTO.Auth;
 
-namespace IdiomasAPI.Source.Application.UseCase.AuthCase;
+namespace Idiomas.Source.Application.UseCase.AuthCase;
 
 public class MailPasswordLogin(IUserRepository userRepository, IHash hash)
 {

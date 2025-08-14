@@ -1,10 +1,10 @@
-using IdiomasAPI.Application.DTO.File;
-using IdiomasAPI.Source.Application.Mapper;
-using IdiomasAPI.Source.Helper;
-using IdiomasAPI.Source.Interface.Repository;
-using IdiomasAPI.Source.Interface.Storage;
+using Idiomas.Application.DTO.File;
+using Idiomas.Source.Application.Mapper;
+using Idiomas.Source.Helper;
+using Idiomas.Source.Interface.Repository;
+using Idiomas.Source.Interface.Storage;
 
-namespace IdiomasAPI.Source.Application.UseCase.File;
+namespace Idiomas.Source.Application.UseCase.File;
 
 public record struct Response (string UrlToUpload, string FileKey);
 

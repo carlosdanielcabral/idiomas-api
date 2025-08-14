@@ -1,9 +1,9 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
-using IdiomasAPI.Source.Interface.Storage;
+using Idiomas.Source.Interface.Storage;
 
-namespace IdiomasAPI.Source.Infrastructure.Storage.Adapter;
+namespace Idiomas.Source.Infrastructure.Storage.Adapter;
 
 public class AzureBlobStorage(BlobServiceClient client, IConfiguration configuration, IWebHostEnvironment environment) : IFileStorageAdapter
 {

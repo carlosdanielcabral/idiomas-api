@@ -1,9 +1,9 @@
-using IdiomasAPI.Source.Application.UseCase.AuthCase;
-using IdiomasAPI.Source.Application.UseCase.DictionaryCase;
-using IdiomasAPI.Source.Application.UseCase.File;
-using IdiomasAPI.Source.Application.UseCase.UserCase;
+using Idiomas.Source.Application.UseCase.AuthCase;
+using Idiomas.Source.Application.UseCase.DictionaryCase;
+using Idiomas.Source.Application.UseCase.File;
+using Idiomas.Source.Application.UseCase.UserCase;
 
-namespace IdiomasAPI.Source.Application;
+namespace Idiomas.Source.Application;
 
 public static class DependencyInjection
 {

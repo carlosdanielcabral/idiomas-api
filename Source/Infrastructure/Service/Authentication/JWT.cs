@@ -1,11 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using IdiomasAPI.Source.Domain.Entity;
-using IdiomasAPI.Source.Interface.Service;
+using Idiomas.Source.Domain.Entity;
+using Idiomas.Source.Interface.Service;
 using Microsoft.IdentityModel.Tokens;
 
-namespace IdiomasAPI.Source.Infrastructure.Service.Authentication;
+namespace Idiomas.Source.Infrastructure.Service.Authentication;
 
 public class JWT(IConfiguration configuration) : IToken
 {

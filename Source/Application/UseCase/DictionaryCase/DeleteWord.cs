@@ -1,9 +1,9 @@
-using IdiomasAPI.Source.Interface.Repository;
-using IdiomasAPI.Source.Domain.Entity;
-using IdiomasAPI.Source.Application.Error;
+using Idiomas.Source.Interface.Repository;
+using Idiomas.Source.Domain.Entity;
+using Idiomas.Source.Application.Error;
 using System.Net;
 
-namespace IdiomasAPI.Source.Application.UseCase.DictionaryCase;
+namespace Idiomas.Source.Application.UseCase.DictionaryCase;
 
 public class DeleteWord(IDictionaryRepository dictionaryRepository)
 {

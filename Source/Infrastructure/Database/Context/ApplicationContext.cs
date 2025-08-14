@@ -1,7 +1,7 @@
-using IdiomasAPI.Source.Infrastructure.Database.Model;
+using Idiomas.Source.Infrastructure.Database.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace IdiomasAPI.Source.Infrastructure.Database.Context;
+namespace Idiomas.Source.Infrastructure.Database.Context;
 
 public class ApplicationContext(DbContextOptions<ApplicationContext> options) : DbContext(options)
 {

@@ -1,11 +1,11 @@
-using IdiomasAPI.Source.Application.DTO.User;
-using IdiomasAPI.Source.Application.UseCase.UserCase;
-using IdiomasAPI.Source.Domain.Entity;
-using IdiomasAPI.Source.Interface.Controller;
-using IdiomasAPI.Source.Presentation.DTO.User;
-using IdiomasAPI.Source.Presentation.Mapper;
+using Idiomas.Source.Application.DTO.User;
+using Idiomas.Source.Application.UseCase.UserCase;
+using Idiomas.Source.Domain.Entity;
+using Idiomas.Source.Interface.Controller;
+using Idiomas.Source.Presentation.DTO.User;
+using Idiomas.Source.Presentation.Mapper;
 
-namespace IdiomasAPI.Source.Presentation.Http.Controller;
+namespace Idiomas.Source.Presentation.Http.Controller;
 
 public class UserController() : IUserController
 {

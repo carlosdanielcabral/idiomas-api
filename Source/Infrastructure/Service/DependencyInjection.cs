@@ -1,12 +1,12 @@
 
 using System.Text;
-using IdiomasAPI.Source.Infrastructure.Service.Authentication;
-using IdiomasAPI.Source.Infrastructure.Service.Hash;
-using IdiomasAPI.Source.Interface.Service;
+using Idiomas.Source.Infrastructure.Service.Authentication;
+using Idiomas.Source.Infrastructure.Service.Hash;
+using Idiomas.Source.Interface.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-namespace IdiomasAPI.Source.Infrastructure.Service;
+namespace Idiomas.Source.Infrastructure.Service;
 
 public static class DependencyInjection
 {

@@ -1,5 +1,5 @@
-using IdiomasAPI.Source.Domain.Enum;
+using Idiomas.Source.Domain.Enum;
 
-namespace IdiomasAPI.Application.DTO.File;
+namespace Idiomas.Application.DTO.File;
 
 public record CreateFileDTO(string OriginalFilename, string MimeType, long Size);

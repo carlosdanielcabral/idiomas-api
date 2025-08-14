@@ -1,7 +1,7 @@
-using IdiomasAPI.Source.Application.DTO.Auth;
-using IdiomasAPI.Source.Application.UseCase.AuthCase;
+using Idiomas.Source.Application.DTO.Auth;
+using Idiomas.Source.Application.UseCase.AuthCase;
 
-namespace IdiomasAPI.Source.Interface.Controller;
+namespace Idiomas.Source.Interface.Controller;
 
 public interface IAuthController
 {

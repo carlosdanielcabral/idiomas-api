@@ -1,7 +1,7 @@
-using IdiomasAPI.Source.Interface.Repository;
-using IdiomasAPI.Source.Domain.Entity;
+using Idiomas.Source.Interface.Repository;
+using Idiomas.Source.Domain.Entity;
 
-namespace IdiomasAPI.Source.Application.UseCase.DictionaryCase;
+namespace Idiomas.Source.Application.UseCase.DictionaryCase;
 
 public class ListWords(IDictionaryRepository dictionaryRepository)
 {

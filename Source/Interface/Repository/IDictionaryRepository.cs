@@ -1,6 +1,6 @@
-using IdiomasAPI.Source.Domain.Entity;
+using Idiomas.Source.Domain.Entity;
 
-namespace IdiomasAPI.Source.Interface.Repository;
+namespace Idiomas.Source.Interface.Repository;
 
 public interface IDictionaryRepository
 {

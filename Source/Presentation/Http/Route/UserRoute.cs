@@ -1,9 +1,9 @@
 
-using IdiomasAPI.Source.Interface.Controller;
-using IdiomasAPI.Source.Interface.Route;
-using IdiomasAPI.Source.Presentation.DTO.User;
+using Idiomas.Source.Interface.Controller;
+using Idiomas.Source.Interface.Route;
+using Idiomas.Source.Presentation.DTO.User;
 
-namespace IdiomasAPI.Source.Presentation.Http.Route;
+namespace Idiomas.Source.Presentation.Http.Route;
 
 public class UserRoute(IUserController controller) : IRoute
 {

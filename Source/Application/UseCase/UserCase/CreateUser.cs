@@ -1,13 +1,13 @@
-using IdiomasAPI.Source.Application.DTO.User;
-using IdiomasAPI.Source.Infrastructure.Helper;
-using IdiomasAPI.Source.Interface.Repository;
-using IdiomasAPI.Source.Interface.Service;
-using IdiomasAPI.Source.Application.Error;
+using Idiomas.Source.Application.DTO.User;
+using Idiomas.Source.Infrastructure.Helper;
+using Idiomas.Source.Interface.Repository;
+using Idiomas.Source.Interface.Service;
+using Idiomas.Source.Application.Error;
 using System.Net;
-using IdiomasAPI.Source.Domain.Entity;
-using IdiomasAPI.Source.Application.Mapper;
+using Idiomas.Source.Domain.Entity;
+using Idiomas.Source.Application.Mapper;
 
-namespace IdiomasAPI.Source.Application.UseCase.UserCase;
+namespace Idiomas.Source.Application.UseCase.UserCase;
 
 public class CreateUser(IUserRepository userRepository, IHash hash)
 {

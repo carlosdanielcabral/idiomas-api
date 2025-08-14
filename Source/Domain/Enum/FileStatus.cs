@@ -1,4 +1,4 @@
-namespace IdiomasAPI.Source.Domain.Enum;
+namespace Idiomas.Source.Domain.Enum;
 
 public enum FileStatus
 {

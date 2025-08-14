@@ -1,9 +1,9 @@
 
-using IdiomasAPI.Source.Application.DTO.File;
-using IdiomasAPI.Source.Interface.Controller;
-using IdiomasAPI.Source.Interface.Route;
+using Idiomas.Source.Application.DTO.File;
+using Idiomas.Source.Interface.Controller;
+using Idiomas.Source.Interface.Route;
 
-namespace IdiomasAPI.Source.Presentation.Http.Route;
+namespace Idiomas.Source.Presentation.Http.Route;
 
 public class FileRoute(IFileController controller) : IRoute
 {

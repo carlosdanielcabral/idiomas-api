@@ -1,7 +1,7 @@
-using IdiomasAPI.Source.Interface.Service;
+using Idiomas.Source.Interface.Service;
 using Isopoh.Cryptography.Argon2;
 
-namespace IdiomasAPI.Source.Infrastructure.Service.Hash;
+namespace Idiomas.Source.Infrastructure.Service.Hash;
 
 public class Argon2Hash : IHash
 {

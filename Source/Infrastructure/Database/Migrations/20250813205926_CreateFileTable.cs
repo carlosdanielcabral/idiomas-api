@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace IdiomasAPI.Source.Infrastructure.Database.Migrations
+namespace Idiomas.Source.Infrastructure.Database.Migrations
 {
     /// <inheritdoc />
     public partial class CreateFileTable : Migration

@@ -1,4 +1,4 @@
-namespace IdiomasAPI.Source.Presentation.DTO.User;
+namespace Idiomas.Source.Presentation.DTO.User;
 
 public record UserResponseDTO
 {

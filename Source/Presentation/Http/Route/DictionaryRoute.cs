@@ -1,9 +1,9 @@
 
-using IdiomasAPI.Source.Interface.Controller;
-using IdiomasAPI.Source.Interface.Route;
-using IdiomasAPI.Source.Presentation.DTO.Dictionary;
+using Idiomas.Source.Interface.Controller;
+using Idiomas.Source.Interface.Route;
+using Idiomas.Source.Presentation.DTO.Dictionary;
 
-namespace IdiomasAPI.Source.Presentation.Http.Route;
+namespace Idiomas.Source.Presentation.Http.Route;
 
 public class DictionaryRoute(IDictionaryController controller) : IRoute
 {
