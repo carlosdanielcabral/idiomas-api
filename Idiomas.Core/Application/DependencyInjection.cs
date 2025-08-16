@@ -9,12 +9,20 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        // User
         services.AddScoped<CreateUser>();
+        services.AddScoped<UpdateUser>();
+
+        // Auth
         services.AddScoped<MailPasswordLogin>();
+
+        // Dictionary
         services.AddScoped<CreateWord>();
         services.AddScoped<ListWords>();
         services.AddScoped<UpdateWord>();
         services.AddScoped<DeleteWord>();
+
+        // File
         services.AddScoped<RequestFileUpload>();
         services.AddScoped<ConfirmFileUpload>();
         services.AddScoped<FailFileUpload>();

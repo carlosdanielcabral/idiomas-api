@@ -11,3 +11,8 @@ public record CreateUserResponseDTO
 {
     public required UserResponseDTO User { get; init; }
 }
+
+public record UpdateUserResponseDTO
+{
+    public required UserResponseDTO User { get; init; }
+}

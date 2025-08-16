@@ -10,4 +10,9 @@ public static class UserMappingExtension
     {
         return new User(UUIDGenerator.Generate(), dto.Name, dto.Email, dto.Password);
     }
+
+    public static User ToEntity(this UpdateUserDTO dto, string id)
+    {
+        return new User(id, dto.Name, dto.Email, dto.Password);
+    }
 }

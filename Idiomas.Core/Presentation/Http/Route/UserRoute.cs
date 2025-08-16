@@ -13,5 +13,9 @@ public class UserRoute(IUserController controller) : IRoute
     {
         app.MapPost("/user", _controller.SaveUser)
             .Produces<CreateUserResponseDTO>(StatusCodes.Status201Created);
+
+        app.MapPut("/user/{userid}", _controller.UpdateUser)
+            .Produces<UpdateUserResponseDTO>(StatusCodes.Status200OK)
+            .RequireAuthorization();
     }
 }

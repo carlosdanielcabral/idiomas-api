@@ -29,7 +29,35 @@ public class UserRepository(ApplicationContext database) : IUserRepository
     public async Task<User?> GetByEmail(string email)
     {
         UserModel? model = await this._database.User.FirstOrDefaultAsync(u => u.Email == email);
-
         return model?.ToEntity();
+    }
+
+    public async Task<User?> GetById(string id)
+    {
+        if (!Guid.TryParse(id, out var guid))
+            return null;
+
+        var model = await this._database.User.FirstOrDefaultAsync(u => u.Id == guid);
+        return model?.ToEntity();
+    }
+
+    public async Task<User> Update(User updatedUser)
+    {
+        Guid userId = Guid.Parse(updatedUser.Id);
+
+        UserModel? outdatedUser = await this._database.User.FirstOrDefaultAsync(user => user.Id == userId);
+    
+        if (outdatedUser is null)
+        {
+            throw new KeyNotFoundException($"User with ID {userId} not found.");
+        }
+
+        outdatedUser.Name = updatedUser.Name;
+        outdatedUser.Password = updatedUser.Password;
+        outdatedUser.Email = updatedUser.Email;
+
+        await this._database.SaveChangesAsync();
+
+        return outdatedUser.ToEntity();
     }
 }
