@@ -44,6 +44,15 @@ public static class DependencyInjection
 
                 ClockSkew = TimeSpan.FromSeconds(30) 
             };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    context.Token = context.Request.Cookies["Authorization"];
+                    return Task.CompletedTask;
+                }
+            };
         });
 
         return services;

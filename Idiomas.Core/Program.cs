@@ -11,13 +11,14 @@ builder.Services
     .AddHelpers()
     .AddInfrastructure(builder.Configuration, builder.Environment)
     .AddApplication()
-    .AddPresentation()
+    .AddPresentation(builder.Configuration)
     .AddAuthorization();
 
 WebApplication app = builder.Build();
 
 app.AddAPIDocumentation()
     .AddMiddlewares()
+    .UseCors("AllowSpecificOrigin")
     .UseAuthentication()
     .UseAuthorization();
 

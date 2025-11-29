@@ -7,14 +7,34 @@ namespace Idiomas.Core.Presentation.Http;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddHttp(this IServiceCollection services)
+    public static IServiceCollection AddHttp(this IServiceCollection services, IConfiguration configuration)
     {
         services
+            .ConfigCors(configuration)
             .AddRateLimit()
             .AddPresentationControllers()
             .AddPresentationRoutes()
             .AddAPIDocumentation()
             .AddScoped<Router>();
+
+        return services;
+    }
+
+    public static IServiceCollection ConfigCors(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddCors(options =>
+        {
+            string frontendLocalUrl = configuration["FrontendLocalUrl"] ?? throw new InvalidOperationException("FrontendLocalUrl is not configured");
+
+            Console.WriteLine($"Configuring CORS allowed origins: {frontendLocalUrl}");
+
+            options.AddPolicy("AllowSpecificOrigin",
+                builder => builder.WithOrigins(frontendLocalUrl)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+            );
+        });
 
         return services;
     }

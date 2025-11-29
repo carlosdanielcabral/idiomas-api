@@ -5,5 +5,5 @@ namespace Idiomas.Core.Interface.Controller;
 
 public interface IAuthController
 {
-    public Task<IResult> MailPasswordLogin(MailPasswordLoginDTO dto, MailPasswordLogin useCase);
+    public Task<IResult> MailPasswordLogin(HttpContext httpContext, MailPasswordLoginDTO dto, MailPasswordLogin useCase);
 }
