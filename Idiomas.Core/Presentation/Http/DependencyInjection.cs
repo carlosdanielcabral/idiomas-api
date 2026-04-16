@@ -28,8 +28,11 @@ public static class DependencyInjection
 
             Console.WriteLine($"Configuring CORS allowed origins: {frontendLocalUrl}");
 
+            string[] allowedOrigins = frontendLocalUrl.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
             options.AddPolicy("AllowSpecificOrigin",
-                builder => builder.WithOrigins(frontendLocalUrl)
+                builder => builder
+                    .WithOrigins(allowedOrigins)
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials()
