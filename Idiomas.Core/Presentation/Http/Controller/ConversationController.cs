@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using Idiomas.Core.Application.DTO.Conversation;
+using Idiomas.Core.Application.Error;
 using Idiomas.Core.Application.UseCase.ConversationCase;
 using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Interface.Controller;
 using Idiomas.Core.Presentation.DTO.Conversation;
 using Idiomas.Core.Presentation.Extensions;
@@ -17,6 +19,12 @@ public class ConversationController : IConversationController
         StartConversation useCase)
     {
         string userIdString = user.GetUserId().ToString();
+
+        // Validate Language enum value
+        if (!Enum.IsDefined(typeof(Language), dto.Language))
+        {
+            throw new ApiException($"Invalid language: {dto.Language}. Valid languages are: {string.Join(", ", Enum.GetNames<Language>())}", System.Net.HttpStatusCode.BadRequest);
+        }
 
         StartConversationRequest request = new(dto.Language, dto.Mode, dto.ScenarioId);
 
