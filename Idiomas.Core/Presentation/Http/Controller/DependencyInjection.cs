@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Idiomas.Core.Application.Http.Controller;
 using Idiomas.Core.Interface.Controller;
 
@@ -16,6 +17,7 @@ public static class DependencyInjection
         services.ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
         return services;
