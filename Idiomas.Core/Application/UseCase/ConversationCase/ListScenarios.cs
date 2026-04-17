@@ -11,7 +11,7 @@ public class ListScenarios(IScenarioRepository scenarioRepository)
 
     public async Task<IEnumerable<Scenario>> Execute(string? language)
     {
-        Language? parsedLanguage = LanguageHelper.ParseOptionalLanguage(language);
+        Language? parsedLanguage = LanguageHelper.ParseLanguage(language);
 
         return await this._scenarioRepository.GetByLanguage(parsedLanguage);
     }

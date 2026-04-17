@@ -20,7 +20,7 @@ public class ConversationController : IConversationController
     {
         string userIdString = user.GetUserId().ToString();
 
-        Language language = LanguageHelper.ParseLanguage(dto.Language);
+        Language language = LanguageHelper.ParseLanguage(dto.Language, isRequired: true)!;
 
         StartConversationRequest request = new(language, dto.Mode, dto.ScenarioId);
 
