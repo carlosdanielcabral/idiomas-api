@@ -1,11 +1,9 @@
 using System.Security.Claims;
-using System.Net;
 using Idiomas.Core.Application.DTO.Conversation;
-using Idiomas.Core.Application.Error;
 using Idiomas.Core.Application.UseCase.ConversationCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
-using Idiomas.Core.Domain.Enum.Extensions;
+using Idiomas.Core.Helper;
 using Idiomas.Core.Interface.Controller;
 using Idiomas.Core.Presentation.DTO.Conversation;
 using Idiomas.Core.Presentation.Extensions;
@@ -22,7 +20,7 @@ public class ConversationController : IConversationController
     {
         string userIdString = user.GetUserId().ToString();
 
-        Language language = ParseLanguage(dto.Language);
+        Language language = LanguageHelper.ParseLanguage(dto.Language);
 
         StartConversationRequest request = new(language, dto.Mode, dto.ScenarioId);
 
@@ -138,26 +136,5 @@ public class ConversationController : IConversationController
         await useCase.Execute(conversationId, userIdString);
 
         return TypedResults.NoContent();
-    }
-
-    private Language ParseLanguage(string? language)
-    {
-        if (string.IsNullOrWhiteSpace(language))
-        {
-            throw new ApiException("Language is required.", HttpStatusCode.BadRequest);
-        }
-
-        bool isValidLanguage = Enum.TryParse<Language>(language, ignoreCase: true, out Language parsedLanguage);
-
-        if (!isValidLanguage)
-        {
-            string availableLanguagesString = LanguageExtensions.GetAvailableLanguagesString();
-
-            throw new ApiException(
-                $"Invalid language '{language}'. Available languages: {availableLanguagesString}",
-                HttpStatusCode.BadRequest);
-        }
-
-        return parsedLanguage;
     }
 }
