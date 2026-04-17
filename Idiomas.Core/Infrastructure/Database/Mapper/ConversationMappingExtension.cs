@@ -25,7 +25,8 @@ public static class ConversationMappingExtension
             model.UserId.ToString(),
             language,
             mode,
-            scenarioId
+            scenarioId,
+            model.IsActive
         );
 
         foreach (MessageModel messageModel in model.Messages)

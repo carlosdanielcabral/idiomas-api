@@ -7,7 +7,8 @@ public class Conversation(
     string userId,
     Language language,
     ConversationMode mode,
-    string? scenarioId = null)
+    string? scenarioId = null,
+    bool isActive = true)
 {
     public string Id { get; private set; } = id;
     public string UserId { get; private set; } = userId;
@@ -17,7 +18,7 @@ public class Conversation(
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;
     public ICollection<Message> Messages { get; private set; } = new List<Message>();
-    public bool IsActive { get; private set; } = true;
+    public bool IsActive { get; private set; } = isActive;
 
     public void Touch()
     {
