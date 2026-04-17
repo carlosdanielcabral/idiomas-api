@@ -49,11 +49,6 @@ public class GeminiConversationLLMService : IConversationLLMService
                     request,
                     new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
                 );
-
-                Console.WriteLine($"Response status code: {response.StatusCode}");
-                
-                string responseContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Response content: {responseContent}");
         
                 if (response.IsSuccessStatusCode)
                 {
@@ -135,7 +130,8 @@ public class GeminiConversationLLMService : IConversationLLMService
 
         systemInstruction += $"\n\nThe user is practicing {conversation.Language}. Respond exclusively in this language.";
 
-        int contextLimit = this._configuration.GetValue<int>("Conversation:ContextLimit", 10);
+        string contextLimitString = this._configuration["Conversation:ContextLimit"];
+int contextLimit = string.IsNullOrEmpty(contextLimitString) ? 10 : int.Parse(contextLimitString);
 
         foreach (Message message in conversation.Messages.OrderBy(m => m.CreatedAt).TakeLast(contextLimit))
         {
