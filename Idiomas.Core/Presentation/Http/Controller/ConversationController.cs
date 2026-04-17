@@ -20,7 +20,8 @@ public class ConversationController : IConversationController
     {
         string userIdString = user.GetUserId().ToString();
 
-        Language language = LanguageHelper.ParseLanguage(dto.Language, isRequired: true)!;
+        Language language = LanguageHelper.ParseLanguage(dto.Language, isRequired: true)
+            ?? throw new InvalidOperationException("Language cannot be null when isRequired is true.");
 
         StartConversationRequest request = new(language, dto.Mode, dto.ScenarioId);
 
