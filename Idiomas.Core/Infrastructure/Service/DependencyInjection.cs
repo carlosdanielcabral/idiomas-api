@@ -1,7 +1,7 @@
-
 using System.Text;
 using Idiomas.Core.Infrastructure.Service.Authentication;
 using Idiomas.Core.Infrastructure.Service.Hash;
+using Idiomas.Core.Infrastructure.Service.LLM;
 using Idiomas.Core.Interface.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -14,6 +14,9 @@ public static class DependencyInjection
     {
         services.AddScoped<IHash, Argon2Hash>();
         services.AddInfraAuthentication(configuration);
+
+        // LLM Service
+        services.AddHttpClient<IConversationLLMService, GeminiConversationLLMService>();
 
         return services;
     }

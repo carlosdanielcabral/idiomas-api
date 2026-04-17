@@ -12,6 +12,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthController, AuthController>();
         services.AddScoped<IDictionaryController, DictionaryController>();
         services.AddScoped<IFileController, FileController>();
+        services.AddScoped<IConversationController, ConversationController>();
         services.ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;

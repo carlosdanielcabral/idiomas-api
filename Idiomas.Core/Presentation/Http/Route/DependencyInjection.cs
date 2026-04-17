@@ -8,6 +8,7 @@ public static class DependencyInjection
         services.AddScoped<AuthRoute>();
         services.AddScoped<DictionaryRoute>();
         services.AddScoped<FileRoute>();
+        services.AddScoped<ConversationRoute>();
 
         return services;
     }
