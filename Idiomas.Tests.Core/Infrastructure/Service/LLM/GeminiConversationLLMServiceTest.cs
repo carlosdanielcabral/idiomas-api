@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Idiomas.Core.Application.Error;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Service.LLM;
@@ -30,6 +31,10 @@ public class GeminiConversationLLMServiceTest
         this._configurationMock
             .Setup(config => config["Gemini:Model"])
             .Returns("gemini-2.0-flash");
+
+        this._configurationMock
+            .Setup(config => config["Conversation:ContextLimit"])
+            .Returns("10");
 
         this._service = new GeminiConversationLLMService(this._httpClient, this._configurationMock.Object);
     }
@@ -110,10 +115,10 @@ public class GeminiConversationLLMServiceTest
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.TooManyRequests));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<HttpRequestException>(
+        var exception = await Assert.ThrowsAsync<ApiException>(
             () => this._service.SendMessageAsync(conversation, userMessage, scenarioDescription));
 
-        Assert.Contains("Failed to get response from Gemini API after maximum retries", exception.Message);
+        Assert.Contains("AI service is temporarily unavailable", exception.Message);
     }
 
     [Fact]
@@ -134,7 +139,7 @@ public class GeminiConversationLLMServiceTest
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Unauthorized));
 
         // Act & Assert
-        await Assert.ThrowsAsync<HttpRequestException>(
+        await Assert.ThrowsAsync<ApiException>(
             () => this._service.SendMessageAsync(conversation, userMessage, scenarioDescription));
     }
 }
