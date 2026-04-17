@@ -1,12 +1,13 @@
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Database.Model;
+using Idiomas.Core.Interface.Service;
 
 namespace Idiomas.Core.Infrastructure.Database.Mapper;
 
 public static class ConversationMappingExtension
 {
-    public static Conversation ToEntity(this ConversationModel model)
+    public static Conversation ToEntity(this ConversationModel model, IEncryptionService encryptionService)
     {
         if (!Enum.TryParse<Language>(model.Language, out var language))
         {
@@ -31,7 +32,7 @@ public static class ConversationMappingExtension
 
         foreach (MessageModel messageModel in model.Messages)
         {
-            conversation.AddMessage(messageModel.ToEntity());
+            conversation.AddMessage(messageModel.ToEntity(encryptionService));
         }
 
         return conversation;
@@ -54,8 +55,8 @@ public static class ConversationMappingExtension
         return model;
     }
 
-    public static IEnumerable<Conversation> ToEntities(this IEnumerable<ConversationModel> models)
+    public static IEnumerable<Conversation> ToEntities(this IEnumerable<ConversationModel> models, IEncryptionService encryptionService)
     {
-        return models.Select(m => m.ToEntity());
+        return models.Select(m => m.ToEntity(encryptionService));
     }
 }

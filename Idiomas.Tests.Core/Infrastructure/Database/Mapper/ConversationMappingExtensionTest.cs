@@ -2,17 +2,30 @@ using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Database.Mapper;
 using Idiomas.Core.Infrastructure.Database.Model;
+using Idiomas.Core.Interface.Service;
+using Moq;
 
 namespace Idiomas.Tests.Core.Infrastructure.Database.Mapper;
 
 public class ConversationMappingExtensionTest
 {
+    private readonly Mock<IEncryptionService> _encryptionServiceMock;
+
+    public ConversationMappingExtensionTest()
+    {
+        _encryptionServiceMock = new Mock<IEncryptionService>();
+    }
+
     [Fact]
     public void ToEntity_ShouldMapIsActiveTrue_WhenModelIsActive()
     {
         ConversationModel model = CreateConversationModel(isActive: true);
 
-        Conversation entity = model.ToEntity();
+        _encryptionServiceMock
+            .Setup(service => service.Decrypt(It.IsAny<string>()))
+            .Returns((string s) => s);
+
+        Conversation entity = model.ToEntity(_encryptionServiceMock.Object);
 
         Assert.True(entity.IsActive);
     }
@@ -22,7 +35,11 @@ public class ConversationMappingExtensionTest
     {
         ConversationModel model = CreateConversationModel(isActive: false);
 
-        Conversation entity = model.ToEntity();
+        _encryptionServiceMock
+            .Setup(service => service.Decrypt(It.IsAny<string>()))
+            .Returns((string s) => s);
+
+        Conversation entity = model.ToEntity(_encryptionServiceMock.Object);
 
         Assert.False(entity.IsActive);
     }
