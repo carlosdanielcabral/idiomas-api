@@ -1,9 +1,11 @@
 using System.Security.Claims;
+using System.Net;
 using Idiomas.Core.Application.DTO.Conversation;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Application.UseCase.ConversationCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
+using Idiomas.Core.Domain.Enum.Extensions;
 using Idiomas.Core.Interface.Controller;
 using Idiomas.Core.Presentation.DTO.Conversation;
 using Idiomas.Core.Presentation.Extensions;
@@ -20,13 +22,9 @@ public class ConversationController : IConversationController
     {
         string userIdString = user.GetUserId().ToString();
 
-        // Validate Language enum value
-        if (!Enum.IsDefined(typeof(Language), dto.Language))
-        {
-            throw new ApiException($"Invalid language: {dto.Language}. Valid languages are: {string.Join(", ", Enum.GetNames<Language>())}", System.Net.HttpStatusCode.BadRequest);
-        }
+        Language language = ParseLanguage(dto.Language);
 
-        StartConversationRequest request = new(dto.Language, dto.Mode, dto.ScenarioId);
+        StartConversationRequest request = new(language, dto.Mode, dto.ScenarioId);
 
         Conversation conversation = await useCase.Execute(request, userIdString);
 
@@ -140,5 +138,26 @@ public class ConversationController : IConversationController
         await useCase.Execute(conversationId, userIdString);
 
         return TypedResults.NoContent();
+    }
+
+    private Language ParseLanguage(string? language)
+    {
+        if (string.IsNullOrWhiteSpace(language))
+        {
+            throw new ApiException("Language is required.", HttpStatusCode.BadRequest);
+        }
+
+        bool isValidLanguage = Enum.TryParse<Language>(language, ignoreCase: true, out Language parsedLanguage);
+
+        if (!isValidLanguage)
+        {
+            string availableLanguagesString = LanguageExtensions.GetAvailableLanguagesString();
+
+            throw new ApiException(
+                $"Invalid language '{language}'. Available languages: {availableLanguagesString}",
+                HttpStatusCode.BadRequest);
+        }
+
+        return parsedLanguage;
     }
 }
