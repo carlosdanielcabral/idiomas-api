@@ -11,6 +11,13 @@ public class EndConversation(IConversationRepository conversationRepository)
 
     public async Task Execute(string conversationId, string userId)
     {
+        await this.ValidateConversation(conversationId, userId);
+
+        await this._conversationRepository.Inactivate(conversationId);
+    }
+
+    private async Task ValidateConversation(string conversationId, string userId)
+    {
         Conversation? conversation = await this._conversationRepository.GetById(conversationId);
 
         if (conversation == null)
@@ -26,7 +33,5 @@ public class EndConversation(IConversationRepository conversationRepository)
                 "You do not have permission to access this conversation.",
                 HttpStatusCode.Forbidden);
         }
-
-        await this._conversationRepository.Inactivate(conversationId);
     }
 }

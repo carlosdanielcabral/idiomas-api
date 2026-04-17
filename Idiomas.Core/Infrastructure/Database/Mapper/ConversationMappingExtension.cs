@@ -4,7 +4,7 @@ using Idiomas.Core.Infrastructure.Database.Model;
 
 namespace Idiomas.Core.Infrastructure.Database.Mapper;
 
-public static class ConversationModelMapper
+public static class ConversationMappingExtension
 {
     public static Conversation ToEntity(this ConversationModel model)
     {
@@ -18,17 +18,15 @@ public static class ConversationModelMapper
             throw new InvalidOperationException($"Invalid mode value in database: {model.Mode}");
         }
 
+        string? scenarioId = model.ScenarioId.HasValue ? model.ScenarioId.Value.ToString() : null;
+
         Conversation conversation = new(
             model.Id.ToString(),
             model.UserId.ToString(),
             language,
-            mode
+            mode,
+            scenarioId
         );
-
-        if (model.ScenarioId.HasValue)
-        {
-            conversation.SetScenarioId(model.ScenarioId.Value.ToString());
-        }
 
         return conversation;
     }

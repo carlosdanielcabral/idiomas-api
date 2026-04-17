@@ -29,8 +29,7 @@ public class GetConversationTest
         string userId = UUIDGenerator.Generate();
         string scenarioId = UUIDGenerator.Generate();
 
-        CoreConversation conversation = new(conversationId, userId, Language.Spanish, ConversationMode.Guided);
-        conversation.SetScenarioId(scenarioId);
+        CoreConversation conversation = new(conversationId, userId, Language.Spanish, ConversationMode.Guided, scenarioId);
 
         this._conversationRepositoryMock
             .Setup(repository => repository.GetById(conversationId))

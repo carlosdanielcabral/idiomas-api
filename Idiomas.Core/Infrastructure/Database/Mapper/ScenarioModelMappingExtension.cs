@@ -4,7 +4,7 @@ using Idiomas.Core.Infrastructure.Database.Model;
 
 namespace Idiomas.Core.Infrastructure.Database.Mapper;
 
-public static class ScenarioModelMapper
+public static class ScenarioModelMappingExtension
 {
     public static Scenario ToEntity(this ScenarioModel model)
     {

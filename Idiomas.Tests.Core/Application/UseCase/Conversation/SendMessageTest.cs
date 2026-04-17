@@ -122,8 +122,7 @@ public class SendMessageTest
         string scenarioId = UUIDGenerator.Generate();
         string content = "I'd like a table for two";
 
-        CoreConversation conversation = new(conversationId, userId, Language.English, ConversationMode.Guided);
-        conversation.SetScenarioId(scenarioId);
+        CoreConversation conversation = new(conversationId, userId, Language.English, ConversationMode.Guided, scenarioId);
         SendMessageRequest request = new(content);
 
         CoreScenario scenario = new(scenarioId, Language.English, "At the Restaurant", "Ordering food at a restaurant");

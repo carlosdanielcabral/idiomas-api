@@ -83,6 +83,8 @@ public class SendMessage(
     private async Task SaveUserMessage(Conversation conversation, string content)
     {
         string messageId = UUIDGenerator.Generate();
+        this.ValidateMessage(messageId, conversation.Id, content);
+
         Message message = new(messageId, conversation.Id, MessageRole.User, content);
 
         await this._conversationRepository.InsertMessage(message);
@@ -107,6 +109,8 @@ public class SendMessage(
     {
         foreach (CorrectionResponse correctionResponse in corrections)
         {
+            this.ValidateCorrection(correctionResponse, userMessageId);
+
             string correctionId = UUIDGenerator.Generate();
             Correction correction = new(
                 correctionId,
@@ -123,14 +127,61 @@ public class SendMessage(
         return corrections;
     }
 
+    private void ValidateCorrection(CorrectionResponse correction, string userMessageId)
+    {
+        const string ERROR_MESSAGE = "Failed to load response from AI";
+
+        if (string.IsNullOrWhiteSpace(userMessageId))
+        {
+            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
+        }
+
+        if (string.IsNullOrWhiteSpace(correction.OriginalFragment))
+        {
+            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
+        }
+
+        if (string.IsNullOrWhiteSpace(correction.SuggestedFragment))
+        {
+            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
+        }
+
+        if (string.IsNullOrWhiteSpace(correction.Explanation))
+        {
+            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
+        }
+    }
+
     private async Task<Message> SaveAssistantMessage(string conversationId, string content)
     {
         string messageId = UUIDGenerator.Generate();
+        this.ValidateMessage(messageId, conversationId, content);
+
         Message message = new(messageId, conversationId, MessageRole.Assistant, content);
 
         await this._conversationRepository.InsertMessage(message);
 
         return message;
+    }
+
+    private void ValidateMessage(string messageId, string conversationId, string content)
+    {
+        const string ERROR_MESSAGE = "Failed to create message";
+
+        if (string.IsNullOrWhiteSpace(messageId))
+        {
+            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
+        }
+
+        if (string.IsNullOrWhiteSpace(conversationId))
+        {
+            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
+        }
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
+        }
     }
 
     private MessageResponse BuildMessageResponse(Message assistantMessage, List<CorrectionResponse> corrections)

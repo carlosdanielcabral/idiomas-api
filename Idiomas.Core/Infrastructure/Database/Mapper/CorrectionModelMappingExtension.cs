@@ -4,7 +4,7 @@ using Idiomas.Core.Infrastructure.Database.Model;
 
 namespace Idiomas.Core.Infrastructure.Database.Mapper;
 
-public static class CorrectionModelMapper
+public static class CorrectionModelMappingExtension
 {
     public static Correction ToEntity(this CorrectionModel model)
     {

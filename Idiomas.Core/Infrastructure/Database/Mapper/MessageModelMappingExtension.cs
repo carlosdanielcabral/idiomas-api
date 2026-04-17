@@ -4,7 +4,7 @@ using Idiomas.Core.Infrastructure.Database.Model;
 
 namespace Idiomas.Core.Infrastructure.Database.Mapper;
 
-public static class MessageModelMapper
+public static class MessageModelMappingExtension
 {
     public static Message ToEntity(this MessageModel model)
     {

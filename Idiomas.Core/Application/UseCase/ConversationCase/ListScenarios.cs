@@ -2,6 +2,7 @@ using System.Net;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
+using Idiomas.Core.Domain.Enum.Extensions;
 using Idiomas.Core.Interface.Repository;
 
 namespace Idiomas.Core.Application.UseCase.ConversationCase;
@@ -28,8 +29,7 @@ public class ListScenarios(IScenarioRepository scenarioRepository)
 
         if (!isValidLanguage)
         {
-            string[] availableLanguages = Enum.GetNames<Language>();
-            string availableLanguagesString = string.Join(", ", availableLanguages);
+            string availableLanguagesString = LanguageExtensions.GetAvailableLanguagesString();
 
             throw new ApiException(
                 $"Invalid language '{language}'. Available languages: {availableLanguagesString}",

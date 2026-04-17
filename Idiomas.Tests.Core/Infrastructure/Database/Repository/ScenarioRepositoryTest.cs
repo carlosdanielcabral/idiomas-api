@@ -1,5 +1,6 @@
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Infrastructure.Database.Context;
+using Idiomas.Core.Infrastructure.Database.Model;
 using Idiomas.Core.Infrastructure.Database.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,9 +42,19 @@ public class ScenarioRepositoryTest : IDisposable
     public async Task GetById_WithValidGuid_ShouldReturnScenarioIfExists()
     {
         // Arrange
-        await this._repository.SeedScenarios();
-        var scenarios = await this._database.Scenario.FirstOrDefaultAsync();
-        string validGuid = scenarios!.Id.ToString();
+        var scenario = new ScenarioModel
+        {
+            Id = Guid.NewGuid(),
+            Language = "English",
+            Title = "Test Scenario",
+            Description = "Test description",
+            IsActive = true
+        };
+
+        this._database.Scenario.Add(scenario);
+        await this._database.SaveChangesAsync();
+
+        string validGuid = scenario.Id.ToString();
 
         // Act
         Scenario? result = await this._repository.GetById(validGuid);

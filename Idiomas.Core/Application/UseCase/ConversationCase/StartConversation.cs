@@ -1,7 +1,7 @@
 using Idiomas.Core.Application.DTO.Conversation;
 using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Mapper;
 using Idiomas.Core.Domain.Entity;
-using Idiomas.Core.Infrastructure.Helper;
 using Idiomas.Core.Interface.Repository;
 using System.Net;
 
@@ -16,28 +16,42 @@ public class StartConversation(
 
     public async Task<Conversation> Execute(StartConversationRequest request, string userId)
     {
-        string conversationId = UUIDGenerator.Generate();
+        await this.ValidateConversation(request, userId);
 
-        Conversation conversation = new(conversationId, userId, request.Language, request.Mode);
-
-        if (!string.IsNullOrEmpty(request.ScenarioId))
-        {
-            Scenario? scenario = await this._scenarioRepository.GetById(request.ScenarioId);
-            if (scenario == null)
-            {
-                throw new ApiException("Scenario not found.", HttpStatusCode.NotFound);
-            }
-
-            if (scenario.Language != request.Language)
-            {
-                throw new ApiException(
-                    "Scenario language does not match conversation language.",
-                    HttpStatusCode.BadRequest);
-            }
-
-            conversation.SetScenarioId(request.ScenarioId);
-        }
+        Conversation conversation = request.ToEntity(userId, request.ScenarioId);
 
         return await this._conversationRepository.Insert(conversation);
+    }
+
+    private async Task ValidateConversation(StartConversationRequest request, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            throw new ApiException("UserId is required.", HttpStatusCode.BadRequest);
+        }
+
+        if (request.mode == ConversationMode.Free)
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(request.ScenarioId))
+        {
+            throw new ApiException("ScenarioId is required for guided conversations.", HttpStatusCode.BadRequest);
+        }
+
+        Scenario? scenario = await this._scenarioRepository.GetById(request.ScenarioId);
+
+        if (scenario == null)
+        {
+            throw new ApiException("Scenario not found.", HttpStatusCode.NotFound);
+        }
+
+        if (scenario.Language != request.Language)
+        {
+            throw new ApiException(
+                "Scenario language does not match conversation language.",
+                HttpStatusCode.BadRequest);
+        }
     }
 }
