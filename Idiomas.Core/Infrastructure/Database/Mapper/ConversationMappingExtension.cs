@@ -28,6 +28,11 @@ public static class ConversationMappingExtension
             scenarioId
         );
 
+        foreach (MessageModel messageModel in model.Messages)
+        {
+            conversation.AddMessage(messageModel.ToEntity());
+        }
+
         return conversation;
     }
 
