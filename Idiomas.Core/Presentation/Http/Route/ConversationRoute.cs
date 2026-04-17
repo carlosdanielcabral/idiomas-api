@@ -1,6 +1,6 @@
-using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Interface.Controller;
 using Idiomas.Core.Interface.Route;
+using Idiomas.Core.Presentation.DTO;
 using Idiomas.Core.Presentation.DTO.Conversation;
 
 namespace Idiomas.Core.Presentation.Http.Route;
@@ -14,12 +14,13 @@ public class ConversationRoute(IConversationController controller) : IRoute
         var conversations = app.MapGroup("/conversations").RequireAuthorization();
 
         // List scenarios
-        conversations.MapGet("/scenarios", (Language? language, IServiceProvider provider) =>
+        conversations.MapGet("/scenarios", (string? language, IServiceProvider provider) =>
         {
             var useCase = provider.GetRequiredService<Application.UseCase.ConversationCase.ListScenarios>();
             return this._controller.ListScenarios(language, useCase);
         })
-        .Produces<List<ScenarioResponseDTO>>(StatusCodes.Status200OK);
+        .Produces<List<ScenarioResponseDTO>>(StatusCodes.Status200OK)
+        .Produces<ErrorResponseDTO>(StatusCodes.Status400BadRequest);
 
         // Start conversation
         conversations.MapPost("/", (CreateConversationRequestDTO dto, HttpContext context, IServiceProvider provider) =>

@@ -2,7 +2,6 @@ using System.Security.Claims;
 using Idiomas.Core.Application.DTO.Conversation;
 using Idiomas.Core.Application.UseCase.ConversationCase;
 using Idiomas.Core.Domain.Entity;
-using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Interface.Controller;
 using Idiomas.Core.Presentation.DTO.Conversation;
 using Idiomas.Core.Presentation.Extensions;
@@ -58,15 +57,15 @@ public class ConversationController : IConversationController
         return TypedResults.Ok(response);
     }
 
-    public async Task<IResult> ListScenarios(Language? language, ListScenarios useCase)
+    public async Task<IResult> ListScenarios(string? language, ListScenarios useCase)
     {
         IEnumerable<Scenario> scenarios = await useCase.Execute(language);
 
-        List<ScenarioResponseDTO> response = scenarios.Select(s => new ScenarioResponseDTO
+        List<ScenarioResponseDTO> response = scenarios.Select(scenario => new ScenarioResponseDTO
         {
-            Id = s.Id,
-            Title = s.Title,
-            Description = s.Description
+            Id = scenario.Id,
+            Title = scenario.Title,
+            Description = scenario.Description
         }).ToList();
 
         return TypedResults.Ok(response);
