@@ -28,7 +28,8 @@ public class ScenarioRepository(ApplicationContext database) : IScenarioReposito
 
     public async Task<Scenario?> GetById(string id)
     {
-        Guid scenarioId = Guid.Parse(id);
+        if (!Guid.TryParse(id, out var scenarioId))
+            return null;
 
         ScenarioModel? model = await this._database.Scenario
             .FirstOrDefaultAsync(s => s.Id == scenarioId);
