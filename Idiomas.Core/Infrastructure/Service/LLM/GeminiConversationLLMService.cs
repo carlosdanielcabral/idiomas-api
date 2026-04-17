@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Idiomas.Core.Application.DTO.Conversation;
+using Idiomas.Core.Application.Error;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Service.LLM;
@@ -49,10 +50,16 @@ public class GeminiConversationLLMService : IConversationLLMService
                     new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
                 );
 
+                Console.WriteLine($"Response status code: {response.StatusCode}");
+                
+                string responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Response content: {responseContent}");
+        
                 if (response.IsSuccessStatusCode)
                 {
                     GeminiResponse? geminiResponse = await response.Content.ReadFromJsonAsync<GeminiResponse>();
                     string content = geminiResponse?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text ?? "{}";
+
                     return this.ParseResponse(content);
                 }
 
@@ -61,23 +68,33 @@ public class GeminiConversationLLMService : IConversationLLMService
                 {
                     int delayMs = this.CalculateExponentialBackoffWithJitter(baseDelayMs, attempt);
                     await Task.Delay(delayMs);
+
                     continue;
                 }
 
-                // For non-retryable status codes or max retries reached, throw
-                response.EnsureSuccessStatusCode();
+                // For non-retryable status codes or max retries reached, throw proper ApiException
+                string errorContent = await response.Content.ReadAsStringAsync();
+
+                throw new ApiException(
+                    $"Failed to process message with AI service. Status: {response.StatusCode}. Please try again later.",
+                    HttpStatusCode.ServiceUnavailable
+                );
             }
             catch (HttpRequestException ex) when (attempt < maxRetries)
             {
                 // Handle network errors with retry
                 int delayMs = this.CalculateExponentialBackoffWithJitter(baseDelayMs, attempt);
                 await Task.Delay(delayMs);
+
                 continue;
             }
         }
 
         // This should not be reached, but handle the case where all retries fail
-        throw new HttpRequestException("Failed to get response from Gemini API after maximum retries.");
+        throw new ApiException(
+            "AI service is temporarily unavailable. Please try again later.",
+            HttpStatusCode.ServiceUnavailable
+        );
     }
 
     private bool IsRetryableStatusCode(HttpStatusCode statusCode)
