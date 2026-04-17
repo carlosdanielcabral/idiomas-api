@@ -11,10 +11,10 @@ public class ConversationRoute(IConversationController controller) : IRoute
 
     public void Register(WebApplication app)
     {
-        var conversations = app.MapGroup("/api/conversations").RequireAuthorization();
+        var conversations = app.MapGroup("/conversations").RequireAuthorization();
 
         // List scenarios
-        conversations.MapGet("/scenarios", (Language language, IServiceProvider provider) =>
+        conversations.MapGet("/scenarios", (Language? language, IServiceProvider provider) =>
         {
             var useCase = provider.GetRequiredService<Application.UseCase.ConversationCase.ListScenarios>();
             return this._controller.ListScenarios(language, useCase);

@@ -22,7 +22,7 @@ public class ListScenariosTest
     [Fact]
     public async Task Execute_ShouldReturnScenarios_ForLanguage()
     {
-        Language language = Language.English;
+        Language? language = Language.English;
         List<CoreScenario> expectedScenarios = new()
         {
             new CoreScenario(UUIDGenerator.Generate(), Language.English, "Restaurant", "Ordering food"),
@@ -43,7 +43,7 @@ public class ListScenariosTest
     [Fact]
     public async Task Execute_ShouldReturnEmptyList_WhenNoScenarios()
     {
-        Language language = Language.German;
+        Language? language = Language.German;
 
         this._scenarioRepositoryMock
             .Setup(repository => repository.GetByLanguage(language))
@@ -52,5 +52,26 @@ public class ListScenariosTest
         IEnumerable<CoreScenario> result = await _sut.Execute(language);
 
         Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task Execute_ShouldReturnAllScenarios_WhenLanguageIsNull()
+    {
+        Language? language = null;
+        List<CoreScenario> expectedScenarios = new()
+        {
+            new CoreScenario(UUIDGenerator.Generate(), Language.English, "Restaurant", "Ordering food"),
+            new CoreScenario(UUIDGenerator.Generate(), Language.Spanish, "Restaurante", "Ordering in Spanish"),
+            new CoreScenario(UUIDGenerator.Generate(), Language.French, "Restaurant", "Ordering in French")
+        };
+
+        this._scenarioRepositoryMock
+            .Setup(repository => repository.GetByLanguage(language))
+            .ReturnsAsync(expectedScenarios);
+
+        IEnumerable<CoreScenario> result = await _sut.Execute(language);
+
+        Assert.Equal(3, result.Count());
+        this._scenarioRepositoryMock.Verify(repository => repository.GetByLanguage(language), Times.Once);
     }
 }

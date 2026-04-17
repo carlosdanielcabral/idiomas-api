@@ -12,11 +12,16 @@ public class ScenarioRepository(ApplicationContext database) : IScenarioReposito
 {
     private readonly ApplicationContext _database = database;
 
-    public async Task<IEnumerable<Scenario>> GetByLanguage(Language language)
+    public async Task<IEnumerable<Scenario>> GetByLanguage(Language? language)
     {
-        List<ScenarioModel> models = await this._database.Scenario
-            .Where(s => s.Language == language.ToString() && s.IsActive)
-            .ToListAsync();
+        IQueryable<ScenarioModel> query = this._database.Scenario.Where(s => s.IsActive);
+
+        if (language.HasValue)
+        {
+            query = query.Where(s => s.Language == language.Value.ToString());
+        }
+
+        List<ScenarioModel> models = await query.ToListAsync();
 
         return models.ToEntities();
     }

@@ -58,7 +58,7 @@ public class ConversationController : IConversationController
         return TypedResults.Ok(response);
     }
 
-    public async Task<IResult> ListScenarios(Language language, ListScenarios useCase)
+    public async Task<IResult> ListScenarios(Language? language, ListScenarios useCase)
     {
         IEnumerable<Scenario> scenarios = await useCase.Execute(language);
 

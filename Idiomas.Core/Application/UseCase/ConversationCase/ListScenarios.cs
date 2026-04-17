@@ -8,7 +8,7 @@ public class ListScenarios(IScenarioRepository scenarioRepository)
 {
     private readonly IScenarioRepository _scenarioRepository = scenarioRepository;
 
-    public async Task<IEnumerable<Scenario>> Execute(Language language)
+    public async Task<IEnumerable<Scenario>> Execute(Language? language)
     {
         return await this._scenarioRepository.GetByLanguage(language);
     }
