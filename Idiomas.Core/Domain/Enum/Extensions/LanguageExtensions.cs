@@ -4,7 +4,7 @@ public static class LanguageExtensions
 {
     public static string GetAvailableLanguagesString()
     {
-        string[] availableLanguages = Enum.GetNames<Language>();
+        string[] availableLanguages = System.Enum.GetNames<Language>();
 
         return string.Join(", ", availableLanguages);
     }

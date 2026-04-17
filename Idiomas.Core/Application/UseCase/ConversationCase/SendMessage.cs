@@ -107,10 +107,12 @@ public class SendMessage(
         List<CorrectionResponse> corrections,
         string userMessageId)
     {
-        foreach (CorrectionResponse correctionResponse in corrections)
-        {
-            this.ValidateCorrection(correctionResponse, userMessageId);
+        List<CorrectionResponse> validCorrections = corrections
+            .Where(correction => this.IsValidCorrection(correction, userMessageId))
+            .ToList();
 
+        foreach (CorrectionResponse correctionResponse in validCorrections)
+        {
             string correctionId = UUIDGenerator.Generate();
             Correction correction = new(
                 correctionId,
@@ -124,32 +126,15 @@ public class SendMessage(
             await this._conversationRepository.InsertCorrection(correction);
         }
 
-        return corrections;
+        return validCorrections;
     }
 
-    private void ValidateCorrection(CorrectionResponse correction, string userMessageId)
+    private bool IsValidCorrection(CorrectionResponse correction, string userMessageId)
     {
-        const string ERROR_MESSAGE = "Failed to load response from AI";
-
-        if (string.IsNullOrWhiteSpace(userMessageId))
-        {
-            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
-        }
-
-        if (string.IsNullOrWhiteSpace(correction.OriginalFragment))
-        {
-            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
-        }
-
-        if (string.IsNullOrWhiteSpace(correction.SuggestedFragment))
-        {
-            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
-        }
-
-        if (string.IsNullOrWhiteSpace(correction.Explanation))
-        {
-            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
-        }
+        return !string.IsNullOrWhiteSpace(userMessageId)
+            && !string.IsNullOrWhiteSpace(correction.OriginalFragment)
+            && !string.IsNullOrWhiteSpace(correction.SuggestedFragment)
+            && !string.IsNullOrWhiteSpace(correction.Explanation);
     }
 
     private async Task<Message> SaveAssistantMessage(string conversationId, string content)

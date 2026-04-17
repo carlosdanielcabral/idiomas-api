@@ -2,6 +2,7 @@ using Idiomas.Core.Application.DTO.Conversation;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Application.Mapper;
 using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Interface.Repository;
 using System.Net;
 
@@ -30,7 +31,7 @@ public class StartConversation(
             throw new ApiException("UserId is required.", HttpStatusCode.BadRequest);
         }
 
-        if (request.mode == ConversationMode.Free)
+        if (request.Mode == ConversationMode.Free)
         {
             return;
         }
