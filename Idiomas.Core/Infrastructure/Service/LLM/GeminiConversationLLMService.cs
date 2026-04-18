@@ -164,7 +164,7 @@ int contextLimit = string.IsNullOrEmpty(contextLimitString) ? 10 : int.Parse(con
             Contents = contents,
             GenerationConfig = new GeminiGenerationConfig
             {
-                Temperature = 0.3,
+                Temperature = 0.7,
                 ResponseMimeType = "application/json"
             }
         };
