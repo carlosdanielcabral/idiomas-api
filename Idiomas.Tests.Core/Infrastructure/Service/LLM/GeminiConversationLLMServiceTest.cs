@@ -142,4 +142,57 @@ public class GeminiConversationLLMServiceTest
         await Assert.ThrowsAsync<ApiException>(
             () => this._service.SendMessageAsync(conversation, userMessage, scenarioDescription));
     }
+
+    [Fact]
+    public async Task SendMessageAsync_WithCorrections_ShouldParseCorrectly()
+    {
+        // Arrange
+        Conversation conversation = new("conv-123", "user-123", Language.Portuguese, ConversationMode.Free);
+        string userMessage = "queru pedir auguma coyza";
+        string? scenarioDescription = null;
+
+        var geminiResponse = new
+        {
+            candidates = new[]
+            {
+                new
+                {
+                    content = new
+                    {
+                        parts = new[]
+                        {
+                            new
+                            {
+                                text = """{"response":"Claro! O que você gostaria de pedir?","corrections":[{"originalFragment":"queru","suggestedFragment":"quero","explanation":"A forma correta é 'quero' (eu quero), não 'queru'","type":"Spelling"},{"originalFragment":"auguma","suggestedFragment":"alguma","explanation":"A forma correta é 'alguma', não 'auguma'","type":"Spelling"},{"originalFragment":"coyza","suggestedFragment":"coisa","explanation":"A forma correta é 'coisa', não 'coyza'","type":"Spelling"}]}"""
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        this._httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(() =>
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.OK);
+                response.Content = JsonContent.Create(geminiResponse);
+                return response;
+            });
+
+        // Act
+        var result = await this._service.SendMessageAsync(conversation, userMessage, scenarioDescription);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Claro! O que você gostaria de pedir?", result.Content);
+        Assert.Equal(3, result.Corrections.Count);
+        Assert.Equal("queru", result.Corrections[0].OriginalFragment);
+        Assert.Equal("quero", result.Corrections[0].SuggestedFragment);
+        Assert.Equal(ErrorType.Spelling, result.Corrections[0].Type);
+    }
 }

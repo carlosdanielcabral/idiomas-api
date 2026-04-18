@@ -176,7 +176,7 @@ int contextLimit = string.IsNullOrEmpty(contextLimitString) ? 10 : int.Parse(con
         {
             GeminiContentResponse? parsed = JsonSerializer.Deserialize<GeminiContentResponse>(content, new JsonSerializerOptions
             {
-                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
 
             List<CorrectionResponse> corrections = parsed?.Corrections?.Select(c => new CorrectionResponse(
@@ -258,15 +258,11 @@ public class GeminiContentResponse
 
 public class GeminiCorrection
 {
-    [JsonPropertyName("original_fragment")]
     public string OriginalFragment { get; set; } = string.Empty;
 
-    [JsonPropertyName("suggested_fragment")]
     public string SuggestedFragment { get; set; } = string.Empty;
 
-    [JsonPropertyName("explanation")]
     public string Explanation { get; set; } = string.Empty;
 
-    [JsonPropertyName("type")]
     public string Type { get; set; } = string.Empty;
 }
