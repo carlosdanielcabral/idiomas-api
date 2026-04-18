@@ -40,6 +40,7 @@ public class ConversationRepository(
         Guid userGuid = Guid.Parse(userId);
 
         List<ConversationModel> models = await this._database.Conversation
+            .Include(c => c.Messages)
             .Where(c => c.UserId == userGuid)
             .OrderByDescending(c => c.UpdatedAt)
             .ToListAsync();
