@@ -1,4 +1,4 @@
-# Idiomas API
+# Idiomas API [🏗️ Under development]
 
 A comprehensive REST API for a language learning platform that provides authentication, AI-powered conversations, dictionary management, and file storage capabilities.
 
