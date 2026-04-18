@@ -17,7 +17,7 @@ public static class DependencyInjection
         services.AddScoped<IEncryptionService, AesGcmEncryptionService>(provider =>
         {
             var configuration = provider.GetRequiredService<IConfiguration>();
-            var encryptionKey = configuration["Encryption__Key"];
+            var encryptionKey = configuration["Encryption:Key"];
             return new AesGcmEncryptionService(encryptionKey);
         });
         services.AddInfraAuthentication(configuration);
