@@ -22,6 +22,97 @@ namespace Idiomas.Core.Infrastructure.Database.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.ConversationModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("language");
+
+                    b.Property<string>("Mode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("mode");
+
+                    b.Property<Guid?>("ScenarioId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("scenario_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("ScenarioId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("conversation");
+                });
+
+            modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.CorrectionModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Explanation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("explanation");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("message_id");
+
+                    b.Property<string>("OriginalFragment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("original_fragment");
+
+                    b.Property<string>("SuggestedFragment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("suggested_fragment");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MessageId");
+
+                    b.ToTable("correction");
+                });
+
             modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.FileModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -97,6 +188,74 @@ namespace Idiomas.Core.Infrastructure.Database.Migrations
                     b.ToTable("meaning");
                 });
 
+            modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.MessageModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("content");
+
+                    b.Property<Guid>("ConversationId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("conversation_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("role");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConversationId");
+
+                    b.HasIndex("ConversationId", "CreatedAt");
+
+                    b.ToTable("message");
+                });
+
+            modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.ScenarioModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("language");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("title");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Language");
+
+                    b.ToTable("scenario");
+                });
+
             modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.UserModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -162,6 +321,34 @@ namespace Idiomas.Core.Infrastructure.Database.Migrations
                     b.ToTable("word");
                 });
 
+            modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.ConversationModel", b =>
+                {
+                    b.HasOne("Idiomas.Core.Infrastructure.Database.Model.ScenarioModel", "Scenario")
+                        .WithMany("Conversations")
+                        .HasForeignKey("ScenarioId");
+
+                    b.HasOne("Idiomas.Core.Infrastructure.Database.Model.UserModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Scenario");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.CorrectionModel", b =>
+                {
+                    b.HasOne("Idiomas.Core.Infrastructure.Database.Model.MessageModel", "Message")
+                        .WithMany("Corrections")
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Message");
+                });
+
             modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.FileModel", b =>
                 {
                     b.HasOne("Idiomas.Core.Infrastructure.Database.Model.UserModel", "User")
@@ -184,6 +371,17 @@ namespace Idiomas.Core.Infrastructure.Database.Migrations
                     b.Navigation("Word");
                 });
 
+            modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.MessageModel", b =>
+                {
+                    b.HasOne("Idiomas.Core.Infrastructure.Database.Model.ConversationModel", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+                });
+
             modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.WordModel", b =>
                 {
                     b.HasOne("Idiomas.Core.Infrastructure.Database.Model.UserModel", "User")
@@ -193,6 +391,21 @@ namespace Idiomas.Core.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.ConversationModel", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.MessageModel", b =>
+                {
+                    b.Navigation("Corrections");
+                });
+
+            modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.ScenarioModel", b =>
+                {
+                    b.Navigation("Conversations");
                 });
 
             modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.UserModel", b =>

@@ -1,4 +1,5 @@
 using Idiomas.Core.Application.UseCase.AuthCase;
+using Idiomas.Core.Application.UseCase.ConversationCase;
 using Idiomas.Core.Application.UseCase.DictionaryCase;
 using Idiomas.Core.Application.UseCase.File;
 using Idiomas.Core.Application.UseCase.UserCase;
@@ -26,6 +27,14 @@ public static class DependencyInjection
         services.AddScoped<RequestFileUpload>();
         services.AddScoped<ConfirmFileUpload>();
         services.AddScoped<FailFileUpload>();
+
+        // Conversation
+        services.AddScoped<StartConversation>();
+        services.AddScoped<SendMessage>();
+        services.AddScoped<ListScenarios>();
+        services.AddScoped<GetConversation>();
+        services.AddScoped<ListConversations>();
+        services.AddScoped<EndConversation>();
 
         return services;
     }

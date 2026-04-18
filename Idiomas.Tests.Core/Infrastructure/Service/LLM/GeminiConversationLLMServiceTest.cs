@@ -1,0 +1,198 @@
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
+using Idiomas.Core.Application.Error;
+using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Domain.Enum;
+using Idiomas.Core.Infrastructure.Service.LLM;
+using Microsoft.Extensions.Configuration;
+using Moq;
+using Moq.Protected;
+
+namespace Idiomas.Tests.Core.Infrastructure.Service.LLM;
+
+public class GeminiConversationLLMServiceTest
+{
+    private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
+    private readonly HttpClient _httpClient;
+    private readonly Mock<IConfiguration> _configurationMock;
+    private readonly GeminiConversationLLMService _service;
+
+    public GeminiConversationLLMServiceTest()
+    {
+        this._httpMessageHandlerMock = new Mock<HttpMessageHandler>();
+        this._httpClient = new HttpClient(this._httpMessageHandlerMock.Object);
+        this._configurationMock = new Mock<IConfiguration>();
+
+        this._configurationMock
+            .Setup(config => config["Gemini:ApiKey"])
+            .Returns("test-api-key");
+
+        this._configurationMock
+            .Setup(config => config["Gemini:Model"])
+            .Returns("gemini-2.0-flash");
+
+        this._configurationMock
+            .Setup(config => config["Conversation:ContextLimit"])
+            .Returns("10");
+
+        this._service = new GeminiConversationLLMService(this._httpClient, this._configurationMock.Object);
+    }
+
+    [Fact]
+    public async Task SendMessageAsync_With429Response_ShouldRetryAndSucceed()
+    {
+        // Arrange
+        Conversation conversation = new("conv-123", "user-123", Language.English, ConversationMode.Free);
+        string userMessage = "Hello";
+        string? scenarioDescription = null;
+
+        // Setup: First 2 calls return 429, third call succeeds
+        var geminiResponse = new
+        {
+            candidates = new[]
+            {
+                new
+                {
+                    content = new
+                    {
+                        parts = new[]
+                        {
+                            new { text = "{\"response\":\"Hello! How can I help you?\"}" }
+                        }
+                    }
+                }
+            }
+        };
+
+        var callCount = 0;
+        this._httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(() =>
+            {
+                callCount++;
+                if (callCount <= 2)
+                {
+                    var response = new HttpResponseMessage(HttpStatusCode.TooManyRequests);
+                    return response;
+                }
+                else
+                {
+                    var response = new HttpResponseMessage(HttpStatusCode.OK);
+                    response.Content = JsonContent.Create(geminiResponse);
+                    return response;
+                }
+            });
+
+        // Act
+        var result = await this._service.SendMessageAsync(conversation, userMessage, scenarioDescription);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Hello! How can I help you?", result.Content);
+        Assert.Equal(3, callCount); // Should have made 3 attempts
+    }
+
+    [Fact]
+    public async Task SendMessageAsync_WithMaxRetriesExceeded_ShouldThrowException()
+    {
+        // Arrange
+        Conversation conversation = new("conv-123", "user-123", Language.English, ConversationMode.Free);
+        string userMessage = "Hello";
+        string? scenarioDescription = null;
+
+        // Setup: All calls return 429
+        this._httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.TooManyRequests));
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<ApiException>(
+            () => this._service.SendMessageAsync(conversation, userMessage, scenarioDescription));
+
+        Assert.Contains("AI service is temporarily unavailable", exception.Message);
+    }
+
+    [Fact]
+    public async Task SendMessageAsync_WithNonRetryableError_ShouldThrowImmediately()
+    {
+        // Arrange
+        Conversation conversation = new("conv-123", "user-123", Language.English, ConversationMode.Free);
+        string userMessage = "Hello";
+        string? scenarioDescription = null;
+
+        // Setup: Returns 401 (non-retryable)
+        this._httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Unauthorized));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ApiException>(
+            () => this._service.SendMessageAsync(conversation, userMessage, scenarioDescription));
+    }
+
+    [Fact]
+    public async Task SendMessageAsync_WithCorrections_ShouldParseCorrectly()
+    {
+        // Arrange
+        Conversation conversation = new("conv-123", "user-123", Language.Portuguese, ConversationMode.Free);
+        string userMessage = "queru pedir auguma coyza";
+        string? scenarioDescription = null;
+
+        var geminiResponse = new
+        {
+            candidates = new[]
+            {
+                new
+                {
+                    content = new
+                    {
+                        parts = new[]
+                        {
+                            new
+                            {
+                                text = """{"response":"Claro! O que você gostaria de pedir?","corrections":[{"originalFragment":"queru","suggestedFragment":"quero","explanation":"A forma correta é 'quero' (eu quero), não 'queru'","type":"Spelling"},{"originalFragment":"auguma","suggestedFragment":"alguma","explanation":"A forma correta é 'alguma', não 'auguma'","type":"Spelling"},{"originalFragment":"coyza","suggestedFragment":"coisa","explanation":"A forma correta é 'coisa', não 'coyza'","type":"Spelling"}]}"""
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        this._httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(() =>
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.OK);
+                response.Content = JsonContent.Create(geminiResponse);
+                return response;
+            });
+
+        // Act
+        var result = await this._service.SendMessageAsync(conversation, userMessage, scenarioDescription);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Claro! O que você gostaria de pedir?", result.Content);
+        Assert.Equal(3, result.Corrections.Count);
+        Assert.Equal("queru", result.Corrections[0].OriginalFragment);
+        Assert.Equal("quero", result.Corrections[0].SuggestedFragment);
+        Assert.Equal(ErrorType.Spelling, result.Corrections[0].Type);
+    }
+}

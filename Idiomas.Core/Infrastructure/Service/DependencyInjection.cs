@@ -1,7 +1,8 @@
-
 using System.Text;
 using Idiomas.Core.Infrastructure.Service.Authentication;
+using Idiomas.Core.Infrastructure.Service.Encryption;
 using Idiomas.Core.Infrastructure.Service.Hash;
+using Idiomas.Core.Infrastructure.Service.LLM;
 using Idiomas.Core.Interface.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -13,7 +14,16 @@ public static class DependencyInjection
     public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IHash, Argon2Hash>();
+        services.AddScoped<IEncryptionService, AesGcmEncryptionService>(provider =>
+        {
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            var encryptionKey = configuration["Encryption:Key"];
+            return new AesGcmEncryptionService(encryptionKey);
+        });
         services.AddInfraAuthentication(configuration);
+
+        // LLM Service
+        services.AddHttpClient<IConversationLLMService, GeminiConversationLLMService>();
 
         return services;
     }
