@@ -166,7 +166,3 @@ dotnet test
 ```
 
 
-## Contact
-
-- **Developer**: Carlos Daniel Cabral
-- **Email**: dev.carlosdaniel@gmail.com
