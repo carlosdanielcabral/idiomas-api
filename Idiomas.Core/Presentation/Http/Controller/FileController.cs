@@ -4,13 +4,16 @@ using Idiomas.Core.Application.DTO.File;
 using Idiomas.Core.Application.UseCase.File;
 using Idiomas.Core.Interface.Controller;
 using Idiomas.Core.Presentation.Extensions;
+using Idiomas.Core.Presentation.Http.Validator.File;
 
 namespace Idiomas.Core.Application.Http.Controller;
 
 public class FileController : IFileController
 {
-    public async Task<IResult> GenerateUploadUrl(CreateFileDTO dto, ClaimsPrincipal user, RequestFileUpload useCase)
+    public async Task<IResult> GenerateUploadUrl(CreateFileDTO dto, ClaimsPrincipal user, RequestFileUploadValidator validator, RequestFileUpload useCase)
     {
+        validator.Validate(dto);
+
         var result = await useCase.Execute(dto, user.GetUserId().ToString());
 
         CreateFileResponseDTO response = new(result.UrlToUpload, result.FileKey);

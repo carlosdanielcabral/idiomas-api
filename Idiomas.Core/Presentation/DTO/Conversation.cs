@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 using Idiomas.Core.Domain.Enum;
 
 namespace Idiomas.Core.Presentation.DTO.Conversation;
@@ -83,7 +81,5 @@ public class ListScenariosRequestDTO
 
 public class SendMessageRequestDTO
 {
-    [Required]
-    [StringLength(4000, MinimumLength = 1)]
     public string Content { get; set; } = string.Empty;
 }

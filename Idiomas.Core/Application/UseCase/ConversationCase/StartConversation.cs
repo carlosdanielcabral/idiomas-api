@@ -26,22 +26,12 @@ public class StartConversation(
 
     private async Task ValidateConversation(StartConversationRequest request, string userId)
     {
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            throw new ApiException("UserId is required.", HttpStatusCode.BadRequest);
-        }
-
         if (request.Mode == ConversationMode.Free)
         {
             return;
         }
 
-        if (string.IsNullOrEmpty(request.ScenarioId))
-        {
-            throw new ApiException("ScenarioId is required for guided conversations.", HttpStatusCode.BadRequest);
-        }
-
-        Scenario? scenario = await this._scenarioRepository.GetById(request.ScenarioId);
+        Scenario? scenario = await this._scenarioRepository.GetById(request.ScenarioId!);
 
         if (scenario == null)
         {

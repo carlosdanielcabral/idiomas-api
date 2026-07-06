@@ -5,14 +5,17 @@ using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Interface.Controller;
 using Idiomas.Core.Presentation.DTO.Dictionary;
 using Idiomas.Core.Presentation.Extensions;
+using Idiomas.Core.Presentation.Http.Validator.Dictionary;
 using Idiomas.Core.Presentation.Mapper;
 
 namespace Idiomas.Core.Presentation.Http.Controller;
 
 public class DictionaryController() : IDictionaryController
 {
-    public async Task<IResult> SaveWord(CreateWordDTO dto, ClaimsPrincipal user, CreateWord useCase)
+    public async Task<IResult> SaveWord(CreateWordDTO dto, ClaimsPrincipal user, CreateWordValidator validator, CreateWord useCase)
     {
+        validator.Validate(dto);
+
         string userIdString = user.GetUserId().ToString();
 
         Word word = await useCase.Execute(dto, userIdString);
@@ -33,8 +36,10 @@ public class DictionaryController() : IDictionaryController
         return TypedResults.Ok(response);
     }
 
-    public async Task<IResult> UpdateWord(string id, UpdateWordDTO dto, ClaimsPrincipal user, UpdateWord useCase)
+    public async Task<IResult> UpdateWord(string id, UpdateWordDTO dto, ClaimsPrincipal user, UpdateWordValidator validator, UpdateWord useCase)
     {
+        validator.Validate(dto);
+
         string userIdString = user.GetUserId().ToString();
 
         Word updatedWord = await useCase.Execute(id, dto, userIdString);

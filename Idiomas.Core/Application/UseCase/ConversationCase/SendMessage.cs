@@ -20,8 +20,6 @@ public class SendMessage(
 
     public async Task<MessageResponse> Execute(string conversationId, SendMessageRequest request, string userId)
     {
-        this.ValidateRequest(request);
-
         Conversation conversation = await this.GetAndValidateConversation(conversationId, userId);
         
         await this.SaveUserMessage(conversation, request.Content);
@@ -42,14 +40,6 @@ public class SendMessage(
         Message assistantMessage = await this.SaveAssistantMessage(conversationId, llmResponse.Content);
 
         return this.BuildMessageResponse(assistantMessage, correctionResponses);
-    }
-
-    private void ValidateRequest(SendMessageRequest request)
-    {
-        if (string.IsNullOrWhiteSpace(request.Content))
-        {
-            throw new ApiException("Message content cannot be empty", HttpStatusCode.BadRequest);
-        }
     }
 
     private async Task<Conversation> GetAndValidateConversation(string conversationId, string userId)

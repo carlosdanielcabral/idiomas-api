@@ -7,6 +7,7 @@ using Idiomas.Core.Helper;
 using Idiomas.Core.Interface.Controller;
 using Idiomas.Core.Presentation.DTO.Conversation;
 using Idiomas.Core.Presentation.Extensions;
+using Idiomas.Core.Presentation.Http.Validator.Conversation;
 using Idiomas.Core.Presentation.Mapper;
 
 namespace Idiomas.Core.Presentation.Http.Controller;
@@ -16,8 +17,11 @@ public class ConversationController : IConversationController
     public async Task<IResult> StartConversation(
         CreateConversationRequestDTO dto,
         ClaimsPrincipal user,
+        StartConversationValidator validator,
         StartConversation useCase)
     {
+        validator.Validate(dto);
+
         string userIdString = user.GetUserId().ToString();
 
         Language language = LanguageHelper.ParseLanguage(dto.Language, isRequired: true)
@@ -36,8 +40,11 @@ public class ConversationController : IConversationController
         string conversationId,
         SendMessageRequestDTO dto,
         ClaimsPrincipal user,
+        SendMessageValidator validator,
         SendMessage useCase)
     {
+        validator.Validate(dto);
+
         string userIdString = user.GetUserId().ToString();
 
         SendMessageRequest request = new(dto.Content);
