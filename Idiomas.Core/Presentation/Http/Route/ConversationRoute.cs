@@ -1,7 +1,9 @@
+using Idiomas.Core.Application.DTO.Conversation;
 using Idiomas.Core.Interface.Controller;
 using Idiomas.Core.Interface.Route;
 using Idiomas.Core.Presentation.DTO;
 using Idiomas.Core.Presentation.DTO.Conversation;
+using Idiomas.Core.Presentation.Http.Validator;
 using Idiomas.Core.Presentation.Http.Validator.Conversation;
 
 namespace Idiomas.Core.Presentation.Http.Route;
@@ -26,21 +28,21 @@ public class ConversationRoute(IConversationController controller) : IRoute
         // Start conversation
         conversations.MapPost("/", (CreateConversationRequestDTO dto, HttpContext context, IServiceProvider provider) =>
         {
-            var validator = provider.GetRequiredService<StartConversationValidator>();
             var useCase = provider.GetRequiredService<Application.UseCase.ConversationCase.StartConversation>();
-            return this._controller.StartConversation(dto, context.User, validator, useCase);
+            return this._controller.StartConversation(dto, context.User, useCase);
         })
-        .Produces<ConversationResponseDTO>(StatusCodes.Status201Created);
+        .Produces<ConversationResponseDTO>(StatusCodes.Status201Created)
+        .WithValidation<StartConversationValidator, CreateConversationRequestDTO>();
 
         // Send message
         conversations.MapPost("/{id}/messages", (string id, SendMessageRequestDTO dto, HttpContext context, IServiceProvider provider) =>
         {
-            var validator = provider.GetRequiredService<SendMessageValidator>();
             var useCase = provider.GetRequiredService<Application.UseCase.ConversationCase.SendMessage>();
-            return this._controller.SendMessage(id, dto, context.User, validator, useCase);
+            return this._controller.SendMessage(id, dto, context.User, useCase);
         })
         .Produces<MessageResponseDTO>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status404NotFound);
+        .Produces(StatusCodes.Status404NotFound)
+        .WithValidation<SendMessageValidator, SendMessageRequestDTO>();
 
         // Get conversation
         conversations.MapGet("/{id}", (string id, HttpContext context, IServiceProvider provider) =>

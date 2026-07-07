@@ -5,7 +5,7 @@ using Idiomas.Core.Presentation.DTO.Conversation;
 
 namespace Idiomas.Core.Presentation.Http.Validator.Conversation;
 
-public class SendMessageValidator
+public class SendMessageValidator : IValidator<SendMessageRequestDTO>
 {
     private const int MAXIMUM_CONTENT_LENGTH = 4000;
 

@@ -5,7 +5,7 @@ using Idiomas.Core.Application.Error;
 
 namespace Idiomas.Core.Presentation.Http.Validator.Dictionary;
 
-public class UpdateWordValidator
+public class UpdateWordValidator : IValidator<UpdateWordDTO>
 {
     public void Validate(UpdateWordDTO dto)
     {

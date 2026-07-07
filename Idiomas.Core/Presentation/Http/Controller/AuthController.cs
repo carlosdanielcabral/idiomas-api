@@ -4,7 +4,6 @@ using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Interface.Controller;
 using Idiomas.Core.Interface.Service;
 using Idiomas.Core.Presentation.DTO.Auth;
-using Idiomas.Core.Presentation.Http.Validator.Auth;
 using Idiomas.Core.Presentation.Mapper;
 
 namespace Idiomas.Core.Presentation.Http.Controller;
@@ -13,10 +12,8 @@ public class AuthController(IToken tokenGenerator) : IAuthController
 {
     private readonly IToken _tokenGenerator = tokenGenerator;
 
-    public async Task<IResult> MailPasswordLogin(HttpContext httpContext, MailPasswordLoginDTO dto, MailPasswordLoginValidator validator, MailPasswordLogin useCase)
+    public async Task<IResult> MailPasswordLogin(HttpContext httpContext, MailPasswordLoginDTO dto, MailPasswordLogin useCase)
     {
-        validator.Validate(dto);
-
         User user = await useCase.Execute(dto);
 
         MailPasswordLoginResponseDTO response = new()

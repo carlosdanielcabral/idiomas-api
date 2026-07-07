@@ -5,7 +5,7 @@ using Idiomas.Core.Application.Error;
 
 namespace Idiomas.Core.Presentation.Http.Validator.Dictionary;
 
-public class CreateWordValidator
+public class CreateWordValidator : IValidator<CreateWordDTO>
 {
     public void Validate(CreateWordDTO dto)
     {

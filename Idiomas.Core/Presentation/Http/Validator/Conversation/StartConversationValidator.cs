@@ -6,7 +6,7 @@ using Idiomas.Core.Presentation.DTO.Conversation;
 
 namespace Idiomas.Core.Presentation.Http.Validator.Conversation;
 
-public class StartConversationValidator
+public class StartConversationValidator : IValidator<CreateConversationRequestDTO>
 {
     public void Validate(CreateConversationRequestDTO dto)
     {

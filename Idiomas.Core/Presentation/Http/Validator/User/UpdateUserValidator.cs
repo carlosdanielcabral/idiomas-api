@@ -6,7 +6,7 @@ using Idiomas.Core.Application.Error;
 
 namespace Idiomas.Core.Presentation.Http.Validator.User;
 
-public partial class UpdateUserValidator
+public partial class UpdateUserValidator : IValidator<UpdateUserDTO>
 {
     private const int MINIMUM_PASSWORD_LENGTH = 8;
 

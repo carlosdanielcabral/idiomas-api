@@ -6,7 +6,7 @@ using Idiomas.Core.Application.Error;
 
 namespace Idiomas.Core.Presentation.Http.Validator.Auth;
 
-public partial class MailPasswordLoginValidator
+public partial class MailPasswordLoginValidator : IValidator<MailPasswordLoginDTO>
 {
     public void Validate(MailPasswordLoginDTO dto)
     {

@@ -6,7 +6,7 @@ using Idiomas.Core.Application.Error;
 
 namespace Idiomas.Core.Presentation.Http.Validator.File;
 
-public partial class RequestFileUploadValidator
+public partial class RequestFileUploadValidator : IValidator<CreateFileDTO>
 {
     public void Validate(CreateFileDTO dto)
     {
