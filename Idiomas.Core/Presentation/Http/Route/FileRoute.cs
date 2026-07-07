@@ -1,7 +1,10 @@
 
+using Idiomas.Application.DTO.File;
 using Idiomas.Core.Application.DTO.File;
 using Idiomas.Core.Interface.Controller;
 using Idiomas.Core.Interface.Route;
+using Idiomas.Core.Presentation.Http.Validator;
+using Idiomas.Core.Presentation.Http.Validator.File;
 
 namespace Idiomas.Core.Presentation.Http.Route;
 
@@ -14,7 +17,8 @@ public class FileRoute(IFileController controller) : IRoute
         var file = app.MapGroup("/file").RequireAuthorization();
         
         file.MapPost("/", _controller.GenerateUploadUrl)
-            .Produces<CreateFileResponseDTO>(StatusCodes.Status201Created);
+            .Produces<CreateFileResponseDTO>(StatusCodes.Status201Created)
+            .WithValidation<RequestFileUploadValidator, CreateFileDTO>();
 
         file.MapPatch("/{filekey}/confirmation", _controller.ConfirmFileUpload)
             .Produces(StatusCodes.Status204NoContent);

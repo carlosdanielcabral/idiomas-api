@@ -1,5 +1,6 @@
 using Idiomas.Core.Presentation.Http.Route;
 using Idiomas.Core.Presentation.Http.Controller;
+using Idiomas.Core.Presentation.Http.Validator;
 using Microsoft.OpenApi.Models;
 using System.Threading.RateLimiting;
 
@@ -14,6 +15,7 @@ public static class DependencyInjection
             .AddRateLimit()
             .AddPresentationControllers()
             .AddPresentationRoutes()
+            .AddValidators()
             .AddAPIDocumentation()
             .AddScoped<Router>();
 
