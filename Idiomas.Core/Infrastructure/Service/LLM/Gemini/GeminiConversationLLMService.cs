@@ -11,7 +11,7 @@ using Idiomas.Core.Infrastructure.Service.LLM;
 using Idiomas.Core.Interface.Service;
 using Microsoft.Extensions.Configuration;
 
-namespace Idiomas.Core.Infrastructure.Service.LLM;
+namespace Idiomas.Core.Infrastructure.Service.LLM.Gemini;
 
 public class GeminiConversationLLMService : IConversationLLMService
 {
@@ -39,7 +39,7 @@ public class GeminiConversationLLMService : IConversationLLMService
 
         const int maxRetries = 3;
         const int baseDelayMs = 1000;
-        
+
         for (int attempt = 0; attempt <= maxRetries; attempt++)
         {
             try
@@ -49,7 +49,7 @@ public class GeminiConversationLLMService : IConversationLLMService
                     request,
                     new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
                 );
-        
+
                 if (response.IsSuccessStatusCode)
                 {
                     GeminiResponse? geminiResponse = await response.Content.ReadFromJsonAsync<GeminiResponse>();
@@ -58,7 +58,6 @@ public class GeminiConversationLLMService : IConversationLLMService
                     return this.ParseResponse(content);
                 }
 
-                // Handle retryable status codes
                 if (this.IsRetryableStatusCode(response.StatusCode) && attempt < maxRetries)
                 {
                     int delayMs = this.CalculateExponentialBackoffWithJitter(baseDelayMs, attempt);
@@ -67,7 +66,14 @@ public class GeminiConversationLLMService : IConversationLLMService
                     continue;
                 }
 
-                // For non-retryable status codes or max retries reached, throw proper ApiException
+                if (this.IsRetryableStatusCode(response.StatusCode))
+                {
+                    throw new ApiException(
+                        "AI service is temporarily unavailable. Please try again later.",
+                        HttpStatusCode.ServiceUnavailable
+                    );
+                }
+
                 string errorContent = await response.Content.ReadAsStringAsync();
 
                 throw new ApiException(
@@ -75,17 +81,22 @@ public class GeminiConversationLLMService : IConversationLLMService
                     HttpStatusCode.ServiceUnavailable
                 );
             }
-            catch (HttpRequestException ex) when (attempt < maxRetries)
+            catch (HttpRequestException) when (attempt < maxRetries)
             {
-                // Handle network errors with retry
                 int delayMs = this.CalculateExponentialBackoffWithJitter(baseDelayMs, attempt);
                 await Task.Delay(delayMs);
 
                 continue;
             }
+            catch (HttpRequestException)
+            {
+                throw new ApiException(
+                    "AI service is temporarily unavailable. Please try again later.",
+                    HttpStatusCode.ServiceUnavailable
+                );
+            }
         }
 
-        // This should not be reached, but handle the case where all retries fail
         throw new ApiException(
             "AI service is temporarily unavailable. Please try again later.",
             HttpStatusCode.ServiceUnavailable
@@ -94,13 +105,13 @@ public class GeminiConversationLLMService : IConversationLLMService
 
     private bool IsRetryableStatusCode(HttpStatusCode statusCode)
     {
-        HttpStatusCode[] retryableStatusCodes = 
+        HttpStatusCode[] retryableStatusCodes =
         {
-            HttpStatusCode.TooManyRequests, // 429
-            HttpStatusCode.InternalServerError, // 500
-            HttpStatusCode.BadGateway, // 502
-            HttpStatusCode.ServiceUnavailable, // 503
-            HttpStatusCode.GatewayTimeout // 504
+            HttpStatusCode.TooManyRequests,
+            HttpStatusCode.InternalServerError,
+            HttpStatusCode.BadGateway,
+            HttpStatusCode.ServiceUnavailable,
+            HttpStatusCode.GatewayTimeout
         };
 
         return retryableStatusCodes.Contains(statusCode);
@@ -110,7 +121,8 @@ public class GeminiConversationLLMService : IConversationLLMService
     {
         Random random = new();
         double exponentialDelay = baseDelayMs * Math.Pow(2, attempt);
-        double jitter = random.NextDouble() * 0.1 * exponentialDelay; // 10% jitter
+        double jitter = random.NextDouble() * 0.1 * exponentialDelay;
+
         return (int)(exponentialDelay + jitter);
     }
 
@@ -131,7 +143,7 @@ public class GeminiConversationLLMService : IConversationLLMService
         systemInstruction += $"\n\nThe user is practicing {conversation.Language}. Respond exclusively in this language.";
 
         string contextLimitString = this._configuration["Conversation:ContextLimit"];
-int contextLimit = string.IsNullOrEmpty(contextLimitString) ? 10 : int.Parse(contextLimitString);
+        int contextLimit = string.IsNullOrEmpty(contextLimitString) ? 10 : int.Parse(contextLimitString);
 
         foreach (Message message in conversation.Messages.OrderBy(m => m.CreatedAt).TakeLast(contextLimit))
         {
@@ -197,72 +209,4 @@ int contextLimit = string.IsNullOrEmpty(contextLimitString) ? 10 : int.Parse(con
                 new List<CorrectionResponse>());
         }
     }
-}
-
-public class GeminiRequest
-{
-    [JsonPropertyName("system_instruction")]
-    public GeminiContent? SystemInstruction { get; set; }
-
-    [JsonPropertyName("contents")]
-    public List<GeminiContent> Contents { get; set; } = new();
-
-    [JsonPropertyName("generationConfig")]
-    public GeminiGenerationConfig GenerationConfig { get; set; } = new();
-}
-
-public class GeminiContent
-{
-    [JsonPropertyName("role")]
-    public string Role { get; set; } = string.Empty;
-
-    [JsonPropertyName("parts")]
-    public List<GeminiPart> Parts { get; set; } = new();
-}
-
-public class GeminiPart
-{
-    [JsonPropertyName("text")]
-    public string Text { get; set; } = string.Empty;
-}
-
-public class GeminiGenerationConfig
-{
-    [JsonPropertyName("temperature")]
-    public double Temperature { get; set; }
-
-    [JsonPropertyName("responseMimeType")]
-    public string ResponseMimeType { get; set; } = "application/json";
-}
-
-public class GeminiResponse
-{
-    [JsonPropertyName("candidates")]
-    public List<GeminiCandidate>? Candidates { get; set; }
-}
-
-public class GeminiCandidate
-{
-    [JsonPropertyName("content")]
-    public GeminiContent? Content { get; set; }
-}
-
-public class GeminiContentResponse
-{
-    [JsonPropertyName("response")]
-    public string Response { get; set; } = string.Empty;
-
-    [JsonPropertyName("corrections")]
-    public List<GeminiCorrection>? Corrections { get; set; }
-}
-
-public class GeminiCorrection
-{
-    public string OriginalFragment { get; set; } = string.Empty;
-
-    public string SuggestedFragment { get; set; } = string.Empty;
-
-    public string Explanation { get; set; } = string.Empty;
-
-    public string Type { get; set; } = string.Empty;
 }

@@ -3,6 +3,7 @@ using Idiomas.Core.Infrastructure.Service.Authentication;
 using Idiomas.Core.Infrastructure.Service.Encryption;
 using Idiomas.Core.Infrastructure.Service.Hash;
 using Idiomas.Core.Infrastructure.Service.LLM;
+using Idiomas.Core.Infrastructure.Service.LLM.Gemini;
 using Idiomas.Core.Interface.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;

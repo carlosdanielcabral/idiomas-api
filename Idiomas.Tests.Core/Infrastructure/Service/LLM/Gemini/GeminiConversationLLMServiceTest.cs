@@ -4,12 +4,12 @@ using System.Text.Json;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
-using Idiomas.Core.Infrastructure.Service.LLM;
+using Idiomas.Core.Infrastructure.Service.LLM.Gemini;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;
 
-namespace Idiomas.Tests.Core.Infrastructure.Service.LLM;
+namespace Idiomas.Tests.Core.Infrastructure.Service.LLM.Gemini;
 
 public class GeminiConversationLLMServiceTest
 {
