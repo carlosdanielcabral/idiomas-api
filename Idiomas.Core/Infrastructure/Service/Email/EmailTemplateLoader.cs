@@ -4,7 +4,7 @@ public class EmailTemplateLoader(string templatesDirectory)
 {
     private readonly string _templatesDirectory = templatesDirectory;
 
-    public string Load(string templateName, IEnumerable<EmailTemplatePlaceholder> placeholders)
+    public virtual string Load(string templateName, IEnumerable<EmailTemplatePlaceholder> placeholders)
     {
         string filePath = Path.Combine(this._templatesDirectory, templateName);
 
