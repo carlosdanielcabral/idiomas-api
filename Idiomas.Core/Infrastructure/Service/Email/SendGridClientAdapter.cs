@@ -3,11 +3,11 @@ using SendGrid.Helpers.Mail;
 
 namespace Idiomas.Core.Infrastructure.Service.Email;
 
-public class SendGridClientAdapter(SendGridClient sendGridClient) : ISendGridClient
+public class SendGridClientAdapter(SendGridClient sendGridClient) : IEmailClient
 {
     private readonly SendGridClient _sendGridClient = sendGridClient;
 
-    public async Task<ISendGridClientResponse> SendEmailAsync(SendGridMessage msg, CancellationToken cancellationToken = default)
+    public async Task<IEmailClientResponse> SendEmailAsync(SendGridMessage msg, CancellationToken cancellationToken = default)
     {
         Response response = await this._sendGridClient.SendEmailAsync(msg, cancellationToken);
 
@@ -15,7 +15,7 @@ public class SendGridClientAdapter(SendGridClient sendGridClient) : ISendGridCli
     }
 }
 
-public class SendGridClientResponseAdapter(Response response) : ISendGridClientResponse
+public class SendGridClientResponseAdapter(Response response) : IEmailClientResponse
 {
     private readonly Response _response = response;
 

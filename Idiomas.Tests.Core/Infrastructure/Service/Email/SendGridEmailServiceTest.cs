@@ -9,7 +9,7 @@ namespace Idiomas.Tests.Core.Infrastructure.Service.Email;
 
 public class SendGridEmailServiceTest
 {
-    private readonly Mock<ISendGridClient> _sendGridClientMock = new();
+    private readonly Mock<IEmailClient> _sendGridClientMock = new();
 
     private IConfiguration BuildConfiguration(string apiKey = "SG.test", string senderAddress = "noreply@idiomas.app", string senderName = "Idiomas")
     {
@@ -46,7 +46,7 @@ public class SendGridEmailServiceTest
     {
         IConfiguration config = this.BuildConfiguration();
 
-        var failedResponse = new Mock<ISendGridClientResponse>();
+        var failedResponse = new Mock<IEmailClientResponse>();
         failedResponse.SetupGet(r => r.IsSuccessStatusCode).Returns(false);
         failedResponse.SetupGet(r => r.StatusCode).Returns(System.Net.HttpStatusCode.Unauthorized);
         failedResponse.SetupGet(r => r.Body).Returns(new StringContent("error"));
@@ -67,7 +67,7 @@ public class SendGridEmailServiceTest
     {
         IConfiguration config = this.BuildConfiguration();
 
-        var successResponse = new Mock<ISendGridClientResponse>();
+        var successResponse = new Mock<IEmailClientResponse>();
         successResponse.SetupGet(r => r.IsSuccessStatusCode).Returns(true);
         successResponse.SetupGet(r => r.StatusCode).Returns(System.Net.HttpStatusCode.OK);
         successResponse.SetupGet(r => r.Body).Returns(new StringContent(""));
