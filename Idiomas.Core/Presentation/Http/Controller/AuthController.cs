@@ -33,4 +33,18 @@ public class AuthController(IToken tokenGenerator) : IAuthController
 
         return TypedResults.Ok(response);
     }
+
+    public async Task<IResult> ForgotPassword(ForgotPasswordDTO dto, ForgotPassword useCase)
+    {
+        await useCase.Execute(dto);
+
+        return TypedResults.Ok();
+    }
+
+    public async Task<IResult> ResetPassword(ResetPasswordDTO dto, ResetPassword useCase)
+    {
+        await useCase.Execute(dto);
+
+        return TypedResults.Ok();
+    }
 }
