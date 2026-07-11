@@ -49,6 +49,11 @@ public class GoogleLogin(
 
         if (existingUser != null)
         {
+            if (!existingUser.IsEmailVerified)
+            {
+                throw new ApiException("E-mail não verificado. Verifique sua caixa de entrada para ativar sua conta.", HttpStatusCode.Forbidden);
+            }
+
             return await this.LinkGoogleCredential(existingUser.Id, payload);
         }
 
