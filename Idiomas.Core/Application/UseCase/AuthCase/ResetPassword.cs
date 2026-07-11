@@ -1,6 +1,7 @@
 using Idiomas.Core.Application.DTO.Auth;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
 using System.Net;
@@ -10,10 +11,12 @@ namespace Idiomas.Core.Application.UseCase.AuthCase;
 public class ResetPassword(
     IPasswordResetTokenRepository tokenRepository,
     IUserRepository userRepository,
+    IUserCredentialRepository userCredentialRepository,
     IHash hash)
 {
     private readonly IPasswordResetTokenRepository _tokenRepository = tokenRepository;
     private readonly IUserRepository _userRepository = userRepository;
+    private readonly IUserCredentialRepository _userCredentialRepository = userCredentialRepository;
     private readonly IHash _hash = hash;
 
     public async Task Execute(ResetPasswordDTO dto)
@@ -32,9 +35,18 @@ public class ResetPassword(
             throw new ApiException("Token inválido ou expirado", HttpStatusCode.BadRequest);
         }
 
-        user.Password = this._hash.Hash(dto.NewPassword);
+        UserCredential? credential = await this._userCredentialRepository
+            .GetByUserIdAndProvider(user.Id, AuthProvider.Local);
 
-        await this._userRepository.Update(user);
+        if (credential == null)
+        {
+            throw new ApiException("Usuário não possui credencial local", HttpStatusCode.BadRequest);
+        }
+
+        string passwordHash = this._hash.Hash(dto.NewPassword);
+        credential.UpdatePasswordHash(passwordHash);
+
+        await this._userCredentialRepository.Update(credential);
 
         await this._tokenRepository.MarkAsUsed(token);
     }

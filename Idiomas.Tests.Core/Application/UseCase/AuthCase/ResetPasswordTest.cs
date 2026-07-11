@@ -2,6 +2,7 @@ using Idiomas.Core.Application.DTO.Auth;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Application.UseCase.AuthCase;
 using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
 using Moq;
@@ -13,6 +14,7 @@ public class ResetPasswordTest
 {
     private readonly Mock<IPasswordResetTokenRepository> _tokenRepositoryMock = new();
     private readonly Mock<IUserRepository> _userRepositoryMock = new();
+    private readonly Mock<IUserCredentialRepository> _userCredentialRepositoryMock = new();
     private readonly Mock<IHash> _hashMock = new();
 
     [Fact]
@@ -25,6 +27,7 @@ public class ResetPasswordTest
         var useCase = new ResetPassword(
             this._tokenRepositoryMock.Object,
             this._userRepositoryMock.Object,
+            this._userCredentialRepositoryMock.Object,
             this._hashMock.Object
         );
 
@@ -47,6 +50,7 @@ public class ResetPasswordTest
         var useCase = new ResetPassword(
             this._tokenRepositoryMock.Object,
             this._userRepositoryMock.Object,
+            this._userCredentialRepositoryMock.Object,
             this._hashMock.Object
         );
 
@@ -69,6 +73,7 @@ public class ResetPasswordTest
         var useCase = new ResetPassword(
             this._tokenRepositoryMock.Object,
             this._userRepositoryMock.Object,
+            this._userCredentialRepositoryMock.Object,
             this._hashMock.Object
         );
 
@@ -84,7 +89,8 @@ public class ResetPasswordTest
     {
         Guid userId = Guid.NewGuid();
         var token = new PasswordResetToken(Guid.NewGuid(), userId, "valid-token", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
-        var user = new User(userId.ToString(), "João", "joao@example.com", "oldhash");
+        var user = new User(userId.ToString(), "João", "joao@example.com");
+        var credential = new UserCredential(Guid.NewGuid().ToString(), userId.ToString(), AuthProvider.Local, "oldhash", null);
 
         this._tokenRepositoryMock
             .Setup(repository => repository.GetByToken(It.IsAny<string>()))
@@ -94,6 +100,10 @@ public class ResetPasswordTest
             .Setup(repository => repository.GetById(It.IsAny<string>()))
             .ReturnsAsync(user);
 
+        this._userCredentialRepositoryMock
+            .Setup(repository => repository.GetByUserIdAndProvider(It.IsAny<string>(), AuthProvider.Local))
+            .ReturnsAsync(credential);
+
         this._hashMock
             .Setup(hash => hash.Hash(It.IsAny<string>()))
             .Returns("newhash");
@@ -101,6 +111,7 @@ public class ResetPasswordTest
         var useCase = new ResetPassword(
             this._tokenRepositoryMock.Object,
             this._userRepositoryMock.Object,
+            this._userCredentialRepositoryMock.Object,
             this._hashMock.Object
         );
 
@@ -108,9 +119,9 @@ public class ResetPasswordTest
 
         await useCase.Execute(dto);
 
-        Assert.Equal("newhash", user.Password);
+        Assert.Equal("newhash", credential.PasswordHash);
 
-        this._userRepositoryMock.Verify(repository => repository.Update(It.Is<User>(updatedUser => updatedUser.Password == "newhash")), Times.Once);
+        this._userCredentialRepositoryMock.Verify(repository => repository.Update(It.Is<UserCredential>(updatedCredential => updatedCredential.PasswordHash == "newhash")), Times.Once);
         this._tokenRepositoryMock.Verify(repository => repository.MarkAsUsed(token), Times.Once);
     }
 }

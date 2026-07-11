@@ -21,10 +21,6 @@ public class UserModel
     [Column("email")]
     public required string Email { get; set; }
 
-    [Required]
-    [Column("password")]
-    public required string Password { get; set; }
-
     public ICollection<WordModel> Dictionary { get; set; } = [];
     public ICollection<FileModel> Files { get; set; } = [];
 }

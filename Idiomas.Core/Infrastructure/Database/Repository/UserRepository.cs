@@ -53,7 +53,6 @@ public class UserRepository(ApplicationContext database) : IUserRepository
         }
 
         outdatedUser.Name = updatedUser.Name;
-        outdatedUser.Password = updatedUser.Password;
         outdatedUser.Email = updatedUser.Email;
 
         await this._database.SaveChangesAsync();

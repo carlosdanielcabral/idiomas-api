@@ -51,7 +51,7 @@ public class ForgotPasswordTest
     [Fact]
     public async Task Execute_ThrowsApiExceptionWhenActiveTokenAlreadyExists()
     {
-        var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com", "hashed");
+        var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com");
         var activeToken = new PasswordResetToken(Guid.NewGuid(), Guid.Parse(user.Id), "existing-token", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
 
         this._userRepositoryMock
@@ -82,7 +82,7 @@ public class ForgotPasswordTest
     [Fact]
     public async Task Execute_GeneratesTokenAndSendsEmailWhenNoActiveTokenExists()
     {
-        var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com", "hashed");
+        var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com");
 
         this._userRepositoryMock
             .Setup(repository => repository.GetByEmail(It.IsAny<string>()))
