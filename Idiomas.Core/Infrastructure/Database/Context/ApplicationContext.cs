@@ -13,6 +13,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
     public DbSet<MessageModel> Message { get; set; }
     public DbSet<CorrectionModel> Correction { get; set; }
     public DbSet<ScenarioModel> Scenario { get; set; }
+    public DbSet<PasswordResetTokenModel> PasswordResetToken { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,5 +36,12 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
 
         modelBuilder.Entity<ScenarioModel>()
             .HasIndex(s => s.Language);
+
+        modelBuilder.Entity<PasswordResetTokenModel>()
+            .HasIndex(token => token.Token)
+            .IsUnique();
+
+        modelBuilder.Entity<PasswordResetTokenModel>()
+            .HasIndex(token => token.UserId);
     }
 }

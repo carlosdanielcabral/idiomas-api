@@ -18,5 +18,15 @@ public class AuthRoute(IAuthController controller) : IRoute
             .Produces<MailPasswordLoginResponseDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .WithValidation<MailPasswordLoginValidator, MailPasswordLoginDTO>();
+
+        app.MapPost("/auth/forgot-password", this._controller.ForgotPassword)
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status409Conflict)
+            .WithValidation<ForgotPasswordValidator, ForgotPasswordDTO>();
+
+        app.MapPost("/auth/reset-password", this._controller.ResetPassword)
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .WithValidation<ResetPasswordValidator, ResetPasswordDTO>();
     }
 }

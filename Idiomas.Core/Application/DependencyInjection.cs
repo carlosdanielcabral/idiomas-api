@@ -16,6 +16,8 @@ public static class DependencyInjection
 
         // Auth
         services.AddScoped<MailPasswordLogin>();
+        services.AddScoped<ForgotPassword>();
+        services.AddScoped<ResetPassword>();
 
         // Dictionary
         services.AddScoped<CreateWord>();

@@ -1,5 +1,6 @@
 using System.Text;
 using Idiomas.Core.Infrastructure.Service.Authentication;
+using Idiomas.Core.Infrastructure.Service.Email;
 using Idiomas.Core.Infrastructure.Service.Encryption;
 using Idiomas.Core.Infrastructure.Service.Hash;
 using Idiomas.Core.Infrastructure.Service.LLM;
@@ -7,6 +8,7 @@ using Idiomas.Core.Infrastructure.Service.LLM.Gemini;
 using Idiomas.Core.Interface.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using SendGrid;
 
 namespace Idiomas.Core.Infrastructure.Service;
 
@@ -25,6 +27,23 @@ public static class DependencyInjection
 
         // LLM Service
         services.AddHttpClient<IConversationLLMService, GeminiConversationLLMService>();
+
+        // Email Service
+        string sendGridApiKey = configuration["SendGrid:ApiKey"] ?? throw new InvalidOperationException("SendGrid:ApiKey is required");
+        string templatesDirectory = Path.Combine(AppContext.BaseDirectory, "Templates", "Email");
+
+        services.AddScoped<EmailTemplateLoader>(provider =>
+        {
+            return new EmailTemplateLoader(templatesDirectory);
+        });
+
+        services.AddScoped<IEmailClient, SendGridClientAdapter>(provider =>
+        {
+            SendGridClient sendGridClient = new(sendGridApiKey);
+            return new SendGridClientAdapter(sendGridClient);
+        });
+
+        services.AddScoped<IEmailService, SendGridEmailService>();
 
         return services;
     }
