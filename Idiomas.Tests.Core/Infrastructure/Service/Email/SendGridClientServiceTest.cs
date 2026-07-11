@@ -1,21 +1,22 @@
+using System.Net;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Infrastructure.Service.Email;
 using Idiomas.Core.Interface.Service;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using SendGrid;
 using SendGrid.Helpers.Mail;
 
 namespace Idiomas.Tests.Core.Infrastructure.Service.Email;
 
-public class SendGridEmailServiceTest
+public class SendGridClientServiceTest
 {
-    private readonly Mock<IEmailClient> _sendGridClientMock = new();
+    private readonly Mock<ISendGridClient> _sendGridClientMock = new();
 
-    private IConfiguration BuildConfiguration(string apiKey = "SG.test", string senderAddress = "noreply@idiomas.app", string senderName = "Idiomas")
+    private IConfiguration BuildConfiguration(string senderAddress = "noreply@idiomas.app", string senderName = "Idiomas")
     {
         var configValues = new Dictionary<string, string?>
         {
-            { "SendGrid:ApiKey", apiKey },
             { "Email:SenderAddress", senderAddress },
             { "Email:SenderName", senderName }
         };
@@ -26,19 +27,19 @@ public class SendGridEmailServiceTest
     }
 
     [Fact]
-    public void Constructor_ThrowsWhenApiKeyIsMissing()
-    {
-        IConfiguration config = this.BuildConfiguration(apiKey: null!);
-
-        Assert.Throws<InvalidOperationException>(() => new SendGridEmailService(this._sendGridClientMock.Object, config));
-    }
-
-    [Fact]
     public void Constructor_ThrowsWhenSenderAddressIsMissing()
     {
         IConfiguration config = this.BuildConfiguration(senderAddress: null!);
 
-        Assert.Throws<InvalidOperationException>(() => new SendGridEmailService(this._sendGridClientMock.Object, config));
+        Assert.Throws<InvalidOperationException>(() => new SendGridClientService(this._sendGridClientMock.Object, config));
+    }
+
+    [Fact]
+    public void Constructor_ThrowsWhenSenderNameIsMissing()
+    {
+        IConfiguration config = this.BuildConfiguration(senderName: null!);
+
+        Assert.Throws<InvalidOperationException>(() => new SendGridClientService(this._sendGridClientMock.Object, config));
     }
 
     [Fact]
@@ -46,16 +47,13 @@ public class SendGridEmailServiceTest
     {
         IConfiguration config = this.BuildConfiguration();
 
-        var failedResponse = new Mock<IEmailClientResponse>();
-        failedResponse.SetupGet(r => r.IsSuccessStatusCode).Returns(false);
-        failedResponse.SetupGet(r => r.StatusCode).Returns(System.Net.HttpStatusCode.Unauthorized);
-        failedResponse.SetupGet(r => r.Body).Returns(new StringContent("error"));
+        Response failedResponse = new(HttpStatusCode.Unauthorized, new StringContent("error"), null);
 
         this._sendGridClientMock
             .Setup(client => client.SendEmailAsync(It.IsAny<SendGridMessage>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(failedResponse.Object);
+            .ReturnsAsync(failedResponse);
 
-        var service = new SendGridEmailService(this._sendGridClientMock.Object, config);
+        var service = new SendGridClientService(this._sendGridClientMock.Object, config);
 
         var message = new EmailMessage("user@example.com", "Subject", "<p>Body</p>");
 
@@ -67,20 +65,17 @@ public class SendGridEmailServiceTest
     {
         IConfiguration config = this.BuildConfiguration();
 
-        var successResponse = new Mock<IEmailClientResponse>();
-        successResponse.SetupGet(r => r.IsSuccessStatusCode).Returns(true);
-        successResponse.SetupGet(r => r.StatusCode).Returns(System.Net.HttpStatusCode.OK);
-        successResponse.SetupGet(r => r.Body).Returns(new StringContent(""));
+        Response successResponse = new(HttpStatusCode.OK, new StringContent(""), null);
 
         this._sendGridClientMock
             .Setup(client => client.SendEmailAsync(It.IsAny<SendGridMessage>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(successResponse.Object)
+            .ReturnsAsync(successResponse)
             .Callback<SendGridMessage, CancellationToken>((msg, _) =>
             {
                 Assert.Equal("user@example.com", msg.Personalizations[0].Tos[0].Email);
             });
 
-        var service = new SendGridEmailService(this._sendGridClientMock.Object, config);
+        var service = new SendGridClientService(this._sendGridClientMock.Object, config);
 
         var message = new EmailMessage("user@example.com", "Subject", "<p>Body</p>");
 

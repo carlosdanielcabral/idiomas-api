@@ -29,7 +29,6 @@ public static class DependencyInjection
         services.AddHttpClient<IConversationLLMService, GeminiConversationLLMService>();
 
         // Email Service
-        string sendGridApiKey = configuration["SendGrid:ApiKey"] ?? throw new InvalidOperationException("SendGrid:ApiKey is required");
         string templatesDirectory = Path.Combine(AppContext.BaseDirectory, "Templates", "Email");
 
         services.AddScoped<EmailTemplateLoader>(provider =>
@@ -37,13 +36,13 @@ public static class DependencyInjection
             return new EmailTemplateLoader(templatesDirectory);
         });
 
-        services.AddScoped<IEmailClient, SendGridClientAdapter>(provider =>
+        services.AddScoped<ISendGridClient>(provider =>
         {
-            SendGridClient sendGridClient = new(sendGridApiKey);
-            return new SendGridClientAdapter(sendGridClient);
+            string sendGridApiKey = configuration["SendGrid:ApiKey"] ?? throw new InvalidOperationException("SendGrid:ApiKey is required");
+            return new SendGridClient(sendGridApiKey);
         });
 
-        services.AddScoped<IEmailService, SendGridEmailService>();
+        services.AddScoped<IEmailService, SendGridClientService>();
 
         return services;
     }

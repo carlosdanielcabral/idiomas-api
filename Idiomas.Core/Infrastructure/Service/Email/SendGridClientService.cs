@@ -7,10 +7,9 @@ using SendGrid.Helpers.Mail;
 
 namespace Idiomas.Core.Infrastructure.Service.Email;
 
-public class SendGridEmailService(IEmailClient sendGridClient, IConfiguration configuration) : IEmailService
+public class SendGridClientService(ISendGridClient sendGridClient, IConfiguration configuration) : IEmailService
 {
-    private readonly IEmailClient _sendGridClient = sendGridClient;
-    private readonly string _apiKey = configuration["SendGrid:ApiKey"] ?? throw new InvalidOperationException("SendGrid:ApiKey is required");
+    private readonly ISendGridClient _sendGridClient = sendGridClient;
     private readonly string _senderAddress = configuration["Email:SenderAddress"] ?? throw new InvalidOperationException("Email:SenderAddress is required");
     private readonly string _senderName = configuration["Email:SenderName"] ?? throw new InvalidOperationException("Email:SenderName is required");
 
@@ -24,7 +23,7 @@ public class SendGridEmailService(IEmailClient sendGridClient, IConfiguration co
             htmlContent: message.HtmlBody
         );
 
-        IEmailClientResponse response = await this._sendGridClient.SendEmailAsync(emailMessage);
+        Response response = await this._sendGridClient.SendEmailAsync(emailMessage);
 
         if (!response.IsSuccessStatusCode)
         {
