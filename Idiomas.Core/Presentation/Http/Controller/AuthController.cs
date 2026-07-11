@@ -16,7 +16,7 @@ public class AuthController(IToken tokenGenerator) : IAuthController
     {
         User user = await useCase.Execute(dto);
 
-        MailPasswordLoginResponseDTO response = new()
+        LoginResponseDTO response = new()
         {
             User = user.ToResponseDTO(),
             Token = this._tokenGenerator.Generate(user)
@@ -24,6 +24,28 @@ public class AuthController(IToken tokenGenerator) : IAuthController
 
         var cookieOptions = new CookieOptions
         {            
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+        };
+
+        httpContext.Response.Cookies.Append("Authorization", response.Token, cookieOptions);
+
+        return TypedResults.Ok(response);
+    }
+
+    public async Task<IResult> GoogleLogin(HttpContext httpContext, GoogleLoginDTO dto, GoogleLogin useCase)
+    {
+        User user = await useCase.Execute(dto);
+
+        LoginResponseDTO response = new()
+        {
+            User = user.ToResponseDTO(),
+            Token = this._tokenGenerator.Generate(user)
+        };
+
+        var cookieOptions = new CookieOptions
+        {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,

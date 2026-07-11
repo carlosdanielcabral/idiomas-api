@@ -15,9 +15,15 @@ public class AuthRoute(IAuthController controller) : IRoute
     public void Register(WebApplication app)
     {
         app.MapPost("/auth/login", this._controller.MailPasswordLogin)
-            .Produces<MailPasswordLoginResponseDTO>(StatusCodes.Status200OK)
+            .Produces<LoginResponseDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .WithValidation<MailPasswordLoginValidator, MailPasswordLoginDTO>();
+
+        app.MapPost("/auth/google", this._controller.GoogleLogin)
+            .Produces<LoginResponseDTO>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .WithValidation<GoogleLoginValidator, GoogleLoginDTO>();
 
         app.MapPost("/auth/forgot-password", this._controller.ForgotPassword)
             .Produces(StatusCodes.Status200OK)
