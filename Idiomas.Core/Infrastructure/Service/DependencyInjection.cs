@@ -5,6 +5,7 @@ using Idiomas.Core.Infrastructure.Service.Encryption;
 using Idiomas.Core.Infrastructure.Service.Hash;
 using Idiomas.Core.Infrastructure.Service.LLM;
 using Idiomas.Core.Infrastructure.Service.LLM.Gemini;
+using Idiomas.Core.Infrastructure.Service.Transaction;
 using Idiomas.Core.Interface.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -24,6 +25,7 @@ public static class DependencyInjection
             return new AesGcmEncryptionService(encryptionKey);
         });
         services.AddInfraAuthentication(configuration);
+        services.AddScoped<ITransactionManager, EfCoreTransactionManager>();
 
         // LLM Service
         services.AddHttpClient<IConversationLLMService, GeminiConversationLLMService>();
