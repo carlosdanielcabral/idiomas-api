@@ -40,7 +40,7 @@ public class ResetPassword(
 
         if (credential == null)
         {
-            throw new ApiException("Usuário não possui credencial local", HttpStatusCode.BadRequest);
+            throw new ApiException("Token inválido ou expirado", HttpStatusCode.BadRequest);
         }
 
         string passwordHash = this._hash.Hash(dto.NewPassword);

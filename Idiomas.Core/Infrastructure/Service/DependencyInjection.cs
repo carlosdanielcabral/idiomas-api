@@ -2,6 +2,7 @@ using System.Text;
 using Idiomas.Core.Infrastructure.Service.Authentication;
 using Idiomas.Core.Infrastructure.Service.Email;
 using Idiomas.Core.Infrastructure.Service.Encryption;
+using Idiomas.Core.Infrastructure.Service.Google;
 using Idiomas.Core.Infrastructure.Service.Hash;
 using Idiomas.Core.Infrastructure.Service.LLM;
 using Idiomas.Core.Infrastructure.Service.LLM.Gemini;
@@ -26,6 +27,7 @@ public static class DependencyInjection
         });
         services.AddInfraAuthentication(configuration);
         services.AddScoped<ITransactionManager, EfCoreTransactionManager>();
+        services.AddScoped<IGoogleTokenVerifier, GoogleTokenVerifier>();
 
         // LLM Service
         services.AddHttpClient<IConversationLLMService, GeminiConversationLLMService>();

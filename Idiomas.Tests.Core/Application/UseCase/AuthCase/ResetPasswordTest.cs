@@ -85,6 +85,40 @@ public class ResetPasswordTest
     }
 
     [Fact]
+    public async Task Execute_ThrowsApiExceptionWithGenericMessageWhenUserHasNoLocalCredential()
+    {
+        Guid userId = Guid.NewGuid();
+        var token = new PasswordResetToken(Guid.NewGuid(), userId, "valid-token", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
+        var user = new User(userId.ToString(), "João", "joao@example.com");
+
+        this._tokenRepositoryMock
+            .Setup(repository => repository.GetByToken(It.IsAny<string>()))
+            .ReturnsAsync(token);
+
+        this._userRepositoryMock
+            .Setup(repository => repository.GetById(It.IsAny<string>()))
+            .ReturnsAsync(user);
+
+        this._userCredentialRepositoryMock
+            .Setup(repository => repository.GetByUserIdAndProvider(It.IsAny<string>(), AuthProvider.Local))
+            .ReturnsAsync((UserCredential?)null);
+
+        var useCase = new ResetPassword(
+            this._tokenRepositoryMock.Object,
+            this._userRepositoryMock.Object,
+            this._userCredentialRepositoryMock.Object,
+            this._hashMock.Object
+        );
+
+        var dto = new ResetPasswordDTO("valid-token", "newpassword123");
+
+        var exception = await Assert.ThrowsAsync<ApiException>(() => useCase.Execute(dto));
+
+        Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("Token inválido ou expirado", exception.Message);
+    }
+
+    [Fact]
     public async Task Execute_UpdatesPasswordAndMarksTokenAsUsedWhenValid()
     {
         Guid userId = Guid.NewGuid();
