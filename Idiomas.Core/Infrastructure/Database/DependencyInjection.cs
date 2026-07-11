@@ -24,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<IScenarioRepository, ScenarioRepository>();
         services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
         services.AddScoped<IEmailVerificationTokenRepository, EmailVerificationTokenRepository>();
+        services.AddScoped<IEmailChangeRequestRepository, EmailChangeRequestRepository>();
 
         return services;
     }
