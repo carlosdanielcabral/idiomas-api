@@ -16,6 +16,7 @@ public static class DependencyInjection
 
         // Auth
         services.AddScoped<MailPasswordLogin>();
+        services.AddScoped<GoogleLogin>();
         services.AddScoped<ForgotPassword>();
         services.AddScoped<ResetPassword>();
         services.AddScoped<VerifyEmail>();
