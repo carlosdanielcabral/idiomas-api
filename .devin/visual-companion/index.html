@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Idiomas App - UI Mockups</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 24px;
+      color: #1f2937;
+    }
+    h1 { text-align: center; margin-bottom: 8px; }
+    p.subtitle { text-align: center; color: #6b7280; margin-top: 0; margin-bottom: 32px; }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      justify-items: center;
+    }
+    .phone {
+      width: 280px;
+      height: 560px;
+      background: #ffffff;
+      border: 12px solid #111827;
+      border-radius: 36px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+    }
+    .notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 24px;
+      background: #111827;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      z-index: 10;
+    }
+    .screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 40px 16px 16px;
+      overflow-y: auto;
+    }
+    .label {
+      text-align: center;
+      font-weight: 600;
+      margin-top: 12px;
+      color: #374151;
+    }
+    .appbar {
+      font-size: 18px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .input {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      width: 100%;
+    }
+    .btn {
+      background: #5f3232;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .btn-terracota {
+      background: #c06c4f;
+      color: white;
+    }
+    .link {
+      color: #5f3232;
+      text-align: center;
+      font-size: 13px;
+      display: block;
+    }
+    .card {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .card-title { font-weight: 700; margin-bottom: 4px; }
+    .card-sub { font-size: 13px; color: #6b7280; }
+    .fab {
+      position: absolute;
+      bottom: 72px;
+      right: 16px;
+      width: 48px;
+      height: 48px;
+      background: #5f3232;
+      color: white;
+      border-radius: 50%;
+      border: none;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: #ffffff;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      font-size: 11px;
+      color: #6b7280;
+    }
+    .nav-item.active { color: #5f3232; font-weight: 600; }
+    .splash {
+      background: #5f3232;
+      color: white;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    .splash-icon {
+      width: 120px;
+      height: 120px;
+      background: white;
+      border-radius: 28px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #5f3232;
+      font-size: 64px;
+      font-weight: 700;
+    }
+    .splash-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .splash-subtitle {
+      font-size: 14px;
+      opacity: 0.85;
+    }
+    .message {
+      padding: 10px 14px;
+      border-radius: 16px;
+      margin-bottom: 10px;
+      max-width: 80%;
+      font-size: 13px;
+    }
+    .message.user {
+      background: #5f3232;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .message.assistant {
+      background: #f3f4f6;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .correction {
+      background: #fef3c7;
+      border-left: 3px solid #f59e0b;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+    .chat-input {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+    }
+    .chat-input input {
+      flex: 1;
+      border: 1px solid #d1d5db;
+      border-radius: 20px;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    .send-btn {
+      width: 36px;
+      height: 36px;
+      background: #5f3232;
+      color: white;
+      border-radius: 50%;
+      border: none;
+    }
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .stat-value { font-weight: 700; color: #5f3232; }
+    .option {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    .option.selected {
+      background: #c06c4f;
+      color: white;
+      border-color: #c06c4f;
+      font-weight: 600;
+    }
+    .select {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .word-item {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 12px 0;
+    }
+    .word-title { font-weight: 700; }
+    .word-ipa { color: #6b7280; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Idiomas App - Proposta de UI</h1>
+  <p class="subtitle">Mockups das telas principais do MVP</p>
+
+  <div class="gallery">
+
+    <!-- Splash -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="splash">
+          <div class="splash-icon">A文</div>
+          <div class="splash-title">Idiomas</div>
+          <div class="splash-subtitle">Aprenda idiomas com IA</div>
+        </div>
+      </div>
+      <div class="label">0. Splash Screen</div>
+    </div>
+
+    <!-- Login -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="appbar">Idiomas</div>
+          <h2 style="margin-bottom: 24px;">Entrar</h2>
+          <input class="input" placeholder="E-mail" value="usuario@email.com">
+          <input class="input" placeholder="Senha" type="password" value="********">
+          <button class="btn">Entrar</button>
+          <a class="link" href="#">Criar conta</a>
+        </div>
+      </div>
+      <div class="label">1. Login</div>
+    </div>
+
+    <!-- Cadastro -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="appbar">Idiomas</div>
+          <h2 style="margin-bottom: 24px;">Criar conta</h2>
+          <input class="input" placeholder="Nome">
+          <input class="input" placeholder="E-mail">
+          <input class="input" placeholder="Senha" type="password">
+          <button class="btn">Cadastrar</button>
+          <a class="link" href="#">Já tenho conta</a>
+        </div>
+      </div>
+      <div class="label">2. Cadastro</div>
+    </div>
+
+    <!-- Home -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="appbar">Olá, Carlos!</div>
+          <div class="card">
+            <div class="stat">
+              <span>Palavras salvas</span>
+              <span class="stat-value">42</span>
+            </div>
+            <div class="stat">
+              <span>Conversas</span>
+              <span class="stat-value">7</span>
+            </div>
+            <div class="stat">
+              <span>Idioma ativo</span>
+              <span class="stat-value">Inglês</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Continuar praticando</div>
+            <div class="card-sub">Inglês - Modo livre</div>
+          </div>
+          <button class="btn">Nova conversa</button>
+          <button class="btn btn-terracota">Ver dicionário</button>
+          <div class="bottom-nav">
+            <div class="nav-item active">Início</div>
+            <div class="nav-item">Dicionário</div>
+            <div class="nav-item">Conversas</div>
+          </div>
+        </div>
+      </div>
+      <div class="label">3. Home</div>
+    </div>
+
+    <!-- Dicionário -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="appbar">Dicionário</div>
+          <input class="input" placeholder="Buscar palavra..." style="margin-bottom: 16px;">
+          <div class="word-item">
+            <div class="word-title">Serendipity</div>
+            <div class="word-ipa">/ˌser.ənˈdɪp.ə.ti/</div>
+          </div>
+          <div class="word-item">
+            <div class="word-title">Eloquent</div>
+            <div class="word-ipa">/ˈel.ə.kwənt/</div>
+          </div>
+          <div class="word-item">
+            <div class="word-title">Resilient</div>
+            <div class="word-ipa">/rɪˈzɪl.jənt/</div>
+          </div>
+          <button class="fab">+</button>
+          <div class="bottom-nav">
+            <div class="nav-item">Início</div>
+            <div class="nav-item active">Dicionário</div>
+            <div class="nav-item">Conversas</div>
+          </div>
+        </div>
+      </div>
+      <div class="label">4. Dicionário</div>
+    </div>
+
+    <!-- Formulário de palavra -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="appbar">Nova palavra</div>
+          <input class="input" placeholder="Palavra" value="Serendipity">
+          <input class="input" placeholder="IPA" value="/ˌser.ənˈdɪp.ə.ti/">
+          <h4 style="margin-bottom: 8px;">Significados</h4>
+          <input class="input" placeholder="Significado" value="Acaso feliz">
+          <input class="input" placeholder="Exemplo" value="Finding this restaurant was pure serendipity.">
+          <button class="btn btn-terracota" style="margin-bottom: 16px;">+ Adicionar significado</button>
+          <button class="btn">Salvar</button>
+        </div>
+      </div>
+      <div class="label">5. Formulário de palavra</div>
+    </div>
+
+    <!-- Iniciar conversa -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="appbar">Nova conversa</div>
+          <h4 style="margin-bottom: 8px;">Idioma</h4>
+          <div class="select">Inglês <span>▼</span></div>
+          <h4 style="margin-bottom: 8px;">Modo</h4>
+          <div class="option selected">Livre</div>
+          <div class="option">Guiado</div>
+          <h4 style="margin-bottom: 8px;">Cenário</h4>
+          <div class="option selected">No aeroporto</div>
+          <div class="option">Pedindo comida</div>
+          <button class="btn" style="margin-top: auto;">Iniciar</button>
+        </div>
+      </div>
+      <div class="label">6. Iniciar conversa</div>
+    </div>
+
+    <!-- Chat -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="appbar">Inglês - Livre</div>
+          <div class="message user">I want to improve my english.</div>
+          <div class="message assistant">
+            That's great! Let's practice. Tell me about your day.
+            <div class="correction">
+              <strong> english</strong> → <strong>English</strong><br>
+              Línguas sempre começam com letra maiúscula.
+            </div>
+          </div>
+          <div class="message user">Yesterday I go to the park.</div>
+          <div class="message assistant">
+            Good try! But "yesterday" requires the past tense.
+            <div class="correction">
+              <strong>go</strong> → <strong>went</strong><br>
+              Use o passado simples para ações completadas.
+            </div>
+          </div>
+          <div class="chat-input">
+            <input placeholder="Digite uma mensagem...">
+            <button class="send-btn">→</button>
+          </div>
+        </div>
+      </div>
+      <div class="label">7. Conversa</div>
+    </div>
+
+  </div>
+
+  <!-- ─── Comparação de ícones ─────────────────────────────────────────────── -->
+  <h2 style="text-align:center; margin-top: 56px; margin-bottom: 8px;">Comparação de ícones</h2>
+  <p style="text-align:center; color:#6b7280; margin-bottom: 32px;">Material Icons (nativo Flutter) vs Lucide (Figma Make)</p>
+
+  <div style="max-width: 720px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; background: #f9fafb; padding: 12px 24px; font-weight: 700; font-size: 13px; color: #374151; border-bottom: 1px solid #e5e7eb;">
+      <span>Uso no app</span>
+      <span style="text-align:center;">Material Icons</span>
+      <span style="text-align:center;">Lucide (Figma)</span>
+    </div>
+
+    <style>
+      .icon-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        padding: 14px 24px;
+        border-bottom: 1px solid #f3f4f6;
+        align-items: center;
+        font-size: 13px;
+        color: #1f2937;
+      }
+      .icon-row:last-child { border-bottom: none; }
+      .icon-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        color: #6b7280;
+      }
+      .icon-cell span.material-icons-outlined {
+        font-size: 28px;
+        color: #5f3232;
+      }
+      .lucide-svg {
+        width: 28px;
+        height: 28px;
+        stroke: #5f3232;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+    </style>
+
+    <!-- Início -->
+    <div class="icon-row">
+      <span>Bottom nav — Início</span>
+      <div class="icon-cell">
+        <span class="material-icons-outlined">home</span>
+        <span>Icons.home_outlined</span>
+      </div>
+      <div class="icon-cell">
+        <svg class="lucide-svg" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </div>
+    </div>
+
+    <!-- Dicionário -->
+    <div class="icon-row">
+      <span>Bottom nav — Dicionário</span>
+      <div class="icon-cell">
+        <span class="material-icons-outlined">menu_book</span>
+        <span>Icons.menu_book_outlined</span>
+      </div>
+      <div class="icon-cell">
+        <svg class="lucide-svg" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span>BookOpen</span>
+      </div>
+    </div>
+
+    <!-- Conversas -->
+    <div class="icon-row">
+      <span>Bottom nav — Conversas</span>
+      <div class="icon-cell">
+        <span class="material-icons-outlined">chat_bubble_outline</span>
+        <span>Icons.chat_bubble_outline</span>
+      </div>
+      <div class="icon-cell">
+        <svg class="lucide-svg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>MessageCircle</span>
+      </div>
+    </div>
+
+    <!-- Buscar -->
+    <div class="icon-row">
+      <span>Buscar palavra</span>
+      <div class="icon-cell">
+        <span class="material-icons-outlined">search</span>
+        <span>Icons.search</span>
+      </div>
+      <div class="icon-cell">
+        <svg class="lucide-svg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Search</span>
+      </div>
+    </div>
+
+    <!-- Enviar mensagem -->
+    <div class="icon-row">
+      <span>Enviar mensagem</span>
+      <div class="icon-cell">
+        <span class="material-icons-outlined">send</span>
+        <span>Icons.send</span>
+      </div>
+      <div class="icon-cell">
+        <svg class="lucide-svg" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span>Send</span>
+      </div>
+    </div>
+
+    <!-- Dropdown -->
+    <div class="icon-row">
+      <span>Dropdown idioma</span>
+      <div class="icon-cell">
+        <span class="material-icons-outlined">keyboard_arrow_down</span>
+        <span>Icons.keyboard_arrow_down</span>
+      </div>
+      <div class="icon-cell">
+        <svg class="lucide-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        <span>ChevronDown</span>
+      </div>
+    </div>
+
+    <!-- FAB -->
+    <div class="icon-row">
+      <span>FAB — Adicionar</span>
+      <div class="icon-cell">
+        <span class="material-icons-outlined">add</span>
+        <span>Icons.add</span>
+      </div>
+      <div class="icon-cell">
+        <svg class="lucide-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Plus</span>
+      </div>
+    </div>
+
+    <!-- Editar -->
+    <div class="icon-row">
+      <span>Editar palavra</span>
+      <div class="icon-cell">
+        <span class="material-icons-outlined">edit</span>
+        <span>Icons.edit_outlined</span>
+      </div>
+      <div class="icon-cell">
+        <svg class="lucide-svg" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span>Edit2</span>
+      </div>
+    </div>
+
+    <!-- Deletar -->
+    <div class="icon-row">
+      <span>Deletar palavra</span>
+      <div class="icon-cell">
+        <span class="material-icons-outlined">delete_outline</span>
+        <span>Icons.delete_outline</span>
+      </div>
+      <div class="icon-cell">
+        <svg class="lucide-svg" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        <span>Trash2</span>
+      </div>
+    </div>
+
+    <!-- Encerrar conversa -->
+    <div class="icon-row">
+      <span>Encerrar conversa</span>
+      <div class="icon-cell">
+        <span class="material-icons-outlined">stop_circle</span>
+        <span>Icons.stop_circle_outlined</span>
+      </div>
+      <div class="icon-cell">
+        <svg class="lucide-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6"/></svg>
+        <span>StopCircle</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

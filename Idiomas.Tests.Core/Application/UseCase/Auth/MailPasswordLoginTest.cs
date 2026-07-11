@@ -33,7 +33,7 @@ public class MailPasswordLoginTest
     public async Task Execute_ShouldReturnUser_WhenCredentialsAreValid()
     {
         MailPasswordLoginDTO loginDto = new("test@example.com", "password123");
-        User user = new("1", "Test User", "test@example.com");
+        User user = new("1", "Test User", "test@example.com", true);
         UserCredential credential = new("cred-1", "1", AuthProvider.Local, "hashed_password", null);
 
         this._userRepositoryMock
@@ -73,7 +73,7 @@ public class MailPasswordLoginTest
     public async Task Execute_ShouldThrowApiException_WhenPasswordIsInvalid()
     {
         MailPasswordLoginDTO loginDto = new("test@example.com", "wrongpassword");
-        User user = new("1", "Test User", "test@example.com");
+        User user = new("1", "Test User", "test@example.com", true);
         UserCredential credential = new("cred-1", "1", AuthProvider.Local, "hashed_password", null);
 
         this._userRepositoryMock
@@ -98,7 +98,7 @@ public class MailPasswordLoginTest
     public async Task Execute_ShouldThrowApiException_WhenUserHasNoLocalCredential()
     {
         MailPasswordLoginDTO loginDto = new("test@example.com", "password123");
-        User user = new("1", "Test User", "test@example.com");
+        User user = new("1", "Test User", "test@example.com", true);
 
         this._userRepositoryMock
             .Setup(repository => repository.GetByEmail(loginDto.Email))

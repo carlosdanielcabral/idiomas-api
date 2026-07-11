@@ -9,12 +9,12 @@ public static class UserMappingExtension
 {
     public static User ToEntity(this CreateUserDTO dto)
     {
-        return new User(UUIDGenerator.Generate(), dto.Name, dto.Email);
+        return new User(UUIDGenerator.Generate(), dto.Name, dto.Email, false);
     }
 
     public static User ToEntity(this UpdateUserDTO dto, string id)
     {
-        return new User(id, dto.Name, dto.Email);
+        return new User(id, dto.Name, dto.Email, false);
     }
 
     public static UserCredential ToCredentialEntity(this CreateUserDTO dto, string userId, string passwordHash)

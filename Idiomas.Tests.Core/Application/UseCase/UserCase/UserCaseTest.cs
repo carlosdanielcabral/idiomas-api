@@ -70,7 +70,7 @@ public class CreateUserTest
     public async Task Execute_ShouldThrowApiException_WhenEmailAlreadyExists()
     {
         CreateUserDTO createUserDTO = new("Test User", "test@example.com", "password123");
-        User existingUser = new("1", "Existing User", "test@example.com");
+        User existingUser = new("1", "Existing User", "test@example.com", true);
 
         this._userRepositoryMock
             .Setup(repository => repository.GetByEmail(createUserDTO.Email))

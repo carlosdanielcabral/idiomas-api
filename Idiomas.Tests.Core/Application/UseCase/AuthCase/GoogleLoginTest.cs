@@ -66,7 +66,7 @@ public class GoogleLoginTest
     public async Task Execute_ReturnsUserWhenCredentialAlreadyLinked()
     {
         GoogleTokenPayload payload = CreatePayload();
-        User user = new("user-1", "João Silva", "joao@gmail.com");
+        User user = new("user-1", "João Silva", "joao@gmail.com", true);
         UserCredential credential = new("cred-1", "user-1", AuthProvider.Google, null, "google-sub-123");
 
         this._tokenVerifierMock
@@ -121,7 +121,7 @@ public class GoogleLoginTest
     public async Task Execute_LinksGoogleCredentialWhenUserExistsByEmail()
     {
         GoogleTokenPayload payload = CreatePayload();
-        User existingUser = new("user-1", "João Silva", "joao@gmail.com");
+        User existingUser = new("user-1", "João Silva", "joao@gmail.com", true);
 
         this._tokenVerifierMock
             .Setup(verifier => verifier.Verify(It.IsAny<string>()))

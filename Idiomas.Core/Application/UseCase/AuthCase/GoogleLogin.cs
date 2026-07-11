@@ -80,7 +80,7 @@ public class GoogleLogin(
     {
         await using IDatabaseTransaction transaction = await this._transactionManager.BeginTransactionAsync();
 
-        User user = new(UUIDGenerator.Generate(), payload.Name, payload.Email);
+        User user = new(UUIDGenerator.Generate(), payload.Name, payload.Email, true);
 
         User createdUser = await this._userRepository.Insert(user);
 

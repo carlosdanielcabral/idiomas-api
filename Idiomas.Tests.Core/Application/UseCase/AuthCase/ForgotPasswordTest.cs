@@ -59,7 +59,7 @@ public class ForgotPasswordTest
     [Fact]
     public async Task Execute_ReturnsSilentlyWhenUserHasNoLocalCredential()
     {
-        var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com");
+        var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com", true);
 
         this._userRepositoryMock
             .Setup(repository => repository.GetByEmail(It.IsAny<string>()))
@@ -83,7 +83,7 @@ public class ForgotPasswordTest
     [Fact]
     public async Task Execute_ThrowsApiExceptionWhenActiveTokenAlreadyExists()
     {
-        var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com");
+        var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com", true);
         var credential = new UserCredential("cred-1", user.Id, AuthProvider.Local, "hashed", null);
         var activeToken = new PasswordResetToken(Guid.NewGuid(), Guid.Parse(user.Id), "existing-token", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
 
@@ -113,7 +113,7 @@ public class ForgotPasswordTest
     [Fact]
     public async Task Execute_GeneratesTokenAndSendsEmailWhenNoActiveTokenExists()
     {
-        var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com");
+        var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com", true);
         var credential = new UserCredential("cred-1", user.Id, AuthProvider.Local, "hashed", null);
 
         this._userRepositoryMock

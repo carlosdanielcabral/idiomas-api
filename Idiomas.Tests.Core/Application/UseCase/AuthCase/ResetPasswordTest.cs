@@ -89,7 +89,7 @@ public class ResetPasswordTest
     {
         Guid userId = Guid.NewGuid();
         var token = new PasswordResetToken(Guid.NewGuid(), userId, "valid-token", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
-        var user = new User(userId.ToString(), "João", "joao@example.com");
+        var user = new User(userId.ToString(), "João", "joao@example.com", true);
 
         this._tokenRepositoryMock
             .Setup(repository => repository.GetByToken(It.IsAny<string>()))
@@ -123,7 +123,7 @@ public class ResetPasswordTest
     {
         Guid userId = Guid.NewGuid();
         var token = new PasswordResetToken(Guid.NewGuid(), userId, "valid-token", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
-        var user = new User(userId.ToString(), "João", "joao@example.com");
+        var user = new User(userId.ToString(), "João", "joao@example.com", true);
         var credential = new UserCredential(Guid.NewGuid().ToString(), userId.ToString(), AuthProvider.Local, "oldhash", null);
 
         this._tokenRepositoryMock

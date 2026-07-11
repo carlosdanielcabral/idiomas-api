@@ -54,6 +54,7 @@ public class UserRepository(ApplicationContext database) : IUserRepository
 
         outdatedUser.Name = updatedUser.Name;
         outdatedUser.Email = updatedUser.Email;
+        outdatedUser.IsEmailVerified = updatedUser.IsEmailVerified;
 
         await this._database.SaveChangesAsync();
 
