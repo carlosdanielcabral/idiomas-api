@@ -19,11 +19,13 @@ public class ForgotPasswordTest
     private readonly Mock<IEmailService> _emailServiceMock = new();
     private readonly Mock<EmailTemplateLoader> _templateLoaderMock;
     private readonly Mock<IConfiguration> _configurationMock = new();
+    private readonly Mock<ITokenHasher> _tokenHasherMock = new();
 
     public ForgotPasswordTest()
     {
         this._templateLoaderMock = new Mock<EmailTemplateLoader>(Path.Combine(Path.GetTempPath(), "fake"));
         this._configurationMock.SetupGet(config => config["FrontendUrl"]).Returns("https://app.idiomas.com");
+        this._tokenHasherMock.Setup(hasher => hasher.Hash(It.IsAny<string>())).Returns("hashed-token");
     }
 
     private ForgotPassword CreateSut()
@@ -34,7 +36,8 @@ public class ForgotPasswordTest
             this._tokenRepositoryMock.Object,
             this._emailServiceMock.Object,
             this._templateLoaderMock.Object,
-            this._configurationMock.Object
+            this._configurationMock.Object,
+            this._tokenHasherMock.Object
         );
     }
 
@@ -85,7 +88,7 @@ public class ForgotPasswordTest
     {
         var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com", true);
         var credential = new UserCredential("cred-1", user.Id, AuthProvider.Local, "hashed", null);
-        var activeToken = new PasswordResetToken(Guid.NewGuid(), Guid.Parse(user.Id), "existing-token", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
+        var activeToken = new PasswordResetToken(Guid.NewGuid(), Guid.Parse(user.Id), "existing-hash", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
 
         this._userRepositoryMock
             .Setup(repository => repository.GetByEmail(It.IsAny<string>()))
@@ -138,10 +141,11 @@ public class ForgotPasswordTest
 
         await sut.Execute(dto);
 
+        this._tokenHasherMock.Verify(hasher => hasher.Hash(It.IsAny<string>()), Times.Once);
         this._tokenRepositoryMock.Verify(repository => repository.GetActiveTokenByUserId(Guid.Parse(user.Id)), Times.Once);
         this._tokenRepositoryMock.Verify(repository => repository.Insert(It.Is<PasswordResetToken>(token =>
             token.UserId == Guid.Parse(user.Id) &&
-            !string.IsNullOrEmpty(token.Token) &&
+            !string.IsNullOrEmpty(token.TokenHash) &&
             token.ExpiresAt > DateTime.UtcNow
         )), Times.Once);
         this._emailServiceMock.Verify(service => service.SendAsync(It.Is<EmailMessage>(message =>

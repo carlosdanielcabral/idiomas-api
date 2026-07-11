@@ -17,8 +17,8 @@ public class PasswordResetTokenModel
 
     [Required]
     [MaxLength(128)]
-    [Column("token")]
-    public required string Token { get; set; }
+    [Column("token_hash")]
+    public required string TokenHash { get; set; }
 
     [Required]
     [Column("created_at")]

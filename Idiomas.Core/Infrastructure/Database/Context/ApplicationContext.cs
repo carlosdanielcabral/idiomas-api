@@ -41,7 +41,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
             .HasIndex(s => s.Language);
 
         modelBuilder.Entity<PasswordResetTokenModel>()
-            .HasIndex(token => token.Token)
+            .HasIndex(token => token.TokenHash)
             .IsUnique();
 
         modelBuilder.Entity<PasswordResetTokenModel>()

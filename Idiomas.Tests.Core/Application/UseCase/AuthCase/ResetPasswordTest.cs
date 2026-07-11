@@ -16,20 +16,32 @@ public class ResetPasswordTest
     private readonly Mock<IUserRepository> _userRepositoryMock = new();
     private readonly Mock<IUserCredentialRepository> _userCredentialRepositoryMock = new();
     private readonly Mock<IHash> _hashMock = new();
+    private readonly Mock<ITokenHasher> _tokenHasherMock = new();
+
+    public ResetPasswordTest()
+    {
+        this._tokenHasherMock.Setup(hasher => hasher.Hash(It.IsAny<string>())).Returns("hashed-token");
+    }
+
+    private ResetPassword CreateSut()
+    {
+        return new ResetPassword(
+            this._tokenRepositoryMock.Object,
+            this._userRepositoryMock.Object,
+            this._userCredentialRepositoryMock.Object,
+            this._hashMock.Object,
+            this._tokenHasherMock.Object
+        );
+    }
 
     [Fact]
     public async Task Execute_ThrowsApiExceptionWhenTokenDoesNotExist()
     {
         this._tokenRepositoryMock
-            .Setup(repository => repository.GetByToken(It.IsAny<string>()))
+            .Setup(repository => repository.GetByTokenHash(It.IsAny<string>()))
             .ReturnsAsync((PasswordResetToken?)null);
 
-        var useCase = new ResetPassword(
-            this._tokenRepositoryMock.Object,
-            this._userRepositoryMock.Object,
-            this._userCredentialRepositoryMock.Object,
-            this._hashMock.Object
-        );
+        var useCase = this.CreateSut();
 
         var dto = new ResetPasswordDTO("invalid-token", "newpassword123");
 
@@ -41,18 +53,13 @@ public class ResetPasswordTest
     [Fact]
     public async Task Execute_ThrowsApiExceptionWhenTokenIsExpired()
     {
-        var token = new PasswordResetToken(Guid.NewGuid(), Guid.NewGuid(), "valid-token", DateTime.UtcNow.AddHours(-2), DateTime.UtcNow.AddHours(-1));
+        var token = new PasswordResetToken(Guid.NewGuid(), Guid.NewGuid(), "valid-hash", DateTime.UtcNow.AddHours(-2), DateTime.UtcNow.AddHours(-1));
 
         this._tokenRepositoryMock
-            .Setup(repository => repository.GetByToken(It.IsAny<string>()))
+            .Setup(repository => repository.GetByTokenHash(It.IsAny<string>()))
             .ReturnsAsync(token);
 
-        var useCase = new ResetPassword(
-            this._tokenRepositoryMock.Object,
-            this._userRepositoryMock.Object,
-            this._userCredentialRepositoryMock.Object,
-            this._hashMock.Object
-        );
+        var useCase = this.CreateSut();
 
         var dto = new ResetPasswordDTO("valid-token", "newpassword123");
 
@@ -64,18 +71,13 @@ public class ResetPasswordTest
     [Fact]
     public async Task Execute_ThrowsApiExceptionWhenTokenIsAlreadyUsed()
     {
-        var token = new PasswordResetToken(Guid.NewGuid(), Guid.NewGuid(), "valid-token", DateTime.UtcNow.AddHours(-2), DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddMinutes(-5));
+        var token = new PasswordResetToken(Guid.NewGuid(), Guid.NewGuid(), "valid-hash", DateTime.UtcNow.AddHours(-2), DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddMinutes(-5));
 
         this._tokenRepositoryMock
-            .Setup(repository => repository.GetByToken(It.IsAny<string>()))
+            .Setup(repository => repository.GetByTokenHash(It.IsAny<string>()))
             .ReturnsAsync(token);
 
-        var useCase = new ResetPassword(
-            this._tokenRepositoryMock.Object,
-            this._userRepositoryMock.Object,
-            this._userCredentialRepositoryMock.Object,
-            this._hashMock.Object
-        );
+        var useCase = this.CreateSut();
 
         var dto = new ResetPasswordDTO("valid-token", "newpassword123");
 
@@ -88,11 +90,11 @@ public class ResetPasswordTest
     public async Task Execute_ThrowsApiExceptionWithGenericMessageWhenUserHasNoLocalCredential()
     {
         Guid userId = Guid.NewGuid();
-        var token = new PasswordResetToken(Guid.NewGuid(), userId, "valid-token", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
+        var token = new PasswordResetToken(Guid.NewGuid(), userId, "valid-hash", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
         var user = new User(userId.ToString(), "João", "joao@example.com", true);
 
         this._tokenRepositoryMock
-            .Setup(repository => repository.GetByToken(It.IsAny<string>()))
+            .Setup(repository => repository.GetByTokenHash(It.IsAny<string>()))
             .ReturnsAsync(token);
 
         this._userRepositoryMock
@@ -103,12 +105,7 @@ public class ResetPasswordTest
             .Setup(repository => repository.GetByUserIdAndProvider(It.IsAny<string>(), AuthProvider.Local))
             .ReturnsAsync((UserCredential?)null);
 
-        var useCase = new ResetPassword(
-            this._tokenRepositoryMock.Object,
-            this._userRepositoryMock.Object,
-            this._userCredentialRepositoryMock.Object,
-            this._hashMock.Object
-        );
+        var useCase = this.CreateSut();
 
         var dto = new ResetPasswordDTO("valid-token", "newpassword123");
 
@@ -122,12 +119,12 @@ public class ResetPasswordTest
     public async Task Execute_UpdatesPasswordAndMarksTokenAsUsedWhenValid()
     {
         Guid userId = Guid.NewGuid();
-        var token = new PasswordResetToken(Guid.NewGuid(), userId, "valid-token", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
+        var token = new PasswordResetToken(Guid.NewGuid(), userId, "valid-hash", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
         var user = new User(userId.ToString(), "João", "joao@example.com", true);
         var credential = new UserCredential(Guid.NewGuid().ToString(), userId.ToString(), AuthProvider.Local, "oldhash", null);
 
         this._tokenRepositoryMock
-            .Setup(repository => repository.GetByToken(It.IsAny<string>()))
+            .Setup(repository => repository.GetByTokenHash(It.IsAny<string>()))
             .ReturnsAsync(token);
 
         this._userRepositoryMock
@@ -142,12 +139,7 @@ public class ResetPasswordTest
             .Setup(hash => hash.Hash(It.IsAny<string>()))
             .Returns("newhash");
 
-        var useCase = new ResetPassword(
-            this._tokenRepositoryMock.Object,
-            this._userRepositoryMock.Object,
-            this._userCredentialRepositoryMock.Object,
-            this._hashMock.Object
-        );
+        var useCase = this.CreateSut();
 
         var dto = new ResetPasswordDTO("valid-token", "newpassword123");
 

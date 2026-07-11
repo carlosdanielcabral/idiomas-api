@@ -17,7 +17,8 @@ public class ForgotPassword(
     IPasswordResetTokenRepository tokenRepository,
     IEmailService emailService,
     EmailTemplateLoader templateLoader,
-    IConfiguration configuration)
+    IConfiguration configuration,
+    ITokenHasher tokenHasher)
 {
     private const int TOKEN_LENGTH = 64;
 
@@ -29,6 +30,7 @@ public class ForgotPassword(
     private readonly IEmailService _emailService = emailService;
     private readonly EmailTemplateLoader _templateLoader = templateLoader;
     private readonly IConfiguration _configuration = configuration;
+    private readonly ITokenHasher _tokenHasher = tokenHasher;
 
     public async Task Execute(ForgotPasswordDTO dto)
     {
@@ -51,11 +53,14 @@ public class ForgotPassword(
 
         await this.EnsureNoActiveTokenExists(userId);
 
-        PasswordResetToken token = this.CreatePasswordResetToken(userId);
+        string rawToken = GenerateSecureToken();
+        string tokenHash = this._tokenHasher.Hash(rawToken);
+
+        PasswordResetToken token = new(Guid.NewGuid(), userId, tokenHash, DateTime.UtcNow, DateTime.UtcNow.AddHours(TOKEN_EXPIRATION_HOURS));
 
         await this._tokenRepository.Insert(token);
 
-        await this.SendPasswordResetEmail(user, token.Token);
+        await this.SendPasswordResetEmail(user, rawToken);
     }
 
     private async Task EnsureNoActiveTokenExists(Guid userId)
@@ -68,18 +73,10 @@ public class ForgotPassword(
         }
     }
 
-    private PasswordResetToken CreatePasswordResetToken(Guid userId)
-    {
-        string tokenValue = GenerateSecureToken();
-        DateTime expiresAt = DateTime.UtcNow.AddHours(TOKEN_EXPIRATION_HOURS);
-
-        return new PasswordResetToken(Guid.NewGuid(), userId, tokenValue, DateTime.UtcNow, expiresAt);
-    }
-
-    private async Task SendPasswordResetEmail(User user, string tokenValue)
+    private async Task SendPasswordResetEmail(User user, string rawToken)
     {
         string frontendUrl = this._configuration["FrontendUrl"] ?? throw new InvalidOperationException("FrontendUrl is not configured");
-        string resetLink = $"{frontendUrl}/reset-password?token={tokenValue}";
+        string resetLink = $"{frontendUrl}/reset-password?token={rawToken}";
 
         string htmlBody = this._templateLoader.Load("PasswordResetEmail.html", [
             new EmailTemplatePlaceholder("UserName", user.Name),

@@ -7,7 +7,7 @@ public static class PasswordResetTokenMappingExtension
 {
     public static PasswordResetToken ToEntity(this PasswordResetTokenModel model)
     {
-        return new PasswordResetToken(model.Id, model.UserId, model.Token, model.CreatedAt, model.ExpiresAt, model.UsedAt);
+        return new PasswordResetToken(model.Id, model.UserId, model.TokenHash, model.CreatedAt, model.ExpiresAt, model.UsedAt);
     }
 
     public static PasswordResetTokenModel ToModel(this PasswordResetToken entity)
@@ -16,7 +16,7 @@ public static class PasswordResetTokenMappingExtension
         {
             Id = entity.Id,
             UserId = entity.UserId,
-            Token = entity.Token,
+            TokenHash = entity.TokenHash,
             CreatedAt = entity.CreatedAt,
             ExpiresAt = entity.ExpiresAt,
             UsedAt = entity.UsedAt

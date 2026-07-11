@@ -20,10 +20,10 @@ public class PasswordResetTokenRepository(ApplicationContext database) : IPasswo
         await this._database.SaveChangesAsync();
     }
 
-    public async Task<PasswordResetToken?> GetByToken(string token)
+    public async Task<PasswordResetToken?> GetByTokenHash(string tokenHash)
     {
         PasswordResetTokenModel? model = await this._database.PasswordResetToken
-            .FirstOrDefaultAsync(record => record.Token == token);
+            .FirstOrDefaultAsync(record => record.TokenHash == tokenHash);
 
         return model?.ToEntity();
     }
