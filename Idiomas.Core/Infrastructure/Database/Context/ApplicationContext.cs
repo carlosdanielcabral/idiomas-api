@@ -14,6 +14,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
     public DbSet<CorrectionModel> Correction { get; set; }
     public DbSet<ScenarioModel> Scenario { get; set; }
     public DbSet<PasswordResetTokenModel> PasswordResetToken { get; set; }
+    public DbSet<UserCredentialModel> UserCredential { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -43,5 +44,22 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
 
         modelBuilder.Entity<PasswordResetTokenModel>()
             .HasIndex(token => token.UserId);
+
+        modelBuilder.Entity<UserCredentialModel>()
+            .HasIndex(credential => new { credential.Provider, credential.ExternalSubject })
+            .IsUnique();
+
+        modelBuilder.Entity<UserCredentialModel>()
+            .HasIndex(credential => new { credential.UserId, credential.Provider })
+            .IsUnique();
+
+        modelBuilder.Entity<UserCredentialModel>()
+            .HasOne(credential => credential.User)
+            .WithMany()
+            .HasForeignKey(credential => credential.UserId);
+
+        modelBuilder.Entity<UserModel>()
+            .HasIndex(user => user.Email)
+            .IsUnique();
     }
 }

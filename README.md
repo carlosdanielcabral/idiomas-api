@@ -17,7 +17,8 @@
 - 📚 **Dictionary Management** — Create and manage vocabulary dictionaries
 - ☁️ **File Storage** — Azure Blob Storage integration for file uploads and management
 - 🛡️ **Rate Limiting** — Built-in rate limiting to protect against abuse (100 requests per minute per IP)
-- 📘 **API Documentation** — Interactive Swagger UI for API exploration
+- � **Email Service** — Send email notifications via SendGrid through a generic `IEmailService` interface
+- � **API Documentation** — Interactive Swagger UI for API exploration
 
 ---
 
@@ -164,6 +165,9 @@ Key environment variables (see `.env.example` for the complete list):
 | `Gemini__ApiKey` | Gemini AI API key |
 | `Gemini__Model` | Gemini AI model name |
 | `Encryption__Key` | Encryption key (minimum 32 characters) |
+| `SendGrid__ApiKey` | SendGrid API key for sending emails |
+| `Email__SenderAddress` | Default email sender address |
+| `Email__SenderName` | Default email sender name |
 | `FrontendLocalUrl` | Allowed frontend URLs for CORS |
 
 ---

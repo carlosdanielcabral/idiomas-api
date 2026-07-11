@@ -27,12 +27,7 @@ public partial class UpdateUserValidator : IValidator<UpdateUserDTO>
             throw new ApiException("Email inválido", HttpStatusCode.BadRequest);
         }
 
-        if (string.IsNullOrWhiteSpace(dto.Password))
-        {
-            throw new ApiException("Senha é obrigatória", HttpStatusCode.BadRequest);
-        }
-
-        if (dto.Password.Length < MINIMUM_PASSWORD_LENGTH)
+        if (!string.IsNullOrEmpty(dto.Password) && dto.Password.Length < MINIMUM_PASSWORD_LENGTH)
         {
             throw new ApiException($"Senha deve ter pelo menos {MINIMUM_PASSWORD_LENGTH} caracteres", HttpStatusCode.BadRequest);
         }

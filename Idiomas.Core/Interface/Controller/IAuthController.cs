@@ -7,6 +7,8 @@ public interface IAuthController
 {
     public Task<IResult> MailPasswordLogin(HttpContext httpContext, MailPasswordLoginDTO dto, MailPasswordLogin useCase);
 
+    public Task<IResult> GoogleLogin(HttpContext httpContext, GoogleLoginDTO dto, GoogleLogin useCase);
+
     public Task<IResult> ForgotPassword(ForgotPasswordDTO dto, ForgotPassword useCase);
 
     public Task<IResult> ResetPassword(ResetPasswordDTO dto, ResetPassword useCase);

@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using Idiomas.Core.Application.DTO.Auth;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Service.Email;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
@@ -12,6 +13,7 @@ namespace Idiomas.Core.Application.UseCase.AuthCase;
 
 public class ForgotPassword(
     IUserRepository userRepository,
+    IUserCredentialRepository userCredentialRepository,
     IPasswordResetTokenRepository tokenRepository,
     IEmailService emailService,
     EmailTemplateLoader templateLoader,
@@ -22,6 +24,7 @@ public class ForgotPassword(
     private const int TOKEN_EXPIRATION_HOURS = 1;
 
     private readonly IUserRepository _userRepository = userRepository;
+    private readonly IUserCredentialRepository _userCredentialRepository = userCredentialRepository;
     private readonly IPasswordResetTokenRepository _tokenRepository = tokenRepository;
     private readonly IEmailService _emailService = emailService;
     private readonly EmailTemplateLoader _templateLoader = templateLoader;
@@ -32,6 +35,14 @@ public class ForgotPassword(
         User? user = await this._userRepository.GetByEmail(dto.Email);
 
         if (user == null)
+        {
+            return;
+        }
+
+        UserCredential? credential = await this._userCredentialRepository
+            .GetByUserIdAndProvider(user.Id, AuthProvider.Local);
+
+        if (credential == null)
         {
             return;
         }
