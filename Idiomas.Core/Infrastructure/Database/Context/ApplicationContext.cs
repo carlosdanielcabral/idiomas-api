@@ -15,6 +15,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
     public DbSet<ScenarioModel> Scenario { get; set; }
     public DbSet<PasswordResetTokenModel> PasswordResetToken { get; set; }
     public DbSet<UserCredentialModel> UserCredential { get; set; }
+    public DbSet<EmailVerificationTokenModel> EmailVerificationToken { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -61,5 +62,17 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
         modelBuilder.Entity<UserModel>()
             .HasIndex(user => user.Email)
             .IsUnique();
+
+        modelBuilder.Entity<EmailVerificationTokenModel>()
+            .HasIndex(token => token.TokenHash)
+            .IsUnique();
+
+        modelBuilder.Entity<EmailVerificationTokenModel>()
+            .HasIndex(token => token.UserId);
+
+        modelBuilder.Entity<EmailVerificationTokenModel>()
+            .HasOne(token => token.User)
+            .WithMany()
+            .HasForeignKey(token => token.UserId);
     }
 }
