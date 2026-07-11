@@ -17,12 +17,14 @@ public class AuthRoute(IAuthController controller) : IRoute
         app.MapPost("/auth/login", this._controller.MailPasswordLogin)
             .Produces<LoginResponseDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status403Forbidden)
             .WithValidation<MailPasswordLoginValidator, MailPasswordLoginDTO>();
 
         app.MapPost("/auth/google", this._controller.GoogleLogin)
             .Produces<LoginResponseDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
             .WithValidation<GoogleLoginValidator, GoogleLoginDTO>();
 
         app.MapPost("/auth/forgot-password", this._controller.ForgotPassword)
@@ -34,5 +36,18 @@ public class AuthRoute(IAuthController controller) : IRoute
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .WithValidation<ResetPasswordValidator, ResetPasswordDTO>();
+
+        app.MapGet("/auth/verify-email", this._controller.VerifyEmail)
+            .Produces(StatusCodes.Status302Found)
+            .Produces(StatusCodes.Status400BadRequest);
+
+        app.MapPost("/auth/resend-verification", this._controller.ResendVerification)
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status409Conflict)
+            .WithValidation<ResendVerificationValidator, ResendVerificationDTO>();
+
+        app.MapGet("/auth/verify-email-change", this._controller.VerifyEmailChange)
+            .Produces(StatusCodes.Status302Found)
+            .Produces(StatusCodes.Status400BadRequest);
     }
 }
