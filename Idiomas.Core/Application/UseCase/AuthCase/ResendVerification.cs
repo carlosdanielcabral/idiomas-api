@@ -11,10 +11,10 @@ using System.Net;
 
 namespace Idiomas.Core.Application.UseCase.AuthCase;
 
-public class ForgotPassword(
+public class ResendVerification(
     IUserRepository userRepository,
     IUserCredentialRepository userCredentialRepository,
-    IPasswordResetTokenRepository tokenRepository,
+    IEmailVerificationTokenRepository tokenRepository,
     IEmailService emailService,
     EmailTemplateLoader templateLoader,
     IConfiguration configuration,
@@ -26,13 +26,13 @@ public class ForgotPassword(
 
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IUserCredentialRepository _userCredentialRepository = userCredentialRepository;
-    private readonly IPasswordResetTokenRepository _tokenRepository = tokenRepository;
+    private readonly IEmailVerificationTokenRepository _tokenRepository = tokenRepository;
     private readonly IEmailService _emailService = emailService;
     private readonly EmailTemplateLoader _templateLoader = templateLoader;
     private readonly IConfiguration _configuration = configuration;
     private readonly ITokenHasher _tokenHasher = tokenHasher;
 
-    public async Task Execute(ForgotPasswordDTO dto)
+    public async Task Execute(ResendVerificationDTO dto)
     {
         User? user = await this._userRepository.GetByEmail(dto.Email);
 
@@ -49,6 +49,11 @@ public class ForgotPassword(
             return;
         }
 
+        if (user.IsEmailVerified)
+        {
+            return;
+        }
+
         Guid userId = Guid.Parse(user.Id);
 
         await this.EnsureNoActiveTokenExists(userId);
@@ -56,34 +61,40 @@ public class ForgotPassword(
         string rawToken = GenerateSecureToken();
         string tokenHash = this._tokenHasher.Hash(rawToken);
 
-        PasswordResetToken token = new(Guid.NewGuid(), userId, tokenHash, DateTime.UtcNow, DateTime.UtcNow.AddHours(TOKEN_EXPIRATION_HOURS));
+        EmailVerificationToken token = new(
+            Guid.NewGuid(),
+            userId,
+            tokenHash,
+            DateTime.UtcNow,
+            DateTime.UtcNow.AddHours(TOKEN_EXPIRATION_HOURS)
+        );
 
         await this._tokenRepository.Insert(token);
 
-        await this.SendPasswordResetEmail(user, rawToken);
+        await this.SendVerificationEmail(user, rawToken);
     }
 
     private async Task EnsureNoActiveTokenExists(Guid userId)
     {
-        PasswordResetToken? activeToken = await this._tokenRepository.GetActiveTokenByUserId(userId);
+        EmailVerificationToken? activeToken = await this._tokenRepository.GetActiveTokenByUserId(userId);
 
         if (activeToken != null)
         {
-            throw new ApiException("Já existe uma solicitação de redefinição de senha ativa. Verifique seu email ou aguarde a expiração.", HttpStatusCode.Conflict);
+            throw new ApiException("Já existe uma solicitação de verificação ativa. Verifique seu email ou aguarde a expiração.", HttpStatusCode.Conflict);
         }
     }
 
-    private async Task SendPasswordResetEmail(User user, string rawToken)
+    private async Task SendVerificationEmail(User user, string rawToken)
     {
         string frontendUrl = this._configuration["FrontendUrl"] ?? throw new InvalidOperationException("FrontendUrl is not configured");
-        string resetLink = $"{frontendUrl}/reset-password?token={rawToken}";
+        string verificationLink = $"{frontendUrl}/verify-email?token={rawToken}";
 
-        string htmlBody = this._templateLoader.Load("PasswordResetEmail.html", [
+        string htmlBody = this._templateLoader.Load("EmailVerification.html", [
             new EmailTemplatePlaceholder("UserName", user.Name),
-            new EmailTemplatePlaceholder("ResetLink", resetLink)
+            new EmailTemplatePlaceholder("VerificationLink", verificationLink)
         ]);
 
-        var emailMessage = new EmailMessage(user.Email, "Redefinição de senha", htmlBody);
+        var emailMessage = new EmailMessage(user.Email, "Verifique seu e-mail", htmlBody);
 
         await this._emailService.SendAsync(emailMessage);
     }

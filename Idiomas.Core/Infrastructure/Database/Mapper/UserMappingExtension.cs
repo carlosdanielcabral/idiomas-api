@@ -7,12 +7,12 @@ public static class UserMappingExtension
 {
     public static User ToEntity(this UserModel model)
     {
-        return new User(model.Id.ToString(), model.Name, model.Email);
+        return new User(model.Id.ToString(), model.Name, model.Email, model.IsEmailVerified);
     }
 
     public static UserModel ToModel(this User entity)
     {
-        return new UserModel() { Id = Guid.Parse(entity.Id), Name = entity.Name, Email = entity.Email };
+        return new UserModel() { Id = Guid.Parse(entity.Id), Name = entity.Name, Email = entity.Email, IsEmailVerified = entity.IsEmailVerified };
     }
 
     public static IEnumerable<User> ToEntities(this IEnumerable<UserModel> models)

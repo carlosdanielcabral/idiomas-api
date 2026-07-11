@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Idiomas.Core.Infrastructure.Database.Model;
 
-[Table("password_reset_token")]
-public class PasswordResetTokenModel
+[Table("email_change_request")]
+public class EmailChangeRequestModel
 {
     [Key]
     [Column("id")]
@@ -14,6 +14,11 @@ public class PasswordResetTokenModel
     [Required]
     [Column("user_id")]
     public required Guid UserId { get; set; }
+
+    [Required]
+    [MaxLength(255)]
+    [Column("new_email")]
+    public required string NewEmail { get; set; }
 
     [Required]
     [MaxLength(128)]

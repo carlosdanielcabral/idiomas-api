@@ -15,6 +15,8 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
     public DbSet<ScenarioModel> Scenario { get; set; }
     public DbSet<PasswordResetTokenModel> PasswordResetToken { get; set; }
     public DbSet<UserCredentialModel> UserCredential { get; set; }
+    public DbSet<EmailVerificationTokenModel> EmailVerificationToken { get; set; }
+    public DbSet<EmailChangeRequestModel> EmailChangeRequest { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,7 +41,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
             .HasIndex(s => s.Language);
 
         modelBuilder.Entity<PasswordResetTokenModel>()
-            .HasIndex(token => token.Token)
+            .HasIndex(token => token.TokenHash)
             .IsUnique();
 
         modelBuilder.Entity<PasswordResetTokenModel>()
@@ -61,5 +63,29 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
         modelBuilder.Entity<UserModel>()
             .HasIndex(user => user.Email)
             .IsUnique();
+
+        modelBuilder.Entity<EmailVerificationTokenModel>()
+            .HasIndex(token => token.TokenHash)
+            .IsUnique();
+
+        modelBuilder.Entity<EmailVerificationTokenModel>()
+            .HasIndex(token => token.UserId);
+
+        modelBuilder.Entity<EmailVerificationTokenModel>()
+            .HasOne(token => token.User)
+            .WithMany()
+            .HasForeignKey(token => token.UserId);
+
+        modelBuilder.Entity<EmailChangeRequestModel>()
+            .HasIndex(request => request.TokenHash)
+            .IsUnique();
+
+        modelBuilder.Entity<EmailChangeRequestModel>()
+            .HasIndex(request => request.UserId);
+
+        modelBuilder.Entity<EmailChangeRequestModel>()
+            .HasOne(request => request.User)
+            .WithMany()
+            .HasForeignKey(request => request.UserId);
     }
 }

@@ -15,6 +15,7 @@ public static class DependencyInjection
         services.AddScoped<MailPasswordLoginValidator>();
         services.AddScoped<ForgotPasswordValidator>();
         services.AddScoped<ResetPasswordValidator>();
+        services.AddScoped<ResendVerificationValidator>();
         services.AddScoped<CreateWordValidator>();
         services.AddScoped<UpdateWordValidator>();
         services.AddScoped<StartConversationValidator>();

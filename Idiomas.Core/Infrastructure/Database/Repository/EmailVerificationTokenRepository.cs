@@ -7,30 +7,30 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Idiomas.Core.Infrastructure.Database.Repository;
 
-public class PasswordResetTokenRepository(ApplicationContext database) : IPasswordResetTokenRepository
+public class EmailVerificationTokenRepository(ApplicationContext database) : IEmailVerificationTokenRepository
 {
     private readonly ApplicationContext _database = database;
 
-    public async Task Insert(PasswordResetToken token)
+    public async Task Insert(EmailVerificationToken token)
     {
-        PasswordResetTokenModel model = token.ToModel();
+        EmailVerificationTokenModel model = token.ToModel();
 
-        this._database.PasswordResetToken.Add(model);
+        this._database.EmailVerificationToken.Add(model);
 
         await this._database.SaveChangesAsync();
     }
 
-    public async Task<PasswordResetToken?> GetByTokenHash(string tokenHash)
+    public async Task<EmailVerificationToken?> GetByTokenHash(string tokenHash)
     {
-        PasswordResetTokenModel? model = await this._database.PasswordResetToken
+        EmailVerificationTokenModel? model = await this._database.EmailVerificationToken
             .FirstOrDefaultAsync(record => record.TokenHash == tokenHash);
 
         return model?.ToEntity();
     }
 
-    public async Task<PasswordResetToken?> GetActiveTokenByUserId(Guid userId)
+    public async Task<EmailVerificationToken?> GetActiveTokenByUserId(Guid userId)
     {
-        PasswordResetTokenModel? model = await this._database.PasswordResetToken
+        EmailVerificationTokenModel? model = await this._database.EmailVerificationToken
             .Where(record => record.UserId == userId && record.UsedAt == null && record.ExpiresAt > DateTime.UtcNow)
             .OrderByDescending(record => record.CreatedAt)
             .FirstOrDefaultAsync();
@@ -38,14 +38,14 @@ public class PasswordResetTokenRepository(ApplicationContext database) : IPasswo
         return model?.ToEntity();
     }
 
-    public async Task MarkAsUsed(PasswordResetToken token)
+    public async Task MarkAsUsed(EmailVerificationToken token)
     {
-        PasswordResetTokenModel? model = await this._database.PasswordResetToken
+        EmailVerificationTokenModel? model = await this._database.EmailVerificationToken
             .FirstOrDefaultAsync(record => record.Id == token.Id);
 
         if (model is null)
         {
-            throw new KeyNotFoundException($"Password reset token with ID {token.Id} not found.");
+            throw new KeyNotFoundException($"Email verification token with ID {token.Id} not found.");
         }
 
         model.UsedAt = DateTime.UtcNow;

@@ -12,4 +12,10 @@ public interface IAuthController
     public Task<IResult> ForgotPassword(ForgotPasswordDTO dto, ForgotPassword useCase);
 
     public Task<IResult> ResetPassword(ResetPasswordDTO dto, ResetPassword useCase);
+
+    public Task<IResult> VerifyEmail(string token, VerifyEmail useCase);
+
+    public Task<IResult> ResendVerification(ResendVerificationDTO dto, ResendVerification useCase);
+
+    public Task<IResult> VerifyEmailChange(string token, VerifyEmailChange useCase);
 }

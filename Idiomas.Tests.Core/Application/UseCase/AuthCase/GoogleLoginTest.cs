@@ -66,7 +66,7 @@ public class GoogleLoginTest
     public async Task Execute_ReturnsUserWhenCredentialAlreadyLinked()
     {
         GoogleTokenPayload payload = CreatePayload();
-        User user = new("user-1", "João Silva", "joao@gmail.com");
+        User user = new("user-1", "João Silva", "joao@gmail.com", true);
         UserCredential credential = new("cred-1", "user-1", AuthProvider.Google, null, "google-sub-123");
 
         this._tokenVerifierMock
@@ -121,7 +121,7 @@ public class GoogleLoginTest
     public async Task Execute_LinksGoogleCredentialWhenUserExistsByEmail()
     {
         GoogleTokenPayload payload = CreatePayload();
-        User existingUser = new("user-1", "João Silva", "joao@gmail.com");
+        User existingUser = new("user-1", "João Silva", "joao@gmail.com", true);
 
         this._tokenVerifierMock
             .Setup(verifier => verifier.Verify(It.IsAny<string>()))
@@ -189,5 +189,31 @@ public class GoogleLoginTest
         this._userRepositoryMock.Verify(repository => repository.Insert(It.Is<User>(user => user.Name == "João Silva" && user.Email == "joao@gmail.com")), Times.Once);
         this._userCredentialRepositoryMock.Verify(repository => repository.Insert(It.Is<UserCredential>(credential => credential.Provider == AuthProvider.Google && credential.ExternalSubject == "google-sub-123" && credential.PasswordHash == null)), Times.Once);
         this._databaseTransactionMock.Verify(transaction => transaction.CommitAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task Execute_ThrowsApiExceptionWhenLocalAccountNotVerified()
+    {
+        GoogleTokenPayload payload = CreatePayload();
+        User existingUser = new("user-1", "João Silva", "joao@gmail.com", false);
+
+        this._tokenVerifierMock
+            .Setup(verifier => verifier.Verify(It.IsAny<string>()))
+            .ReturnsAsync(payload);
+
+        this._userCredentialRepositoryMock
+            .Setup(repository => repository.GetByExternalSubject(AuthProvider.Google, payload.Subject))
+            .ReturnsAsync((UserCredential?)null);
+
+        this._userRepositoryMock
+            .Setup(repository => repository.GetByEmail(payload.Email))
+            .ReturnsAsync(existingUser);
+
+        var dto = new GoogleLoginDTO("id-token");
+
+        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(dto));
+
+        Assert.Equal(HttpStatusCode.Forbidden, exception.StatusCode);
+        Assert.Equal("E-mail não verificado. Verifique sua caixa de entrada para ativar sua conta.", exception.Message);
     }
 }

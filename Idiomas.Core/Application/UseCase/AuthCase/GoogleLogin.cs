@@ -49,6 +49,11 @@ public class GoogleLogin(
 
         if (existingUser != null)
         {
+            if (!existingUser.IsEmailVerified)
+            {
+                throw new ApiException("E-mail não verificado. Verifique sua caixa de entrada para ativar sua conta.", HttpStatusCode.Forbidden);
+            }
+
             return await this.LinkGoogleCredential(existingUser.Id, payload);
         }
 
@@ -80,7 +85,7 @@ public class GoogleLogin(
     {
         await using IDatabaseTransaction transaction = await this._transactionManager.BeginTransactionAsync();
 
-        User user = new(UUIDGenerator.Generate(), payload.Name, payload.Email);
+        User user = new(UUIDGenerator.Generate(), payload.Name, payload.Email, true);
 
         User createdUser = await this._userRepository.Insert(user);
 

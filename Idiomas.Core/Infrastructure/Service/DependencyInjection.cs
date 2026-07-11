@@ -19,6 +19,7 @@ public static class DependencyInjection
     public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IHash, Argon2Hash>();
+        services.AddScoped<ITokenHasher, Sha256TokenHasher>();
         services.AddScoped<IEncryptionService, AesGcmEncryptionService>(provider =>
         {
             var configuration = provider.GetRequiredService<IConfiguration>();

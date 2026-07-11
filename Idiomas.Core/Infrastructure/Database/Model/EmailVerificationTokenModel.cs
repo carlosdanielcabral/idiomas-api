@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Idiomas.Core.Infrastructure.Database.Model;
 
-[Table("password_reset_token")]
-public class PasswordResetTokenModel
+[Table("email_verification_token")]
+public class EmailVerificationTokenModel
 {
     [Key]
     [Column("id")]

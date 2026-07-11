@@ -7,30 +7,30 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Idiomas.Core.Infrastructure.Database.Repository;
 
-public class PasswordResetTokenRepository(ApplicationContext database) : IPasswordResetTokenRepository
+public class EmailChangeRequestRepository(ApplicationContext database) : IEmailChangeRequestRepository
 {
     private readonly ApplicationContext _database = database;
 
-    public async Task Insert(PasswordResetToken token)
+    public async Task Insert(EmailChangeRequest request)
     {
-        PasswordResetTokenModel model = token.ToModel();
+        EmailChangeRequestModel model = request.ToModel();
 
-        this._database.PasswordResetToken.Add(model);
+        this._database.EmailChangeRequest.Add(model);
 
         await this._database.SaveChangesAsync();
     }
 
-    public async Task<PasswordResetToken?> GetByTokenHash(string tokenHash)
+    public async Task<EmailChangeRequest?> GetByTokenHash(string tokenHash)
     {
-        PasswordResetTokenModel? model = await this._database.PasswordResetToken
+        EmailChangeRequestModel? model = await this._database.EmailChangeRequest
             .FirstOrDefaultAsync(record => record.TokenHash == tokenHash);
 
         return model?.ToEntity();
     }
 
-    public async Task<PasswordResetToken?> GetActiveTokenByUserId(Guid userId)
+    public async Task<EmailChangeRequest?> GetActiveRequestByUserId(Guid userId)
     {
-        PasswordResetTokenModel? model = await this._database.PasswordResetToken
+        EmailChangeRequestModel? model = await this._database.EmailChangeRequest
             .Where(record => record.UserId == userId && record.UsedAt == null && record.ExpiresAt > DateTime.UtcNow)
             .OrderByDescending(record => record.CreatedAt)
             .FirstOrDefaultAsync();
@@ -38,14 +38,14 @@ public class PasswordResetTokenRepository(ApplicationContext database) : IPasswo
         return model?.ToEntity();
     }
 
-    public async Task MarkAsUsed(PasswordResetToken token)
+    public async Task MarkAsUsed(EmailChangeRequest request)
     {
-        PasswordResetTokenModel? model = await this._database.PasswordResetToken
-            .FirstOrDefaultAsync(record => record.Id == token.Id);
+        EmailChangeRequestModel? model = await this._database.EmailChangeRequest
+            .FirstOrDefaultAsync(record => record.Id == request.Id);
 
         if (model is null)
         {
-            throw new KeyNotFoundException($"Password reset token with ID {token.Id} not found.");
+            throw new KeyNotFoundException($"Email change request with ID {request.Id} not found.");
         }
 
         model.UsedAt = DateTime.UtcNow;

@@ -12,16 +12,20 @@ public class ResetPassword(
     IPasswordResetTokenRepository tokenRepository,
     IUserRepository userRepository,
     IUserCredentialRepository userCredentialRepository,
-    IHash hash)
+    IHash hash,
+    ITokenHasher tokenHasher)
 {
     private readonly IPasswordResetTokenRepository _tokenRepository = tokenRepository;
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IUserCredentialRepository _userCredentialRepository = userCredentialRepository;
     private readonly IHash _hash = hash;
+    private readonly ITokenHasher _tokenHasher = tokenHasher;
 
     public async Task Execute(ResetPasswordDTO dto)
     {
-        PasswordResetToken? token = await this._tokenRepository.GetByToken(dto.Token);
+        string tokenHash = this._tokenHasher.Hash(dto.Token);
+
+        PasswordResetToken? token = await this._tokenRepository.GetByTokenHash(tokenHash);
 
         if (token == null || token.IsExpired || token.IsUsed)
         {

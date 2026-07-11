@@ -33,7 +33,7 @@ public class MailPasswordLoginTest
     public async Task Execute_ShouldReturnUser_WhenCredentialsAreValid()
     {
         MailPasswordLoginDTO loginDto = new("test@example.com", "password123");
-        User user = new("1", "Test User", "test@example.com");
+        User user = new("1", "Test User", "test@example.com", true);
         UserCredential credential = new("cred-1", "1", AuthProvider.Local, "hashed_password", null);
 
         this._userRepositoryMock
@@ -73,7 +73,7 @@ public class MailPasswordLoginTest
     public async Task Execute_ShouldThrowApiException_WhenPasswordIsInvalid()
     {
         MailPasswordLoginDTO loginDto = new("test@example.com", "wrongpassword");
-        User user = new("1", "Test User", "test@example.com");
+        User user = new("1", "Test User", "test@example.com", true);
         UserCredential credential = new("cred-1", "1", AuthProvider.Local, "hashed_password", null);
 
         this._userRepositoryMock
@@ -98,7 +98,7 @@ public class MailPasswordLoginTest
     public async Task Execute_ShouldThrowApiException_WhenUserHasNoLocalCredential()
     {
         MailPasswordLoginDTO loginDto = new("test@example.com", "password123");
-        User user = new("1", "Test User", "test@example.com");
+        User user = new("1", "Test User", "test@example.com", true);
 
         this._userRepositoryMock
             .Setup(repository => repository.GetByEmail(loginDto.Email))
@@ -112,5 +112,30 @@ public class MailPasswordLoginTest
 
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
         Assert.Equal("Email ou senha inválidos", exception.Message);
+    }
+
+    [Fact]
+    public async Task Execute_ShouldThrowApiException_WhenEmailIsNotVerified()
+    {
+        MailPasswordLoginDTO loginDto = new("test@example.com", "password123");
+        User user = new("1", "Test User", "test@example.com", false);
+        UserCredential credential = new("cred-1", "1", AuthProvider.Local, "hashed_password", null);
+
+        this._userRepositoryMock
+            .Setup(repository => repository.GetByEmail(loginDto.Email))
+            .ReturnsAsync(user);
+
+        this._userCredentialRepositoryMock
+            .Setup(repository => repository.GetByUserIdAndProvider(user.Id, AuthProvider.Local))
+            .ReturnsAsync(credential);
+
+        this._hashMock
+            .Setup(hash => hash.Verify(loginDto.Password, credential.PasswordHash!))
+            .Returns(true);
+
+        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(loginDto));
+
+        Assert.Equal(HttpStatusCode.Forbidden, exception.StatusCode);
+        Assert.Equal("E-mail não verificado. Verifique sua caixa de entrada.", exception.Message);
     }
 }

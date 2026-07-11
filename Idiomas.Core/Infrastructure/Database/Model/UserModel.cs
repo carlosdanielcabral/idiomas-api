@@ -21,6 +21,10 @@ public class UserModel
     [Column("email")]
     public required string Email { get; set; }
 
+    [Required]
+    [Column("is_email_verified")]
+    public required bool IsEmailVerified { get; set; }
+
     public ICollection<WordModel> Dictionary { get; set; } = [];
     public ICollection<FileModel> Files { get; set; } = [];
 }

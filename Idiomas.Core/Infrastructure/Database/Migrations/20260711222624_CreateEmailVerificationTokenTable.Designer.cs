@@ -4,6 +4,7 @@ using Idiomas.Core.Infrastructure.Database.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Idiomas.Core.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20260711222624_CreateEmailVerificationTokenTable")]
+    partial class CreateEmailVerificationTokenTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,50 +114,6 @@ namespace Idiomas.Core.Infrastructure.Database.Migrations
                     b.HasIndex("MessageId");
 
                     b.ToTable("correction");
-                });
-
-            modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.EmailChangeRequestModel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("expires_at");
-
-                    b.Property<string>("NewEmail")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("new_email");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)")
-                        .HasColumnName("token_hash");
-
-                    b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("used_at");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TokenHash")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("email_change_request");
                 });
 
             modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.EmailVerificationTokenModel", b =>
@@ -318,11 +277,11 @@ namespace Idiomas.Core.Infrastructure.Database.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("expires_at");
 
-                    b.Property<string>("TokenHash")
+                    b.Property<string>("Token")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
-                        .HasColumnName("token_hash");
+                        .HasColumnName("token");
 
                     b.Property<DateTime?>("UsedAt")
                         .HasColumnType("datetime2")
@@ -334,7 +293,7 @@ namespace Idiomas.Core.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TokenHash")
+                    b.HasIndex("Token")
                         .IsUnique();
 
                     b.HasIndex("UserId");
@@ -509,17 +468,6 @@ namespace Idiomas.Core.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Message");
-                });
-
-            modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.EmailChangeRequestModel", b =>
-                {
-                    b.HasOne("Idiomas.Core.Infrastructure.Database.Model.UserModel", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Idiomas.Core.Infrastructure.Database.Model.EmailVerificationTokenModel", b =>
