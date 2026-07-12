@@ -1,6 +1,6 @@
 using System.Net;
 using Idiomas.Core.Application.DTO.Dictionary;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Dictionary;
 using Idiomas.Core.Application.UseCase.DictionaryCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Interface.Repository;
@@ -50,7 +50,7 @@ public class UpdateWordTest
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowNotFound_WhenWordDoesNotExist()
+    public async Task Execute_ShouldThrowWordNotFoundException_WhenWordDoesNotExist()
     {
         string userId = "user-id-123";
         string wordId = "non-existing-word";
@@ -61,14 +61,16 @@ public class UpdateWordTest
             .Setup(repository => repository.GetById(wordId))
             .ReturnsAsync((Word) null!);
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(wordId, updateDto, userId));
+        var exception = await Assert.ThrowsAsync<WordNotFoundException>(() => this._sut.Execute(wordId, updateDto, userId));
 
         Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
-        Assert.Equal("Palavra não encontrada", exception.Message);
+        Assert.Equal("dictionary:word-not-found", exception.ErrorCode);
+        Assert.Equal("Word not found", exception.Title);
+        Assert.Equal("The requested word was not found.", exception.Detail);
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowConflict_WhenNewWordNameAlreadyExists()
+    public async Task Execute_ShouldThrowWordAlreadyExistsException_WhenNewWordNameAlreadyExists()
     {
         string userId = "user-id-123";
         string wordId = "word-id-1";
@@ -85,14 +87,16 @@ public class UpdateWordTest
             .Setup(repository => repository.GetByWord(updateDto.Word, userId))
             .ReturnsAsync(conflictingWord);
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(wordId, updateDto, userId));
+        var exception = await Assert.ThrowsAsync<WordAlreadyExistsException>(() => this._sut.Execute(wordId, updateDto, userId));
 
         Assert.Equal(HttpStatusCode.Conflict, exception.StatusCode);
-        Assert.Equal("Palavra já cadastrada", exception.Message);
+        Assert.Equal("dictionary:word-already-exists", exception.ErrorCode);
+        Assert.Equal("Word already exists", exception.Title);
+        Assert.Equal("A word with the same name already exists in your dictionary.", exception.Detail);
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowForbidden_WhenUserIsNotTheOwner()
+    public async Task Execute_ShouldThrowWordAccessDeniedException_WhenUserIsNotTheOwner()
     {
         string ownerId = "owner-id-123";
         string attackerId = "attacker-id-456";
@@ -105,10 +109,12 @@ public class UpdateWordTest
             .Setup(repository => repository.GetById(wordId))
             .ReturnsAsync(existingWord);
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(wordId, updateDto, attackerId));
+        var exception = await Assert.ThrowsAsync<WordAccessDeniedException>(() => this._sut.Execute(wordId, updateDto, attackerId));
 
         Assert.Equal(HttpStatusCode.Forbidden, exception.StatusCode);
-        Assert.Equal("Você não tem permissão para atualizar esta palavra", exception.Message);
+        Assert.Equal("dictionary:word-access-denied", exception.ErrorCode);
+        Assert.Equal("Word access denied", exception.Title);
+        Assert.Equal("You do not have permission to modify this word.", exception.Detail);
     }
 
     [Fact]
@@ -135,7 +141,6 @@ public class UpdateWordTest
         Assert.Equal("same-word", result.Name);
 
         this._dictionaryRepositoryMock.Verify(repository => repository.GetByWord(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-
         this._dictionaryRepositoryMock.Verify(repository => repository.Update(It.IsAny<Word>()), Times.Once);
     }
 }
