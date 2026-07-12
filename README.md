@@ -8,6 +8,21 @@
 
 **Idiomas API** is a robust backend for language learning applications, providing everything needed to build interactive and personalized learning experiences — from secure user authentication and AI-powered conversations to vocabulary dictionaries and file storage.
 
+## 📑 Table of Contents
+
+- [Features](#-features)
+- [Technologies](#-technologies)
+- [Prerequisites](#-prerequisites)
+- [Getting Started](#-getting-started)
+- [API Documentation](#-api-documentation)
+- [Ports](#-ports)
+- [Email & Mailpit](#-email--mailpit)
+- [Environment Variables](#-environment-variables)
+- [Project Structure](#️-project-structure)
+- [Exception Handling](#️-exception-handling)
+- [Database Migrations](#️-database-migrations)
+- [Running Tests](#-running-tests)
+
 ---
 
 ## ✨ Features
@@ -223,11 +238,53 @@ The application follows **Clean Architecture** principles:
 ```
 Idiomas.Core/
 ├── Application/       # Application logic and use cases
-├── Domain/          # Domain entities and interfaces
-├── Helper/          # Helper utilities and services
-├── Infrastructure/  # External dependencies (database, storage, AI)
-└── Presentation/    # API layer (controllers, routes, DTOs)
+├── Domain/            # Domain entities and interfaces
+├── Exceptions/        # Base exception class and shared validation exceptions
+├── Helper/            # Helper utilities and services
+├── Infrastructure/    # External dependencies (database, storage, AI)
+└── Presentation/      # API layer (controllers, routes, DTOs)
 ```
+
+---
+
+## ⚠️ Exception Handling
+
+All API exceptions inherit from `ApiException` (located in the `Exceptions` layer), which carries an `ErrorCode`, `Title`, `HttpStatusCode`, `Detail`, and optional `Extensions`. The `ApiExceptionMiddleware` in the Presentation layer catches these and converts them into RFC 7807 `ProblemDetails` JSON responses.
+
+### Exception organization
+
+Exceptions are organized by the layer that throws them:
+
+| Location | Namespace | Purpose |
+|----------|-----------|---------|
+| `Exceptions/` | `Idiomas.Core.Exceptions` | Base `ApiException` class |
+| `Exceptions/Validation/` | `Idiomas.Core.Exceptions.Validation` | Generic validation exceptions (e.g. `FieldRequiredException`, `StringTooShortException`) shared across layers |
+| `Application/Exceptions/` | `Idiomas.Core.Application.Exceptions.*` | Business-rule exceptions (Auth, Conversation, Dictionary, File, User) thrown by use cases |
+| `Infrastructure/Exceptions/` | `Idiomas.Core.Infrastructure.Exceptions.*` | Infrastructure failures (Email, Google, LLM) thrown by external service adapters |
+| `Helper/Exceptions/` | `Idiomas.Core.Helper.Exceptions` | Helper-specific exceptions (e.g. `LanguageInvalidException`, `LanguageRequiredException`) |
+| `Presentation/Http/Middleware/` | `Idiomas.Core.Presentation.Http.Middleware` | `ApiExceptionMiddleware` and `ProblemDetailsUris` for mapping exceptions to HTTP responses |
+
+### Example response
+
+When an exception is thrown, the API returns an RFC 7807 `ProblemDetails` JSON response:
+
+```json
+{
+  "type": "tag:idiomas.api,2026:error:validation:string-too-short",
+  "title": "String too short",
+  "status": 400,
+  "detail": "The field 'password' must be at least 8 characters long.",
+  "instance": "tag:idiomas.api,2026:trace:00-abc123def456-..."
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `type` | Unique error identifier (tag URI based on `ErrorCode`) |
+| `title` | Short human-readable summary |
+| `status` | HTTP status code |
+| `detail` | Specific detail about what went wrong |
+| `instance` | Request trace identifier for debugging. This is a tag URI derived from the ASP.NET Core `TraceIdentifier`, which uniquely identifies the request within the server pipeline. It can be used to correlate a specific error with server logs when investigating issues reported by clients |
 
 ---
 
