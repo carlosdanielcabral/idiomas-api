@@ -5,6 +5,8 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      mailpit:
+        condition: service_started
     env_file:
       - .env
     ports:
@@ -43,6 +45,15 @@ services:
     entrypoint: ["sh", "-c", "echo 'Waiting for database...' && sleep 30 && echo 'Testing connection...' && dotnet ef database update --context ApplicationContext --verbose 2>&1 || echo 'Migration failed, exiting'"]
     env_file:
       - .env
+    networks:
+      - idiomas-network
+
+  mailpit:
+    image: axllent/mailpit:v1.22
+    container_name: idiomas-mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
     networks:
       - idiomas-network
 
