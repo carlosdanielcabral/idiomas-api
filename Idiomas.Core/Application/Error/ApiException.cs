@@ -10,11 +10,4 @@ public class ApiException(string errorCode, string title, HttpStatusCode statusC
     public HttpStatusCode StatusCode { get; } = statusCode;
     public string? Detail { get; } = detail;
     public Dictionary<string, object?> Extensions { get; } = new();
-
-    // Legacy constructor: kept during migration so existing throw sites compile.
-    // Removed in Task 12.
-    public ApiException(string message, HttpStatusCode statusCode)
-        : this("about:blank", message, statusCode, message)
-    {
-    }
 }
