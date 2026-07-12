@@ -1,4 +1,4 @@
-using Idiomas.Core.Application.Error.Infrastructure;
+using Idiomas.Core.Infrastructure.Exceptions.Google;
 using Idiomas.Core.Infrastructure.Service.Google;
 using Microsoft.Extensions.Configuration;
 using Moq;

@@ -1,4 +1,4 @@
-using Idiomas.Core.Application.Error.Infrastructure;
+using Idiomas.Core.Infrastructure.Exceptions.Email;
 using Idiomas.Core.Interface.Service;
 using Microsoft.Extensions.Configuration;
 using SendGrid;

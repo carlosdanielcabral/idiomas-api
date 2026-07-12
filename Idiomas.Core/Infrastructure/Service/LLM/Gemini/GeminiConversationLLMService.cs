@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Idiomas.Core.Application.DTO.Conversation;
-using Idiomas.Core.Application.Error.Infrastructure;
+using Idiomas.Core.Infrastructure.Exceptions.LLM;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Service.LLM;

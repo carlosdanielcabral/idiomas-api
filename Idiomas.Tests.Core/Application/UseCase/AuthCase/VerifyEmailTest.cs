@@ -1,5 +1,5 @@
 using System.Net;
-using Idiomas.Core.Application.Error.Auth;
+using Idiomas.Core.Application.Exceptions.Auth;
 using Idiomas.Core.Application.UseCase.AuthCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Interface.Repository;

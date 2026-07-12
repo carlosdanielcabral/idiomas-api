@@ -1,5 +1,5 @@
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error.Validation;
+using Idiomas.Core.Exceptions.Validation;
 
 namespace Idiomas.Core.Presentation.Http.Validator.Auth;
 

@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using Idiomas.Core.Application.DTO.User;
-using Idiomas.Core.Application.Error.Validation;
+using Idiomas.Core.Exceptions.Validation;
 
 namespace Idiomas.Core.Presentation.Http.Validator.User;
 

@@ -1,5 +1,5 @@
 using System.Net;
-using Idiomas.Core.Application.Error.Infrastructure;
+using Idiomas.Core.Infrastructure.Exceptions.Email;
 using Idiomas.Core.Infrastructure.Service.Email;
 using Idiomas.Core.Interface.Service;
 using Microsoft.Extensions.Configuration;

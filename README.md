@@ -1,29 +1,43 @@
-# 🌍 Idiomas API
+# Idiomas API
 
-> 🏗️ **Under development** — A comprehensive REST API for a language learning platform.
+> **Under development** — A comprehensive REST API for a language learning platform.
 
 [![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![Docker](https://img.shields.io/badge/Docker-🐳-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
 
-**Idiomas API** is a robust backend for language learning applications, providing everything needed to build interactive and personalized learning experiences — from secure user authentication and AI-powered conversations to vocabulary dictionaries and file storage.
+**Idiomas API** is a backend for a language learning application, providing everything needed to build interactive and personalized learning experiences — from secure user authentication and AI-powered conversations to vocabulary dictionaries and file storage.
 
----
+## Table of Contents
 
-## ✨ Features
+- [Features](#features)
+- [Technologies](#technologies)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [API Documentation](#api-documentation)
+- [Ports](#ports)
+- [Email & Mailpit](#email--mailpit)
+- [Environment Variables](#environment-variables)
+- [Project Structure](#️project-structure)
+- [Exception Handling](#️exception-handling)
+- [Database Migrations](#️database-migrations)
+- [Running Tests](#running-tests)
 
-- 🔐 **User Authentication** — JWT-based authentication with secure password hashing using Argon2, plus **Google OAuth login** (Sign in with Google) alongside traditional email/password login
-- 🔄 **Unit of Work** — Transactional consistency across repositories via a generic `IUnitOfWork` abstraction (EF Core implementation), used by use cases that touch multiple aggregates in a single operation (e.g. account creation, linking a Google credential)
-- 🤖 **AI Conversations** — Integration with Google Gemini AI for interactive language learning conversations
-- 📚 **Dictionary Management** — Create and manage vocabulary dictionaries
-- ☁️ **File Storage** — Azure Blob Storage integration for file uploads and management
-- 🛡️ **Rate Limiting** — Built-in rate limiting to protect against abuse (100 requests per minute per IP)
-- 📧 **Email Service** — Send email notifications through a generic `IEmailService` interface. **SendGrid** is used in production, while **Mailpit** is used as a local SMTP server in development so emails can be inspected without sending real messages
-- 📖 **API Documentation** — Interactive Swagger UI for API exploration
 
----
 
-## 🚀 Technologies
+## Features
+
+- **User Authentication** — JWT-based authentication with secure password hashing using Argon2, plus **Google OAuth login** (Sign in with Google) alongside traditional email/password login
+- **Unit of Work** — Transactional consistency across repositories via a generic `IUnitOfWork` abstraction (EF Core implementation), used by use cases that touch multiple aggregates in a single operation (e.g. account creation, linking a Google credential)
+- **AI Conversations** — Integration with Google Gemini AI for interactive language learning conversations
+- **Dictionary Management** — Create and manage vocabulary dictionaries
+- **File Storage** — Azure Blob Storage integration for file uploads and management
+- **Rate Limiting** — Built-in rate limiting to protect against abuse (100 requests per minute per IP)
+- **Email Service** — Send email notifications through a generic `IEmailService` interface. **SendGrid** is used in production, while **Mailpit** is used as a local SMTP server in development so emails can be inspected without sending real messages
+- **API Documentation** — Interactive Swagger UI for API exploration
+
+
+## Technologies
 
 | Category | Technology |
 |----------|------------|
@@ -38,22 +52,20 @@
 | Containerization | **Docker & Docker Compose** |
 | AI | **Google Gemini AI** |
 
----
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you begin, make sure you have the following installed and configured:
 
-- 🐳 [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
-- 🛠️ [.NET 9.0 SDK](https://dotnet.microsoft.com/) (for local development without Docker)
-- ☁️ Azure Storage account (for file storage features)
-- 🔑 Gemini API key (for AI conversation features)
-- 🔑 Google OAuth Client ID (for "Sign in with Google")
-- 🔑 SendGrid API key (only required in production; local development uses Mailpit instead, see [Email & Mailpit](#-email--mailpit))
+- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
+- [.NET 9.0 SDK](https://dotnet.microsoft.com/) (for local development without Docker)
+- Azure Storage account (for file storage features)
+- Gemini API key (for AI conversation features)
+- Google OAuth Client ID (for "Sign in with Google")
+- SendGrid API key (only required in production; local development uses Mailpit instead, see [Email & Mailpit](#-email--mailpit))
 
----
 
-## 🏁 Getting Started
+## Getting Started
 
 ### 🐳 Using Docker Compose (Recommended)
 
@@ -136,9 +148,8 @@ Create a `.env` file in the `IdiomasAPI` directory with the required variables. 
 dotnet run
 ```
 
----
 
-## 📖 API Documentation
+## API Documentation
 
 Once the application is running, you can explore the interactive API documentation at:
 
@@ -150,7 +161,6 @@ The Swagger UI provides:
 - Request/response schemas
 - Try-it-out functionality for testing endpoints
 
----
 
 ## 🔌 Ports
 
@@ -161,9 +171,8 @@ The Swagger UI provides:
 | Mailpit (SMTP) | `1025` |
 | Mailpit (Web UI) | `8025` |
 
----
 
-## 📧 Email & Mailpit
+## Email & Mailpit
 
 Emails are sent through the generic `IEmailService` interface, which has two implementations:
 
@@ -186,9 +195,8 @@ docker run -d --name mailpit -p 1025:1025 -p 8025:8025 axllent/mailpit:v1.22
 
 The `Smtp:Host` / `Smtp:Port` configuration in `appsettings.Development.json` already points to `localhost:1025`, matching this setup.
 
----
 
-## 🔧 Environment Variables
+## Environment Variables
 
 Key environment variables (see `.env.example` for the complete list):
 
@@ -214,24 +222,63 @@ Key environment variables (see `.env.example` for the complete list):
 | `Smtp__Port` | SMTP port used in development (Mailpit) |
 | `FrontendLocalUrl` | Allowed frontend URLs for CORS |
 
----
 
-## 🏗️ Project Structure
+## Project Structure
 
 The application follows **Clean Architecture** principles:
 
 ```
 Idiomas.Core/
 ├── Application/       # Application logic and use cases
-├── Domain/          # Domain entities and interfaces
-├── Helper/          # Helper utilities and services
-├── Infrastructure/  # External dependencies (database, storage, AI)
-└── Presentation/    # API layer (controllers, routes, DTOs)
+├── Domain/            # Domain entities and interfaces
+├── Exceptions/        # Base exception class and shared validation exceptions
+├── Helper/            # Helper utilities and services
+├── Infrastructure/    # External dependencies (database, storage, AI)
+└── Presentation/      # API layer (controllers, routes, DTOs)
 ```
 
----
 
-## 🗄️ Database Migrations
+## Exception Handling
+
+All API exceptions inherit from `ApiException` (located in the `Exceptions` layer), which carries an `ErrorCode`, `Title`, `HttpStatusCode`, `Detail`, and optional `Extensions`. The `ApiExceptionMiddleware` in the Presentation layer catches these and converts them into RFC 7807 `ProblemDetails` JSON responses.
+
+### Exception organization
+
+Exceptions are organized by the layer that throws them:
+
+| Location | Namespace | Purpose |
+|----------|-----------|---------|
+| `Exceptions/` | `Idiomas.Core.Exceptions` | Base `ApiException` class |
+| `Exceptions/Validation/` | `Idiomas.Core.Exceptions.Validation` | Generic validation exceptions (e.g. `FieldRequiredException`, `StringTooShortException`) shared across layers |
+| `Application/Exceptions/` | `Idiomas.Core.Application.Exceptions.*` | Business-rule exceptions (Auth, Conversation, Dictionary, File, User) thrown by use cases |
+| `Infrastructure/Exceptions/` | `Idiomas.Core.Infrastructure.Exceptions.*` | Infrastructure failures (Email, Google, LLM) thrown by external service adapters |
+| `Helper/Exceptions/` | `Idiomas.Core.Helper.Exceptions` | Helper-specific exceptions (e.g. `LanguageInvalidException`, `LanguageRequiredException`) |
+| `Presentation/Http/Middleware/` | `Idiomas.Core.Presentation.Http.Middleware` | `ApiExceptionMiddleware` and `ProblemDetailsUris` for mapping exceptions to HTTP responses |
+
+### Example response
+
+When an exception is thrown, the API returns an RFC 7807 `ProblemDetails` JSON response:
+
+```json
+{
+  "type": "tag:idiomas.api,2026:error:validation:string-too-short",
+  "title": "String too short",
+  "status": 400,
+  "detail": "The field 'password' must be at least 8 characters long.",
+  "instance": "tag:idiomas.api,2026:trace:00-abc123def456-..."
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `type` | Unique error identifier (tag URI based on `ErrorCode`) |
+| `title` | Short human-readable summary |
+| `status` | HTTP status code |
+| `detail` | Specific detail about what went wrong |
+| `instance` | Request trace identifier for debugging. This is a tag URI derived from the ASP.NET Core `TraceIdentifier`, which uniquely identifies the request within the server pipeline. It can be used to correlate a specific error with server logs when investigating issues reported by clients |
+
+
+## Database Migrations
 
 When using Docker Compose, migrations run automatically via the `migration` service.
 
@@ -248,15 +295,13 @@ dotnet ef database update --context ApplicationContext
 dotnet ef migrations add <MigrationName> --context ApplicationContext
 ```
 
----
 
-## 🧪 Running Tests
+## Running Tests
 
 ```bash
 cd Idiomas.Tests.Core
 dotnet test
 ```
 
----
 
 
