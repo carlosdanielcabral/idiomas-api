@@ -1,7 +1,5 @@
-using System.Net;
-
 using Idiomas.Core.Application.DTO.Dictionary;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Validation;
 
 namespace Idiomas.Core.Presentation.Http.Validator.Dictionary;
 
@@ -11,17 +9,17 @@ public class UpdateWordValidator : IValidator<UpdateWordDTO>
     {
         if (string.IsNullOrWhiteSpace(dto.Word))
         {
-            throw new ApiException("Palavra é obrigatória", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("word");
         }
 
         if (string.IsNullOrWhiteSpace(dto.Ipa))
         {
-            throw new ApiException("IPA é obrigatório", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("ipa");
         }
 
         if (dto.Meanings is null || dto.Meanings.Count == 0)
         {
-            throw new ApiException("É necessário informar pelo menos um significado", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("meanings");
         }
 
         this.ValidateMeanings(dto.Meanings);
@@ -35,12 +33,12 @@ public class UpdateWordValidator : IValidator<UpdateWordDTO>
 
             if (string.IsNullOrWhiteSpace(meaning.Meaning))
             {
-                throw new ApiException($"Significado na posição {index + 1} é obrigatório", HttpStatusCode.BadRequest);
+                throw new ItemAtPositionRequiredException("meaning", index + 1);
             }
 
             if (string.IsNullOrWhiteSpace(meaning.Example))
             {
-                throw new ApiException($"Exemplo na posição {index + 1} é obrigatório", HttpStatusCode.BadRequest);
+                throw new ItemAtPositionRequiredException("example", index + 1);
             }
         }
     }

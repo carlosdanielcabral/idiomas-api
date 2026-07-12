@@ -1,6 +1,5 @@
-using System.Net;
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Validation;
 
 namespace Idiomas.Core.Presentation.Http.Validator.Auth;
 
@@ -12,17 +11,17 @@ public class ResetPasswordValidator : IValidator<ResetPasswordDTO>
     {
         if (string.IsNullOrWhiteSpace(dto.Token))
         {
-            throw new ApiException("Token é obrigatório", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("token");
         }
 
         if (string.IsNullOrWhiteSpace(dto.NewPassword))
         {
-            throw new ApiException("Nova senha é obrigatória", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("newPassword");
         }
 
         if (dto.NewPassword.Length < MIN_PASSWORD_LENGTH)
         {
-            throw new ApiException($"A senha deve ter no mínimo {MIN_PASSWORD_LENGTH} caracteres", HttpStatusCode.BadRequest);
+            throw new StringTooShortException("newPassword", MIN_PASSWORD_LENGTH);
         }
     }
 }

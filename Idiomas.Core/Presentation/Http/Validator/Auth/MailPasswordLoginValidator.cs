@@ -1,8 +1,6 @@
-using System.Net;
 using System.Text.RegularExpressions;
-
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Validation;
 
 namespace Idiomas.Core.Presentation.Http.Validator.Auth;
 
@@ -12,17 +10,17 @@ public partial class MailPasswordLoginValidator : IValidator<MailPasswordLoginDT
     {
         if (string.IsNullOrWhiteSpace(dto.Email))
         {
-            throw new ApiException("Email é obrigatório", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("email");
         }
 
         if (!EmailRegex().IsMatch(dto.Email))
         {
-            throw new ApiException("Email inválido", HttpStatusCode.BadRequest);
+            throw new FieldInvalidException("email");
         }
 
         if (string.IsNullOrWhiteSpace(dto.Password))
         {
-            throw new ApiException("Senha é obrigatória", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("password");
         }
     }
 
