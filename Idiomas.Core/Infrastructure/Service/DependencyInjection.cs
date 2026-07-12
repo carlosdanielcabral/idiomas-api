@@ -28,7 +28,7 @@ public static class DependencyInjection
             return new AesGcmEncryptionService(encryptionKey);
         });
         services.AddInfraAuthentication(configuration);
-        services.AddScoped<ITransactionManager, EfCoreTransactionManager>();
+        services.AddScoped<IUnitOfWork, EfCoreUnitOfWork>();
         services.AddScoped<IGoogleTokenVerifier, GoogleTokenVerifier>();
 
         // LLM Service

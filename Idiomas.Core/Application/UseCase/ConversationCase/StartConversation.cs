@@ -26,7 +26,7 @@ public class StartConversation(
 
     private async Task ValidateConversation(StartConversationRequest request, string userId)
     {
-        if (request.Mode == ConversationMode.Free)
+        if (!request.Mode.RequiresScenario())
         {
             return;
         }
@@ -38,7 +38,7 @@ public class StartConversation(
             throw new ApiException("Scenario not found.", HttpStatusCode.NotFound);
         }
 
-        if (scenario.Language != request.Language)
+        if (!scenario.MatchesLanguage(request.Language))
         {
             throw new ApiException(
                 "Scenario language does not match conversation language.",

@@ -17,7 +17,8 @@ public class ResendVerification(
     IEmailService emailService,
     EmailMessageBuilder emailMessageBuilder,
     IConfiguration configuration,
-    ITokenGenerator tokenGenerator)
+    ITokenGenerator tokenGenerator,
+    IUnitOfWork unitOfWork)
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IUserCredentialRepository _userCredentialRepository = userCredentialRepository;
@@ -26,6 +27,7 @@ public class ResendVerification(
     private readonly EmailMessageBuilder _emailMessageBuilder = emailMessageBuilder;
     private readonly IConfiguration _configuration = configuration;
     private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task Execute(ResendVerificationDTO dto)
     {
@@ -57,9 +59,12 @@ public class ResendVerification(
 
         EmailVerificationToken verificationToken = EmailVerificationToken.Create(userId, token.TokenHash);
 
-        await this._tokenRepository.Insert(verificationToken);
+        await this._unitOfWork.ExecuteAsync(async () =>
+        {
+            await this._tokenRepository.Insert(verificationToken);
 
-        await this.SendVerificationEmail(user, token.RawToken);
+            await this.SendVerificationEmail(user, token.RawToken);
+        });
     }
 
     private async Task EnsureNoActiveTokenExists(Guid userId)

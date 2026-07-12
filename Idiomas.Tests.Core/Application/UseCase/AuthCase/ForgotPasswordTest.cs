@@ -20,6 +20,7 @@ public class ForgotPasswordTest
     private readonly Mock<EmailMessageBuilder> _emailMessageBuilderMock;
     private readonly Mock<IConfiguration> _configurationMock = new();
     private readonly Mock<ITokenGenerator> _tokenGeneratorMock = new();
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
     public ForgotPasswordTest()
     {
@@ -29,6 +30,9 @@ public class ForgotPasswordTest
         this._emailMessageBuilderMock
             .Setup(builder => builder.Build(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<EmailTemplatePlaceholder[]>()))
             .Returns(new EmailMessage("joao@example.com", "subject", "<html>email</html>"));
+        this._unitOfWorkMock
+            .Setup(unitOfWork => unitOfWork.ExecuteAsync(It.IsAny<Func<Task>>()))
+            .Returns((Func<Task> operation) => operation());
     }
 
     private ForgotPassword CreateSut()
@@ -40,7 +44,8 @@ public class ForgotPasswordTest
             this._emailServiceMock.Object,
             this._emailMessageBuilderMock.Object,
             this._configurationMock.Object,
-            this._tokenGeneratorMock.Object
+            this._tokenGeneratorMock.Object,
+            this._unitOfWorkMock.Object
         );
     }
 

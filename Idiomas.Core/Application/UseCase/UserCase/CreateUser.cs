@@ -19,7 +19,7 @@ public class CreateUser(
     ITokenGenerator tokenGenerator,
     IEmailService emailService,
     EmailMessageBuilder emailMessageBuilder,
-    ITransactionManager transactionManager,
+    IUnitOfWork unitOfWork,
     IConfiguration configuration)
 {
     private readonly IUserRepository _userRepository = userRepository;
@@ -29,24 +29,23 @@ public class CreateUser(
     private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
     private readonly IEmailService _emailService = emailService;
     private readonly EmailMessageBuilder _emailMessageBuilder = emailMessageBuilder;
-    private readonly ITransactionManager _transactionManager = transactionManager;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IConfiguration _configuration = configuration;
 
     public async Task<User> Execute(CreateUserDTO dto)
     {
         await this.ValidateUser(dto);
 
-        await using IDatabaseTransaction transaction = await this._transactionManager.BeginTransactionAsync();
+        return await this._unitOfWork.ExecuteAsync(async () =>
+        {
+            User user = await this.CreateUserEntity(dto);
 
-        User user = await this.CreateUserEntity(dto);
+            await this.CreateLocalCredential(dto, user.Id);
 
-        await this.CreateLocalCredential(dto, user.Id);
+            await this.CreateAndSendVerificationToken(user);
 
-        await this.CreateAndSendVerificationToken(user);
-
-        await transaction.CommitAsync();
-
-        return user;
+            return user;
+        });
     }
 
     private async Task<User> CreateUserEntity(CreateUserDTO dto)

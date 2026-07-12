@@ -21,6 +21,7 @@ public class ResendVerificationTest
     private readonly Mock<EmailMessageBuilder> _emailMessageBuilderMock;
     private readonly Mock<IConfiguration> _configurationMock = new();
     private readonly Mock<ITokenGenerator> _tokenGeneratorMock = new();
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
     public ResendVerificationTest()
     {
@@ -30,6 +31,9 @@ public class ResendVerificationTest
         this._emailMessageBuilderMock
             .Setup(builder => builder.Build(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<EmailTemplatePlaceholder[]>()))
             .Returns(new EmailMessage("joao@example.com", "subject", "<html>email</html>"));
+        this._unitOfWorkMock
+            .Setup(unitOfWork => unitOfWork.ExecuteAsync(It.IsAny<Func<Task>>()))
+            .Returns((Func<Task> operation) => operation());
     }
 
     private ResendVerification CreateSut()
@@ -41,7 +45,8 @@ public class ResendVerificationTest
             this._emailServiceMock.Object,
             this._emailMessageBuilderMock.Object,
             this._configurationMock.Object,
-            this._tokenGeneratorMock.Object
+            this._tokenGeneratorMock.Object,
+            this._unitOfWorkMock.Object
         );
     }
 

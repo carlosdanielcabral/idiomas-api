@@ -13,13 +13,15 @@ public class ResetPassword(
     IUserRepository userRepository,
     IUserCredentialRepository userCredentialRepository,
     IHash hash,
-    ITokenHasher tokenHasher)
+    ITokenHasher tokenHasher,
+    IUnitOfWork unitOfWork)
 {
     private readonly IPasswordResetTokenRepository _tokenRepository = tokenRepository;
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IUserCredentialRepository _userCredentialRepository = userCredentialRepository;
     private readonly IHash _hash = hash;
     private readonly ITokenHasher _tokenHasher = tokenHasher;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task Execute(ResetPasswordDTO dto)
     {
@@ -48,10 +50,14 @@ public class ResetPassword(
         }
 
         string passwordHash = this._hash.Hash(dto.NewPassword);
+
         credential.UpdatePasswordHash(passwordHash);
 
-        await this._userCredentialRepository.Update(credential);
+        await this._unitOfWork.ExecuteAsync(async () =>
+        {
+            await this._userCredentialRepository.Update(credential);
 
-        await this._tokenRepository.MarkAsUsed(token);
+            await this._tokenRepository.MarkAsUsed(token);
+        });
     }
 }

@@ -9,11 +9,13 @@ namespace Idiomas.Core.Application.UseCase.AuthCase;
 public class VerifyEmail(
     IEmailVerificationTokenRepository tokenRepository,
     IUserRepository userRepository,
-    ITokenHasher tokenHasher)
+    ITokenHasher tokenHasher,
+    IUnitOfWork unitOfWork)
 {
     private readonly IEmailVerificationTokenRepository _tokenRepository = tokenRepository;
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ITokenHasher _tokenHasher = tokenHasher;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task Execute(string rawToken)
     {
@@ -35,8 +37,11 @@ public class VerifyEmail(
 
         user.MarkEmailAsVerified();
 
-        await this._userRepository.Update(user);
+        await this._unitOfWork.ExecuteAsync(async () =>
+        {
+            await this._userRepository.Update(user);
 
-        await this._tokenRepository.MarkAsUsed(token);
+            await this._tokenRepository.MarkAsUsed(token);
+        });
     }
 }

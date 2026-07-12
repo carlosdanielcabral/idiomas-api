@@ -21,8 +21,7 @@ public class CreateUserTest
     private readonly Mock<IEmailService> _emailServiceMock;
     private readonly Mock<EmailMessageBuilder> _emailMessageBuilderMock;
     private readonly Mock<IConfiguration> _configurationMock;
-    private readonly Mock<ITransactionManager> _transactionManagerMock;
-    private readonly Mock<IDatabaseTransaction> _databaseTransactionMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly CreateUser _sut;
 
     public CreateUserTest()
@@ -35,12 +34,11 @@ public class CreateUserTest
         this._emailServiceMock = new Mock<IEmailService>();
         this._emailMessageBuilderMock = new Mock<EmailMessageBuilder>(new EmailTemplateLoader(Path.Combine(Path.GetTempPath(), "fake")));
         this._configurationMock = new Mock<IConfiguration>();
-        this._transactionManagerMock = new Mock<ITransactionManager>();
-        this._databaseTransactionMock = new Mock<IDatabaseTransaction>();
+        this._unitOfWorkMock = new Mock<IUnitOfWork>();
 
-        this._transactionManagerMock
-            .Setup(manager => manager.BeginTransactionAsync())
-            .ReturnsAsync(this._databaseTransactionMock.Object);
+        this._unitOfWorkMock
+            .Setup(unitOfWork => unitOfWork.ExecuteAsync(It.IsAny<Func<Task<User>>>()))
+            .Returns((Func<Task<User>> operation) => operation());
 
         this._configurationMock.SetupGet(config => config["FrontendUrl"]).Returns("https://app.idiomas.com");
         this._tokenGeneratorMock.Setup(generator => generator.Generate()).Returns(new TokenPair("raw-token", "hashed-token"));
@@ -56,7 +54,7 @@ public class CreateUserTest
             this._tokenGeneratorMock.Object,
             this._emailServiceMock.Object,
             this._emailMessageBuilderMock.Object,
-            this._transactionManagerMock.Object,
+            this._unitOfWorkMock.Object,
             this._configurationMock.Object
         );
     }
@@ -88,7 +86,6 @@ public class CreateUserTest
         this._userCredentialRepositoryMock.Verify(repository => repository.Insert(It.IsAny<UserCredential>()), Times.Once);
         this._emailVerificationTokenRepositoryMock.Verify(repository => repository.Insert(It.IsAny<EmailVerificationToken>()), Times.Once);
         this._emailServiceMock.Verify(service => service.SendAsync(It.IsAny<EmailMessage>()), Times.Once);
-        this._databaseTransactionMock.Verify(transaction => transaction.CommitAsync(), Times.Once);
     }
 
     [Fact]

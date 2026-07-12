@@ -18,7 +18,7 @@ public class UpdateUser(
     ITokenGenerator tokenGenerator,
     IEmailService emailService,
     EmailMessageBuilder emailMessageBuilder,
-    ITransactionManager transactionManager,
+    IUnitOfWork unitOfWork,
     IConfiguration configuration)
 {
     private readonly IUserRepository _userRepository = userRepository;
@@ -28,7 +28,7 @@ public class UpdateUser(
     private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
     private readonly IEmailService _emailService = emailService;
     private readonly EmailMessageBuilder _emailMessageBuilder = emailMessageBuilder;
-    private readonly ITransactionManager _transactionManager = transactionManager;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IConfiguration _configuration = configuration;
 
     public async Task<User> Execute(string userId, UpdateUserDTO dto)
@@ -40,25 +40,22 @@ public class UpdateUser(
             throw new ApiException("Usuário não encontrado", HttpStatusCode.NotFound);
         }
 
-        await using IDatabaseTransaction transaction = await this._transactionManager.BeginTransactionAsync();
-
-        currentUser.UpdateProfile(dto.Name);
-
-        if (currentUser.IsEmailChanging(dto.Email))
+        return await this._unitOfWork.ExecuteAsync(async () =>
         {
-            await this.ChangeUserEmail(currentUser, dto.Email);
-        }
+            currentUser.UpdateProfile(dto.Name);
 
-        if (!string.IsNullOrEmpty(dto.Password))
-        {
-            await this.UpdateUserPassword(userId, dto.Password);
-        }
+            if (currentUser.IsEmailChanging(dto.Email))
+            {
+                await this.ChangeUserEmail(currentUser, dto.Email);
+            }
 
-        User updatedUser = await this._userRepository.Update(currentUser);
+            if (!string.IsNullOrEmpty(dto.Password))
+            {
+                await this.UpdateUserPassword(userId, dto.Password);
+            }
 
-        await transaction.CommitAsync();
-
-        return updatedUser;
+            return await this._userRepository.Update(currentUser);
+        });
     }
 
     private async Task ChangeUserEmail(User currentUser, string newEmail)

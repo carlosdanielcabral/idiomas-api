@@ -2,7 +2,6 @@ using Idiomas.Core.Application.DTO.Conversation;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
-using Idiomas.Core.Infrastructure.Helper;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
 using System.Net;
@@ -12,17 +11,19 @@ namespace Idiomas.Core.Application.UseCase.ConversationCase;
 public class SendMessage(
     IConversationRepository conversationRepository,
     IScenarioRepository scenarioRepository,
-    IConversationLLMService llmService)
+    IConversationLLMService llmService,
+    IUnitOfWork unitOfWork)
 {
     private readonly IConversationRepository _conversationRepository = conversationRepository;
     private readonly IScenarioRepository _scenarioRepository = scenarioRepository;
     private readonly IConversationLLMService _llmService = llmService;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task<MessageResponse> Execute(string conversationId, SendMessageRequest request, string userId)
     {
         Conversation conversation = await this.GetAndValidateConversation(conversationId, userId);
         
-        await this.SaveUserMessage(conversation, request.Content);
+        Message userMessage = this.CreateUserMessage(conversation, request.Content);
 
         string? scenarioDescription = await this.GetScenarioDescription(conversation.ScenarioId);
         
@@ -32,12 +33,19 @@ public class SendMessage(
             scenarioDescription
         );
 
-        List<CorrectionResponse> correctionResponses = await this.ProcessCorrections(
-            llmResponse.Corrections,
-            conversation.Messages.Last(message => message.Role == MessageRole.User).Id
-        );
+        (List<CorrectionResponse> correctionResponses, Message assistantMessage) = await this._unitOfWork.ExecuteAsync(async () =>
+        {
+            await this._conversationRepository.InsertMessage(userMessage);
 
-        Message assistantMessage = await this.SaveAssistantMessage(conversationId, llmResponse.Content);
+            List<CorrectionResponse> correctionResponses = await this.ProcessCorrections(
+                llmResponse.Corrections,
+                userMessage.Id
+            );
+
+            Message assistantMessage = await this.SaveAssistantMessage(conversationId, llmResponse.Content);
+
+            return (correctionResponses, assistantMessage);
+        });
 
         return this.BuildMessageResponse(assistantMessage, correctionResponses);
     }
@@ -70,15 +78,15 @@ public class SendMessage(
         return conversation;
     }
 
-    private async Task SaveUserMessage(Conversation conversation, string content)
+    private Message CreateUserMessage(Conversation conversation, string content)
     {
-        string messageId = UUIDGenerator.Generate();
-        this.ValidateMessage(messageId, conversation.Id, content);
+        this.ValidateMessageContent(content);
 
-        Message message = new(messageId, conversation.Id, MessageRole.User, content);
+        Message message = Message.Create(conversation.Id, MessageRole.User, content);
 
-        await this._conversationRepository.InsertMessage(message);
         conversation.AddMessage(message);
+
+        return message;
     }
 
     private async Task<string?> GetScenarioDescription(string? scenarioId)
@@ -97,15 +105,11 @@ public class SendMessage(
         List<CorrectionResponse> corrections,
         string userMessageId)
     {
-        List<CorrectionResponse> validCorrections = corrections
-            .Where(correction => this.IsValidCorrection(correction, userMessageId))
-            .ToList();
+        List<CorrectionResponse> validCorrections = new();
 
-        foreach (CorrectionResponse correctionResponse in validCorrections)
+        foreach (CorrectionResponse correctionResponse in corrections)
         {
-            string correctionId = UUIDGenerator.Generate();
-            Correction correction = new(
-                correctionId,
+            Correction? correction = Correction.Create(
                 userMessageId,
                 correctionResponse.OriginalFragment,
                 correctionResponse.SuggestedFragment,
@@ -113,49 +117,33 @@ public class SendMessage(
                 correctionResponse.Type
             );
 
-            await this._conversationRepository.InsertCorrection(correction);
+            if (correction is not null)
+            {
+                await this._conversationRepository.InsertCorrection(correction);
+
+                validCorrections.Add(correctionResponse);
+            }
         }
 
         return validCorrections;
     }
 
-    private bool IsValidCorrection(CorrectionResponse correction, string userMessageId)
-    {
-        return !string.IsNullOrWhiteSpace(userMessageId)
-            && !string.IsNullOrWhiteSpace(correction.OriginalFragment)
-            && !string.IsNullOrWhiteSpace(correction.SuggestedFragment)
-            && !string.IsNullOrWhiteSpace(correction.Explanation);
-    }
-
     private async Task<Message> SaveAssistantMessage(string conversationId, string content)
     {
-        string messageId = UUIDGenerator.Generate();
-        this.ValidateMessage(messageId, conversationId, content);
+        this.ValidateMessageContent(content);
 
-        Message message = new(messageId, conversationId, MessageRole.Assistant, content);
+        Message message = Message.Create(conversationId, MessageRole.Assistant, content);
 
         await this._conversationRepository.InsertMessage(message);
 
         return message;
     }
 
-    private void ValidateMessage(string messageId, string conversationId, string content)
+    private void ValidateMessageContent(string content)
     {
-        const string ERROR_MESSAGE = "Failed to create message";
-
-        if (string.IsNullOrWhiteSpace(messageId))
-        {
-            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
-        }
-
-        if (string.IsNullOrWhiteSpace(conversationId))
-        {
-            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
-        }
-
         if (string.IsNullOrWhiteSpace(content))
         {
-            throw new ApiException(ERROR_MESSAGE, HttpStatusCode.InternalServerError);
+            throw new ApiException("Failed to create message", HttpStatusCode.InternalServerError);
         }
     }
 

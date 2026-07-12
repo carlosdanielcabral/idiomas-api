@@ -13,12 +13,12 @@ public class GoogleLogin(
     IGoogleTokenVerifier tokenVerifier,
     IUserRepository userRepository,
     IUserCredentialRepository userCredentialRepository,
-    ITransactionManager transactionManager)
+    IUnitOfWork unitOfWork)
 {
     private readonly IGoogleTokenVerifier _tokenVerifier = tokenVerifier;
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IUserCredentialRepository _userCredentialRepository = userCredentialRepository;
-    private readonly ITransactionManager _transactionManager = transactionManager;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task<User> Execute(GoogleLoginDTO dto)
     {
@@ -61,43 +61,41 @@ public class GoogleLogin(
 
     private async Task<User> LinkGoogleCredential(string userId, GoogleTokenPayload payload)
     {
-        await using IDatabaseTransaction transaction = await this._transactionManager.BeginTransactionAsync();
+        return await this._unitOfWork.ExecuteAsync(async () =>
+        {
+            UserCredential credential = UserCredential.Create(
+                userId,
+                AuthProvider.Google,
+                null,
+                payload.Subject
+            );
 
-        UserCredential credential = UserCredential.Create(
-            userId,
-            AuthProvider.Google,
-            null,
-            payload.Subject
-        );
+            await this._userCredentialRepository.Insert(credential);
 
-        await this._userCredentialRepository.Insert(credential);
+            User? user = await this._userRepository.GetById(userId);
 
-        await transaction.CommitAsync();
-
-        User? user = await this._userRepository.GetById(userId);
-
-        return user!;
+            return user!;
+        });
     }
 
     private async Task<User> CreateNewGoogleUser(GoogleTokenPayload payload)
     {
-        await using IDatabaseTransaction transaction = await this._transactionManager.BeginTransactionAsync();
+        return await this._unitOfWork.ExecuteAsync(async () =>
+        {
+            User user = User.Create(payload.Name, payload.Email, true);
 
-        User user = User.Create(payload.Name, payload.Email, true);
+            User createdUser = await this._userRepository.Insert(user);
 
-        User createdUser = await this._userRepository.Insert(user);
+            UserCredential credential = UserCredential.Create(
+                createdUser.Id,
+                AuthProvider.Google,
+                null,
+                payload.Subject
+            );
 
-        UserCredential credential = UserCredential.Create(
-            createdUser.Id,
-            AuthProvider.Google,
-            null,
-            payload.Subject
-        );
+            await this._userCredentialRepository.Insert(credential);
 
-        await this._userCredentialRepository.Insert(credential);
-
-        await transaction.CommitAsync();
-
-        return createdUser;
+            return createdUser;
+        });
     }
 }

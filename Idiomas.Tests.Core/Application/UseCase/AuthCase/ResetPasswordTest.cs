@@ -17,10 +17,15 @@ public class ResetPasswordTest
     private readonly Mock<IUserCredentialRepository> _userCredentialRepositoryMock = new();
     private readonly Mock<IHash> _hashMock = new();
     private readonly Mock<ITokenHasher> _tokenHasherMock = new();
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
     public ResetPasswordTest()
     {
         this._tokenHasherMock.Setup(hasher => hasher.Hash(It.IsAny<string>())).Returns("hashed-token");
+
+        this._unitOfWorkMock
+            .Setup(unitOfWork => unitOfWork.ExecuteAsync(It.IsAny<Func<Task>>()))
+            .Returns((Func<Task> operation) => operation());
     }
 
     private ResetPassword CreateSut()
@@ -30,7 +35,8 @@ public class ResetPasswordTest
             this._userRepositoryMock.Object,
             this._userCredentialRepositoryMock.Object,
             this._hashMock.Object,
-            this._tokenHasherMock.Object
+            this._tokenHasherMock.Object,
+            this._unitOfWorkMock.Object
         );
     }
 

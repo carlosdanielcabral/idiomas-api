@@ -9,4 +9,9 @@ public class Scenario(string id, Language language, string title, string descrip
     public string Title { get; private set; } = title;
     public string Description { get; private set; } = description;
     public bool IsActive { get; private set; } = true;
+
+    public bool MatchesLanguage(Language language)
+    {
+        return this.Language == language;
+    }
 }

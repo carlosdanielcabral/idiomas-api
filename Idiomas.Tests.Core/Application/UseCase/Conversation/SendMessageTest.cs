@@ -20,6 +20,7 @@ public class SendMessageTest
     private readonly Mock<IConversationRepository> _conversationRepositoryMock;
     private readonly Mock<IScenarioRepository> _scenarioRepositoryMock;
     private readonly Mock<IConversationLLMService> _llmServiceMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly SendMessage _sut;
 
     public SendMessageTest()
@@ -27,10 +28,17 @@ public class SendMessageTest
         this._conversationRepositoryMock = new Mock<IConversationRepository>();
         this._scenarioRepositoryMock = new Mock<IScenarioRepository>();
         this._llmServiceMock = new Mock<IConversationLLMService>();
+        this._unitOfWorkMock = new Mock<IUnitOfWork>();
+
+        this._unitOfWorkMock
+            .Setup(unitOfWork => unitOfWork.ExecuteAsync(It.IsAny<Func<Task<(List<CorrectionResponse>, CoreMessage)>>>()))
+            .Returns((Func<Task<(List<CorrectionResponse>, CoreMessage)>> operation) => operation());
+
         this._sut = new SendMessage(
             _conversationRepositoryMock.Object,
             _scenarioRepositoryMock.Object,
-            _llmServiceMock.Object
+            _llmServiceMock.Object,
+            _unitOfWorkMock.Object
         );
     }
 

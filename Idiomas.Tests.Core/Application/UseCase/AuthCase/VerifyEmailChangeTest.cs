@@ -13,14 +13,20 @@ public class VerifyEmailChangeTest
     private readonly Mock<IEmailChangeRequestRepository> _requestRepositoryMock = new();
     private readonly Mock<IUserRepository> _userRepositoryMock = new();
     private readonly Mock<ITokenHasher> _tokenHasherMock = new();
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
     private readonly VerifyEmailChange _sut;
 
     public VerifyEmailChangeTest()
     {
+        this._unitOfWorkMock
+            .Setup(unitOfWork => unitOfWork.ExecuteAsync(It.IsAny<Func<Task>>()))
+            .Returns((Func<Task> operation) => operation());
+
         this._sut = new VerifyEmailChange(
             this._requestRepositoryMock.Object,
             this._userRepositoryMock.Object,
-            this._tokenHasherMock.Object
+            this._tokenHasherMock.Object,
+            this._unitOfWorkMock.Object
         );
     }
 

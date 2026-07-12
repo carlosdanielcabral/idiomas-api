@@ -16,8 +16,7 @@ public class GoogleLoginTest
     private readonly Mock<IGoogleTokenVerifier> _tokenVerifierMock;
     private readonly Mock<IUserRepository> _userRepositoryMock;
     private readonly Mock<IUserCredentialRepository> _userCredentialRepositoryMock;
-    private readonly Mock<ITransactionManager> _transactionManagerMock;
-    private readonly Mock<IDatabaseTransaction> _databaseTransactionMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly GoogleLogin _sut;
 
     public GoogleLoginTest()
@@ -25,18 +24,17 @@ public class GoogleLoginTest
         this._tokenVerifierMock = new Mock<IGoogleTokenVerifier>();
         this._userRepositoryMock = new Mock<IUserRepository>();
         this._userCredentialRepositoryMock = new Mock<IUserCredentialRepository>();
-        this._transactionManagerMock = new Mock<ITransactionManager>();
-        this._databaseTransactionMock = new Mock<IDatabaseTransaction>();
+        this._unitOfWorkMock = new Mock<IUnitOfWork>();
 
-        this._transactionManagerMock
-            .Setup(manager => manager.BeginTransactionAsync())
-            .ReturnsAsync(this._databaseTransactionMock.Object);
+        this._unitOfWorkMock
+            .Setup(unitOfWork => unitOfWork.ExecuteAsync(It.IsAny<Func<Task<User>>>()))
+            .Returns((Func<Task<User>> operation) => operation());
 
         this._sut = new GoogleLogin(
             this._tokenVerifierMock.Object,
             this._userRepositoryMock.Object,
             this._userCredentialRepositoryMock.Object,
-            this._transactionManagerMock.Object
+            this._unitOfWorkMock.Object
         );
     }
 
@@ -151,7 +149,6 @@ public class GoogleLoginTest
 
         this._userCredentialRepositoryMock.Verify(repository => repository.Insert(It.Is<UserCredential>(credential => credential.Provider == AuthProvider.Google && credential.ExternalSubject == "google-sub-123" && credential.PasswordHash == null)), Times.Once);
         this._userRepositoryMock.Verify(repository => repository.Insert(It.IsAny<User>()), Times.Never);
-        this._databaseTransactionMock.Verify(transaction => transaction.CommitAsync(), Times.Once);
     }
 
     [Fact]
@@ -188,7 +185,6 @@ public class GoogleLoginTest
 
         this._userRepositoryMock.Verify(repository => repository.Insert(It.Is<User>(user => user.Name == "João Silva" && user.Email == "joao@gmail.com")), Times.Once);
         this._userCredentialRepositoryMock.Verify(repository => repository.Insert(It.Is<UserCredential>(credential => credential.Provider == AuthProvider.Google && credential.ExternalSubject == "google-sub-123" && credential.PasswordHash == null)), Times.Once);
-        this._databaseTransactionMock.Verify(transaction => transaction.CommitAsync(), Times.Once);
     }
 
     [Fact]

@@ -1,4 +1,5 @@
 using Idiomas.Core.Domain.Enum;
+using Idiomas.Core.Infrastructure.Helper;
 
 namespace Idiomas.Core.Domain.Entity;
 
@@ -14,6 +15,11 @@ public class Message(
     public string Content { get; private set; } = content;
     public ICollection<Correction> Corrections { get; private set; } = new List<Correction>();
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+
+    public static Message Create(string conversationId, MessageRole role, string content)
+    {
+        return new Message(UUIDGenerator.Generate(), conversationId, role, content);
+    }
 
     public void AddCorrection(Correction correction)
     {

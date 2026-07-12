@@ -17,7 +17,8 @@ public class ForgotPassword(
     IEmailService emailService,
     EmailMessageBuilder emailMessageBuilder,
     IConfiguration configuration,
-    ITokenGenerator tokenGenerator)
+    ITokenGenerator tokenGenerator,
+    IUnitOfWork unitOfWork)
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IUserCredentialRepository _userCredentialRepository = userCredentialRepository;
@@ -26,6 +27,7 @@ public class ForgotPassword(
     private readonly EmailMessageBuilder _emailMessageBuilder = emailMessageBuilder;
     private readonly IConfiguration _configuration = configuration;
     private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task Execute(ForgotPasswordDTO dto)
     {
@@ -52,9 +54,12 @@ public class ForgotPassword(
 
         PasswordResetToken resetToken = PasswordResetToken.Create(userId, token.TokenHash);
 
-        await this._tokenRepository.Insert(resetToken);
+        await this._unitOfWork.ExecuteAsync(async () =>
+        {
+            await this._tokenRepository.Insert(resetToken);
 
-        await this.SendPasswordResetEmail(user, token.RawToken);
+            await this.SendPasswordResetEmail(user, token.RawToken);
+        });
     }
 
     private async Task EnsureNoActiveTokenExists(Guid userId)
