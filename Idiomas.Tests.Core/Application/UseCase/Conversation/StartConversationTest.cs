@@ -1,5 +1,5 @@
 using Idiomas.Core.Application.DTO.Conversation;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Conversation;
 using Idiomas.Core.Application.UseCase.ConversationCase;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Helper;
@@ -76,7 +76,7 @@ public class StartConversationTest
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowException_WhenScenarioNotFound()
+    public async Task Execute_ShouldThrowScenarioNotFoundException_WhenScenarioNotFound()
     {
         string userId = UUIDGenerator.Generate();
         string scenarioId = UUIDGenerator.Generate();
@@ -86,12 +86,16 @@ public class StartConversationTest
             .Setup(repository => repository.GetById(scenarioId))
             .ReturnsAsync((CoreScenario?)null);
 
-        ApiException exception = await Assert.ThrowsAsync<ApiException>(() => _sut.Execute(request, userId));
+        ScenarioNotFoundException exception = await Assert.ThrowsAsync<ScenarioNotFoundException>(() => _sut.Execute(request, userId));
+
         Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
+        Assert.Equal("conversation:scenario-not-found", exception.ErrorCode);
+        Assert.Equal("Scenario not found", exception.Title);
+        Assert.Equal("The requested scenario was not found.", exception.Detail);
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowException_WhenScenarioLanguageDoesNotMatch()
+    public async Task Execute_ShouldThrowScenarioLanguageMismatchException_WhenScenarioLanguageDoesNotMatch()
     {
         string userId = UUIDGenerator.Generate();
         string scenarioId = UUIDGenerator.Generate();
@@ -103,7 +107,11 @@ public class StartConversationTest
             .Setup(repository => repository.GetById(scenarioId))
             .ReturnsAsync(scenario);
 
-        ApiException exception = await Assert.ThrowsAsync<ApiException>(() => _sut.Execute(request, userId));
+        ScenarioLanguageMismatchException exception = await Assert.ThrowsAsync<ScenarioLanguageMismatchException>(() => _sut.Execute(request, userId));
+
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("conversation:scenario-language-mismatch", exception.ErrorCode);
+        Assert.Equal("Scenario language mismatch", exception.Title);
+        Assert.Equal("The scenario language does not match the conversation language.", exception.Detail);
     }
 }

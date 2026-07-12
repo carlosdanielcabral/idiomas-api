@@ -1,10 +1,9 @@
 using Idiomas.Core.Application.DTO.Conversation;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Conversation;
 using Idiomas.Core.Application.Mapper;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Interface.Repository;
-using System.Net;
 
 namespace Idiomas.Core.Application.UseCase.ConversationCase;
 
@@ -17,14 +16,14 @@ public class StartConversation(
 
     public async Task<Conversation> Execute(StartConversationRequest request, string userId)
     {
-        await this.ValidateConversation(request, userId);
+        await this.ValidateConversation(request);
 
         Conversation conversation = request.ToEntity(userId, request.ScenarioId);
 
         return await this._conversationRepository.Insert(conversation);
     }
 
-    private async Task ValidateConversation(StartConversationRequest request, string userId)
+    private async Task ValidateConversation(StartConversationRequest request)
     {
         if (!request.Mode.RequiresScenario())
         {
@@ -35,14 +34,12 @@ public class StartConversation(
 
         if (scenario == null)
         {
-            throw new ApiException("Scenario not found.", HttpStatusCode.NotFound);
+            throw new ScenarioNotFoundException();
         }
 
         if (!scenario.MatchesLanguage(request.Language))
         {
-            throw new ApiException(
-                "Scenario language does not match conversation language.",
-                HttpStatusCode.BadRequest);
+            throw new ScenarioLanguageMismatchException();
         }
     }
 }
