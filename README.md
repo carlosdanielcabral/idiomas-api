@@ -10,18 +10,18 @@
 
 ## Table of Contents
 
-- [Features](#-features)
-- [Technologies](#-technologies)
-- [Prerequisites](#-prerequisites)
-- [Getting Started](#-getting-started)
-- [API Documentation](#-api-documentation)
-- [Ports](#-ports)
-- [Email & Mailpit](#-email--mailpit)
-- [Environment Variables](#-environment-variables)
-- [Project Structure](#️-project-structure)
-- [Exception Handling](#️-exception-handling)
-- [Database Migrations](#️-database-migrations)
-- [Running Tests](#-running-tests)
+- [Features](#features)
+- [Technologies](#technologies)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [API Documentation](#api-documentation)
+- [Ports](#ports)
+- [Email & Mailpit](#email--mailpit)
+- [Environment Variables](#environment-variables)
+- [Project Structure](#️project-structure)
+- [Exception Handling](#️exception-handling)
+- [Database Migrations](#️database-migrations)
+- [Running Tests](#running-tests)
 
 
 
