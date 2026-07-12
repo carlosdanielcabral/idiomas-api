@@ -1,4 +1,4 @@
-using Idiomas.Core.Application.Error.Conversation;
+using Idiomas.Core.Application.Exceptions.Conversation;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Interface.Repository;
 

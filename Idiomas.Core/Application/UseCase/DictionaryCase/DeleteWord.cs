@@ -1,6 +1,6 @@
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Domain.Entity;
-using Idiomas.Core.Application.Error.Dictionary;
+using Idiomas.Core.Application.Exceptions.Dictionary;
 
 namespace Idiomas.Core.Application.UseCase.DictionaryCase;
 

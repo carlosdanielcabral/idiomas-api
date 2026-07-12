@@ -1,5 +1,5 @@
 using Google.Apis.Auth;
-using Idiomas.Core.Application.Error.Infrastructure;
+using Idiomas.Core.Infrastructure.Exceptions.Google;
 using Idiomas.Core.Interface.Service;
 using Microsoft.Extensions.Configuration;
 

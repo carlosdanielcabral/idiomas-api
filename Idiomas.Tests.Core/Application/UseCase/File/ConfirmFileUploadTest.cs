@@ -1,5 +1,5 @@
 using System.Net;
-using Idiomas.Core.Application.Error.File;
+using Idiomas.Core.Application.Exceptions.File;
 using Idiomas.Core.Application.UseCase.File;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;

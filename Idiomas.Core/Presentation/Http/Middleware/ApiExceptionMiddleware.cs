@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Idiomas.Core.Presentation.Http.Middleware;

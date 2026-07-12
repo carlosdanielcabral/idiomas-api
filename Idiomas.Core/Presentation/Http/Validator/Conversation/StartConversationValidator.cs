@@ -1,4 +1,4 @@
-using Idiomas.Core.Application.Error.Validation;
+using Idiomas.Core.Exceptions.Validation;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Presentation.DTO.Conversation;
 

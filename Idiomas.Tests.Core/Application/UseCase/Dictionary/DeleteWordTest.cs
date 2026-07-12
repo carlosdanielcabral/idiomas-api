@@ -1,5 +1,5 @@
 using System.Net;
-using Idiomas.Core.Application.Error.Dictionary;
+using Idiomas.Core.Application.Exceptions.Dictionary;
 using Idiomas.Core.Application.UseCase.DictionaryCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Interface.Repository;

@@ -1,5 +1,5 @@
 using Idiomas.Core.Application.DTO.Conversation;
-using Idiomas.Core.Application.Error.Conversation;
+using Idiomas.Core.Application.Exceptions.Conversation;
 using Idiomas.Core.Application.Mapper;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;

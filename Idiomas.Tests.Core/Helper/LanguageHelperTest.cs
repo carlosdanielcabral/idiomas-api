@@ -1,5 +1,5 @@
 using System.Net;
-using Idiomas.Core.Application.Error.Common;
+using Idiomas.Core.Helper.Error;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Helper;
 

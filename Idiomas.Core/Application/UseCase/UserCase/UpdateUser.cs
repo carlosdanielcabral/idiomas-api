@@ -1,5 +1,5 @@
 using Idiomas.Core.Application.DTO.User;
-using Idiomas.Core.Application.Error.User;
+using Idiomas.Core.Application.Exceptions.User;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Service.Email;

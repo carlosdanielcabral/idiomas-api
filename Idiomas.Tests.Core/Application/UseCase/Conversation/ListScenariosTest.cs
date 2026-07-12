@@ -1,4 +1,4 @@
-using Idiomas.Core.Application.Error.Common;
+using Idiomas.Core.Helper.Error;
 using Idiomas.Core.Application.UseCase.ConversationCase;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Helper;
