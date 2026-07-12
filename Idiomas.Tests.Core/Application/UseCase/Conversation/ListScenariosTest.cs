@@ -1,4 +1,4 @@
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Common;
 using Idiomas.Core.Application.UseCase.ConversationCase;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Helper;
@@ -79,20 +79,22 @@ public class ListScenariosTest
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowApiException_WhenInvalidLanguage()
+    public async Task Execute_ShouldThrowLanguageInvalidException_WhenInvalidLanguage()
     {
         string language = "PT";
 
-        ApiException exception = await Assert.ThrowsAsync<ApiException>(() => _sut.Execute(language));
+        LanguageInvalidException exception = await Assert.ThrowsAsync<LanguageInvalidException>(() => _sut.Execute(language));
 
-        Assert.Contains("Invalid language 'PT'", exception.Message);
-        Assert.Contains("English", exception.Message);
-        Assert.Contains("Spanish", exception.Message);
-        Assert.Contains("French", exception.Message);
-        Assert.Contains("German", exception.Message);
-        Assert.Contains("Italian", exception.Message);
-        Assert.Contains("Portuguese", exception.Message);
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("common:language-invalid", exception.ErrorCode);
+        Assert.Equal("Language invalid", exception.Title);
+        Assert.Contains("PT", exception.Detail);
+        Assert.Contains("English", exception.Detail);
+        Assert.Contains("Spanish", exception.Detail);
+        Assert.Contains("French", exception.Detail);
+        Assert.Contains("German", exception.Detail);
+        Assert.Contains("Italian", exception.Detail);
+        Assert.Contains("Portuguese", exception.Detail);
     }
 
     [Fact]
