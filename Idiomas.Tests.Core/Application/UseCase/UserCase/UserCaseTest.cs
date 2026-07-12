@@ -1,6 +1,6 @@
 using System.Net;
 using Idiomas.Core.Application.DTO.User;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.User;
 using Idiomas.Core.Application.UseCase.UserCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Infrastructure.Service.Email;
@@ -89,7 +89,7 @@ public class CreateUserTest
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowApiException_WhenEmailAlreadyExists()
+    public async Task Execute_ShouldThrowEmailAlreadyInUseException_WhenEmailAlreadyExists()
     {
         CreateUserDTO createUserDTO = new("Test User", "test@example.com", "password123");
         User existingUser = new("1", "Existing User", "test@example.com", true);
@@ -98,10 +98,12 @@ public class CreateUserTest
             .Setup(repository => repository.GetByEmail(createUserDTO.Email))
             .ReturnsAsync(existingUser);
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(createUserDTO));
+        var exception = await Assert.ThrowsAsync<EmailAlreadyInUseException>(() => this._sut.Execute(createUserDTO));
 
         Assert.Equal(HttpStatusCode.Conflict, exception.StatusCode);
-        Assert.Equal("E-mail já cadastrado", exception.Message);
+        Assert.Equal("user:email-already-in-use", exception.ErrorCode);
+        Assert.Equal("Email already in use", exception.Title);
+        Assert.Equal("The email address is already associated with another account.", exception.Detail);
 
         this._userRepositoryMock.Verify(repository => repository.Insert(It.IsAny<User>()), Times.Never);
     }
