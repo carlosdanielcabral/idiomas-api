@@ -1,10 +1,9 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Idiomas.Core.Application.DTO.Conversation;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Infrastructure;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Service.LLM;
@@ -68,18 +67,12 @@ public class GeminiConversationLLMService : IConversationLLMService
 
                 if (this.IsRetryableStatusCode(response.StatusCode))
                 {
-                    throw new ApiException(
-                        "AI service is temporarily unavailable. Please try again later.",
-                        HttpStatusCode.ServiceUnavailable
-                    );
+                    throw new LlmServiceUnavailableException();
                 }
 
                 string errorContent = await response.Content.ReadAsStringAsync();
 
-                throw new ApiException(
-                    $"Failed to process message with AI service. Status: {response.StatusCode}. Please try again later.",
-                    HttpStatusCode.ServiceUnavailable
-                );
+                throw new LlmServiceUnavailableException();
             }
             catch (HttpRequestException) when (attempt < maxRetries)
             {
@@ -90,17 +83,11 @@ public class GeminiConversationLLMService : IConversationLLMService
             }
             catch (HttpRequestException)
             {
-                throw new ApiException(
-                    "AI service is temporarily unavailable. Please try again later.",
-                    HttpStatusCode.ServiceUnavailable
-                );
+                throw new LlmServiceUnavailableException();
             }
         }
 
-        throw new ApiException(
-            "AI service is temporarily unavailable. Please try again later.",
-            HttpStatusCode.ServiceUnavailable
-        );
+        throw new LlmServiceUnavailableException();
     }
 
     private bool IsRetryableStatusCode(HttpStatusCode statusCode)

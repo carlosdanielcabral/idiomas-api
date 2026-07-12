@@ -1,5 +1,4 @@
-using System.Net;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Infrastructure;
 using Idiomas.Core.Interface.Service;
 using Microsoft.Extensions.Configuration;
 using SendGrid;
@@ -27,7 +26,7 @@ public class SendGridClientService(ISendGridClient sendGridClient, IConfiguratio
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new ApiException($"Failed to send email to '{message.To}'. Status: {response.StatusCode}", HttpStatusCode.ServiceUnavailable);
+            throw new EmailSendFailedException(message.To);
         }
     }
 }
