@@ -8,6 +8,7 @@ using Idiomas.Core.Infrastructure.Service.LLM;
 using Idiomas.Core.Infrastructure.Service.LLM.Gemini;
 using Idiomas.Core.Infrastructure.Service.Transaction;
 using Idiomas.Core.Interface.Service;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SendGrid;
@@ -16,7 +17,7 @@ namespace Idiomas.Core.Infrastructure.Service;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
     {
         services.AddScoped<IHash, Argon2Hash>();
         services.AddScoped<ITokenHasher, Sha256TokenHasher>();
@@ -48,7 +49,17 @@ public static class DependencyInjection
             return new SendGridClient(sendGridApiKey);
         });
 
-        services.AddScoped<IEmailService, SendGridClientService>();
+        services.AddScoped<IEmailService>(provider =>
+        {
+            if (environment.IsDevelopment())
+            {
+                return new SmtpEmailService(new SmtpClient(), configuration);
+            }
+
+            ISendGridClient sendGridClient = provider.GetRequiredService<ISendGridClient>();
+            return new SendGridClientService(sendGridClient, configuration);
+        });
+
         services.AddScoped<EmailMessageBuilder>();
 
         return services;

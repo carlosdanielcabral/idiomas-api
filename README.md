@@ -12,13 +12,14 @@
 
 ## ✨ Features
 
-- 🔐 **User Authentication** — JWT-based authentication with secure password hashing using Argon2
+- 🔐 **User Authentication** — JWT-based authentication with secure password hashing using Argon2, plus **Google OAuth login** (Sign in with Google) alongside traditional email/password login
+- 🔄 **Unit of Work** — Transactional consistency across repositories via a generic `IUnitOfWork` abstraction (EF Core implementation), used by use cases that touch multiple aggregates in a single operation (e.g. account creation, linking a Google credential)
 - 🤖 **AI Conversations** — Integration with Google Gemini AI for interactive language learning conversations
 - 📚 **Dictionary Management** — Create and manage vocabulary dictionaries
 - ☁️ **File Storage** — Azure Blob Storage integration for file uploads and management
 - 🛡️ **Rate Limiting** — Built-in rate limiting to protect against abuse (100 requests per minute per IP)
-- � **Email Service** — Send email notifications via SendGrid through a generic `IEmailService` interface
-- � **API Documentation** — Interactive Swagger UI for API exploration
+- 📧 **Email Service** — Send email notifications through a generic `IEmailService` interface. **SendGrid** is used in production, while **Mailpit** is used as a local SMTP server in development so emails can be inspected without sending real messages
+- 📖 **API Documentation** — Interactive Swagger UI for API exploration
 
 ---
 
@@ -30,7 +31,9 @@
 | ORM | **Entity Framework Core 9.0.8** |
 | Database | **SQL Server** (via Docker container) |
 | Storage | **Azure Blob Storage** |
-| Authentication | **JWT** tokens with **Argon2** hashing |
+| Authentication | **JWT** tokens with **Argon2** hashing, plus **Google OAuth** (`Google.Apis.Auth`) |
+| Transactions | **Unit of Work** pattern on top of EF Core (`IUnitOfWork` / `EfCoreUnitOfWork`) |
+| Email | **SendGrid** (production) and **Mailpit** via SMTP/MailKit (development) |
 | Documentation | **Swashbuckle / Swagger** |
 | Containerization | **Docker & Docker Compose** |
 | AI | **Google Gemini AI** |
@@ -45,6 +48,8 @@ Before you begin, make sure you have the following installed and configured:
 - 🛠️ [.NET 9.0 SDK](https://dotnet.microsoft.com/) (for local development without Docker)
 - ☁️ Azure Storage account (for file storage features)
 - 🔑 Gemini API key (for AI conversation features)
+- 🔑 Google OAuth Client ID (for "Sign in with Google")
+- 🔑 SendGrid API key (only required in production; local development uses Mailpit instead, see [Email & Mailpit](#-email--mailpit))
 
 ---
 
@@ -74,8 +79,10 @@ Edit `.env` with the following:
 - Database credentials
 - JWT configuration (`Key`, `Issuer`, `Audience`)
 - Azure Storage configuration
+- Google OAuth Client ID
 - Gemini API key
 - Encryption key (minimum 32 characters)
+- SendGrid API key (optional in development, since Mailpit is used instead — see [Email & Mailpit](#-email--mailpit))
 
 #### 3. Start the application
 
@@ -83,13 +90,14 @@ Edit `.env` with the following:
 docker-compose up -d
 ```
 
-This will start three services:
+This will start four services:
 
 | Service | Description |
 |---------|-------------|
 | `api` | The main API application |
 | `database` | SQL Server database |
 | `migration` | Database migration service |
+| `mailpit` | Local SMTP server used to send and inspect emails in development (see [Email & Mailpit](#-email--mailpit)) |
 
 #### 4. Verify the application
 
@@ -97,6 +105,12 @@ The API will be available at:
 
 ```
 http://localhost:5076
+```
+
+The Mailpit web UI, used to inspect emails sent by the application, will be available at:
+
+```
+http://localhost:8025
 ```
 
 ---
@@ -144,6 +158,33 @@ The Swagger UI provides:
 |---------|------|
 | API | `5076` |
 | Database | `1433` |
+| Mailpit (SMTP) | `1025` |
+| Mailpit (Web UI) | `8025` |
+
+---
+
+## 📧 Email & Mailpit
+
+Emails are sent through the generic `IEmailService` interface, which has two implementations:
+
+| Environment | Implementation | Notes |
+|-------------|-----------------|-------|
+| Development | `SmtpEmailService` (MailKit) | Sends emails to the local **Mailpit** SMTP server, so no real email provider is needed |
+| Other environments | `SendGridClientService` | Sends emails through **SendGrid**, requires `SendGrid__ApiKey` |
+
+The implementation is selected automatically at startup based on `ASPNETCORE_ENVIRONMENT` — no manual configuration is needed to switch between them.
+
+When running via Docker Compose, the `mailpit` service is started automatically. To see the emails sent by the application, open the Mailpit web UI:
+
+🔗 **Mailpit UI**: [http://localhost:8025](http://localhost:8025)
+
+If you run the API locally without Docker, you can start Mailpit on its own:
+
+```bash
+docker run -d --name mailpit -p 1025:1025 -p 8025:8025 axllent/mailpit:v1.22
+```
+
+The `Smtp:Host` / `Smtp:Port` configuration in `appsettings.Development.json` already points to `localhost:1025`, matching this setup.
 
 ---
 
@@ -162,12 +203,15 @@ Key environment variables (see `.env.example` for the complete list):
 | `Azure__Storage__AccountName` | Azure Storage account name |
 | `Azure__Storage__BlobServiceUri` | Azure Blob Storage URI |
 | `Azure__Storage__ContainerName` | Azure container name |
+| `Google__ClientId` | Google OAuth Client ID used to validate "Sign in with Google" tokens |
 | `Gemini__ApiKey` | Gemini AI API key |
 | `Gemini__Model` | Gemini AI model name |
 | `Encryption__Key` | Encryption key (minimum 32 characters) |
-| `SendGrid__ApiKey` | SendGrid API key for sending emails |
+| `SendGrid__ApiKey` | SendGrid API key for sending emails (production only) |
 | `Email__SenderAddress` | Default email sender address |
 | `Email__SenderName` | Default email sender name |
+| `Smtp__Host` | SMTP host used in development (Mailpit) |
+| `Smtp__Port` | SMTP port used in development (Mailpit) |
 | `FrontendLocalUrl` | Allowed frontend URLs for CORS |
 
 ---
