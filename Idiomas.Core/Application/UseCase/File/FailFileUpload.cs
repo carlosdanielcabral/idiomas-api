@@ -1,5 +1,4 @@
-using System.Net;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.File;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Interface.Repository;
@@ -22,17 +21,17 @@ public class FailFileUpload(IFileRepository fileRepository)
 
         if (file is null)
         {
-            throw new ApiException("Arquivo não encontrado", HttpStatusCode.NotFound);
+            throw new FileUploadNotFoundException();
         }
 
         if (file.UserId != userId)
         {
-            throw new ApiException("Você não está autorizado a confirmar a falha no upload deste arquivo", HttpStatusCode.Unauthorized);
+            throw new FileAccessDeniedException();
         }
 
         if (file.Status != FileStatus.Pending)
         {
-            throw new ApiException("Arquivo já foi processado", HttpStatusCode.Conflict);
+            throw new FileAlreadyProcessedException();
         }
     }
-}   
+}
