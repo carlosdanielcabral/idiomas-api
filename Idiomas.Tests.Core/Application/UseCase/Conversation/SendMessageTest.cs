@@ -1,5 +1,5 @@
 using Idiomas.Core.Application.DTO.Conversation;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Conversation;
 using Idiomas.Core.Application.UseCase.ConversationCase;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Helper;
@@ -53,7 +53,7 @@ public class SendMessageTest
         SendMessageRequest request = new(content);
 
         ConversationLLMResponse llmResponse = new(
-            "I'm doing well, thank you! How about you?", 
+            "I'm doing well, thank you! How about you?",
             new List<CorrectionResponse>());
 
         this._conversationRepositoryMock
@@ -160,7 +160,7 @@ public class SendMessageTest
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowException_WhenConversationNotFound()
+    public async Task Execute_ShouldThrowConversationNotFoundException_WhenConversationNotFound()
     {
         string conversationId = UUIDGenerator.Generate();
         string userId = UUIDGenerator.Generate();
@@ -170,12 +170,16 @@ public class SendMessageTest
             .Setup(repository => repository.GetById(conversationId))
             .ReturnsAsync((CoreConversation?)null);
 
-        ApiException exception = await Assert.ThrowsAsync<ApiException>(() => _sut.Execute(conversationId, request, userId));
+        ConversationNotFoundException exception = await Assert.ThrowsAsync<ConversationNotFoundException>(() => _sut.Execute(conversationId, request, userId));
+
         Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
+        Assert.Equal("conversation:not-found", exception.ErrorCode);
+        Assert.Equal("Conversation not found", exception.Title);
+        Assert.Equal("The requested conversation was not found.", exception.Detail);
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowException_WhenConversationNotOwnedByUser()
+    public async Task Execute_ShouldThrowConversationAccessDeniedException_WhenConversationNotOwnedByUser()
     {
         string conversationId = UUIDGenerator.Generate();
         string userId = UUIDGenerator.Generate();
@@ -188,7 +192,11 @@ public class SendMessageTest
             .Setup(repository => repository.GetById(conversationId))
             .ReturnsAsync(conversation);
 
-        ApiException exception = await Assert.ThrowsAsync<ApiException>(() => _sut.Execute(conversationId, request, userId));
+        ConversationAccessDeniedException exception = await Assert.ThrowsAsync<ConversationAccessDeniedException>(() => _sut.Execute(conversationId, request, userId));
+
         Assert.Equal(HttpStatusCode.Forbidden, exception.StatusCode);
+        Assert.Equal("conversation:access-denied", exception.ErrorCode);
+        Assert.Equal("Conversation access denied", exception.Title);
+        Assert.Equal("You do not have permission to access this conversation.", exception.Detail);
     }
 }

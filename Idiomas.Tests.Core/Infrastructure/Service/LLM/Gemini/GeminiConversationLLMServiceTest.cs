@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Infrastructure;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Service.LLM.Gemini;
@@ -98,7 +98,7 @@ public class GeminiConversationLLMServiceTest
     }
 
     [Fact]
-    public async Task SendMessageAsync_WithMaxRetriesExceeded_ShouldThrowException()
+    public async Task SendMessageAsync_WithMaxRetriesExceeded_ShouldThrowLlmServiceUnavailableException()
     {
         // Arrange
         Conversation conversation = new("conv-123", "user-123", Language.English, ConversationMode.Free);
@@ -115,14 +115,17 @@ public class GeminiConversationLLMServiceTest
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.TooManyRequests));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<ApiException>(
+        var exception = await Assert.ThrowsAsync<LlmServiceUnavailableException>(
             () => this._service.SendMessageAsync(conversation, userMessage, scenarioDescription));
 
-        Assert.Contains("AI service is temporarily unavailable", exception.Message);
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, exception.StatusCode);
+        Assert.Equal("infrastructure:llm-service-unavailable", exception.ErrorCode);
+        Assert.Equal("AI service unavailable", exception.Title);
+        Assert.Equal("The AI service is temporarily unavailable. Please try again later.", exception.Detail);
     }
 
     [Fact]
-    public async Task SendMessageAsync_WithNonRetryableError_ShouldThrowImmediately()
+    public async Task SendMessageAsync_WithNonRetryableError_ShouldThrowLlmServiceUnavailableException()
     {
         // Arrange
         Conversation conversation = new("conv-123", "user-123", Language.English, ConversationMode.Free);
@@ -139,8 +142,11 @@ public class GeminiConversationLLMServiceTest
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Unauthorized));
 
         // Act & Assert
-        await Assert.ThrowsAsync<ApiException>(
+        var exception = await Assert.ThrowsAsync<LlmServiceUnavailableException>(
             () => this._service.SendMessageAsync(conversation, userMessage, scenarioDescription));
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, exception.StatusCode);
+        Assert.Equal("infrastructure:llm-service-unavailable", exception.ErrorCode);
     }
 
     [Fact]

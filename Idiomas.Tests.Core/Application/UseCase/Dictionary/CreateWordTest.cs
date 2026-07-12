@@ -1,6 +1,6 @@
 using System.Net;
 using Idiomas.Core.Application.DTO.Dictionary;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Dictionary;
 using Idiomas.Core.Application.UseCase.DictionaryCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Interface.Repository;
@@ -43,7 +43,7 @@ public class CreateWordTest
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowApiException_WhenWordAlreadyExists()
+    public async Task Execute_ShouldThrowWordAlreadyExistsException_WhenWordAlreadyExists()
     {
         string userId = "user-id-123";
 
@@ -54,10 +54,12 @@ public class CreateWordTest
             .Setup(repository => repository.GetByWord(createWordDTO.Word, userId))
             .ReturnsAsync(existingWord);
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => _sut.Execute(createWordDTO, userId));
+        var exception = await Assert.ThrowsAsync<WordAlreadyExistsException>(() => _sut.Execute(createWordDTO, userId));
 
         Assert.Equal(HttpStatusCode.Conflict, exception.StatusCode);
-        Assert.Equal("Palavra já cadastrada", exception.Message);
+        Assert.Equal("dictionary:word-already-exists", exception.ErrorCode);
+        Assert.Equal("Word already exists", exception.Title);
+        Assert.Equal("A word with the same name already exists in your dictionary.", exception.Detail);
 
         this._dictionaryRepositoryMock.Verify(repository => repository.Insert(It.IsAny<Word>()), Times.Never);
     }

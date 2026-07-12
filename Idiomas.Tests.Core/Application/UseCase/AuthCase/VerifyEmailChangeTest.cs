@@ -1,5 +1,5 @@
 using System.Net;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Auth;
 using Idiomas.Core.Application.UseCase.AuthCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Interface.Repository;
@@ -52,7 +52,7 @@ public class VerifyEmailChangeTest
     }
 
     [Fact]
-    public async Task Execute_ThrowsApiException_WhenTokenDoesNotExist()
+    public async Task Execute_ThrowsTokenInvalidOrExpiredException_WhenTokenDoesNotExist()
     {
         string rawToken = "invalid-token";
         string tokenHash = "hashed-token";
@@ -60,13 +60,16 @@ public class VerifyEmailChangeTest
         this._tokenHasherMock.Setup(hasher => hasher.Hash(rawToken)).Returns(tokenHash);
         this._requestRepositoryMock.Setup(repository => repository.GetByTokenHash(tokenHash)).ReturnsAsync((EmailChangeRequest?)null);
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(rawToken));
+        var exception = await Assert.ThrowsAsync<TokenInvalidOrExpiredException>(() => this._sut.Execute(rawToken));
 
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("auth:token-invalid-or-expired", exception.ErrorCode);
+        Assert.Equal("Token invalid or expired", exception.Title);
+        Assert.Equal("The token is invalid or has expired.", exception.Detail);
     }
 
     [Fact]
-    public async Task Execute_ThrowsApiException_WhenTokenIsExpired()
+    public async Task Execute_ThrowsTokenInvalidOrExpiredException_WhenTokenIsExpired()
     {
         Guid userId = Guid.NewGuid();
         string rawToken = "valid-token";
@@ -76,13 +79,16 @@ public class VerifyEmailChangeTest
         this._tokenHasherMock.Setup(hasher => hasher.Hash(rawToken)).Returns(tokenHash);
         this._requestRepositoryMock.Setup(repository => repository.GetByTokenHash(tokenHash)).ReturnsAsync(request);
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(rawToken));
+        var exception = await Assert.ThrowsAsync<TokenInvalidOrExpiredException>(() => this._sut.Execute(rawToken));
 
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("auth:token-invalid-or-expired", exception.ErrorCode);
+        Assert.Equal("Token invalid or expired", exception.Title);
+        Assert.Equal("The token is invalid or has expired.", exception.Detail);
     }
 
     [Fact]
-    public async Task Execute_ThrowsApiException_WhenTokenIsAlreadyUsed()
+    public async Task Execute_ThrowsTokenInvalidOrExpiredException_WhenTokenIsAlreadyUsed()
     {
         Guid userId = Guid.NewGuid();
         string rawToken = "valid-token";
@@ -92,8 +98,11 @@ public class VerifyEmailChangeTest
         this._tokenHasherMock.Setup(hasher => hasher.Hash(rawToken)).Returns(tokenHash);
         this._requestRepositoryMock.Setup(repository => repository.GetByTokenHash(tokenHash)).ReturnsAsync(request);
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(rawToken));
+        var exception = await Assert.ThrowsAsync<TokenInvalidOrExpiredException>(() => this._sut.Execute(rawToken));
 
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("auth:token-invalid-or-expired", exception.ErrorCode);
+        Assert.Equal("Token invalid or expired", exception.Title);
+        Assert.Equal("The token is invalid or has expired.", exception.Detail);
     }
 }

@@ -1,5 +1,5 @@
 using System.Net;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Common;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Helper;
 
@@ -58,53 +58,57 @@ public class LanguageHelperTest
     }
 
     [Fact]
-    public void ParseLanguage_WithInvalidLanguage_ShouldThrowApiException()
+    public void ParseLanguage_WithInvalidLanguage_ShouldThrowLanguageInvalidException()
     {
         string language = "InvalidLanguage";
 
-        ApiException exception = Assert.Throws<ApiException>(() => LanguageHelper.ParseLanguage(language));
+        LanguageInvalidException exception = Assert.Throws<LanguageInvalidException>(() => LanguageHelper.ParseLanguage(language));
 
-        Assert.Contains("Invalid language 'InvalidLanguage'", exception.Message);
-        Assert.Contains("English", exception.Message);
-        Assert.Contains("Spanish", exception.Message);
-        Assert.Contains("French", exception.Message);
-        Assert.Contains("German", exception.Message);
-        Assert.Contains("Italian", exception.Message);
-        Assert.Contains("Portuguese", exception.Message);
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("common:language-invalid", exception.ErrorCode);
+        Assert.Equal("Language invalid", exception.Title);
+        Assert.Contains("InvalidLanguage", exception.Detail);
+        Assert.Contains("English", exception.Detail);
+        Assert.Contains("Spanish", exception.Detail);
+        Assert.Contains("French", exception.Detail);
+        Assert.Contains("German", exception.Detail);
+        Assert.Contains("Italian", exception.Detail);
+        Assert.Contains("Portuguese", exception.Detail);
     }
 
     [Fact]
-    public void ParseLanguage_WithIsRequiredTrue_AndNullLanguage_ShouldThrowApiException()
+    public void ParseLanguage_WithIsRequiredTrue_AndNullLanguage_ShouldThrowLanguageRequiredException()
     {
         string? language = null;
 
-        ApiException exception = Assert.Throws<ApiException>(() => LanguageHelper.ParseLanguage(language, isRequired: true));
+        LanguageRequiredException exception = Assert.Throws<LanguageRequiredException>(() => LanguageHelper.ParseLanguage(language, isRequired: true));
 
-        Assert.Equal("Language is required.", exception.Message);
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("common:language-required", exception.ErrorCode);
+        Assert.Equal("Language required", exception.Title);
+        Assert.Equal("A language must be specified.", exception.Detail);
     }
 
     [Fact]
-    public void ParseLanguage_WithIsRequiredTrue_AndEmptyLanguage_ShouldThrowApiException()
+    public void ParseLanguage_WithIsRequiredTrue_AndEmptyLanguage_ShouldThrowLanguageRequiredException()
     {
         string language = "";
 
-        ApiException exception = Assert.Throws<ApiException>(() => LanguageHelper.ParseLanguage(language, isRequired: true));
+        LanguageRequiredException exception = Assert.Throws<LanguageRequiredException>(() => LanguageHelper.ParseLanguage(language, isRequired: true));
 
-        Assert.Equal("Language is required.", exception.Message);
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("common:language-required", exception.ErrorCode);
     }
 
     [Fact]
-    public void ParseLanguage_WithIsRequiredTrue_AndWhitespaceLanguage_ShouldThrowApiException()
+    public void ParseLanguage_WithIsRequiredTrue_AndWhitespaceLanguage_ShouldThrowLanguageRequiredException()
     {
         string language = "   ";
 
-        ApiException exception = Assert.Throws<ApiException>(() => LanguageHelper.ParseLanguage(language, isRequired: true));
+        LanguageRequiredException exception = Assert.Throws<LanguageRequiredException>(() => LanguageHelper.ParseLanguage(language, isRequired: true));
 
-        Assert.Equal("Language is required.", exception.Message);
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("common:language-required", exception.ErrorCode);
     }
 
     [Fact]

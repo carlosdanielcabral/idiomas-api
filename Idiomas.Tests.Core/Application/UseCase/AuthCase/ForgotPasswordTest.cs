@@ -1,5 +1,5 @@
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Auth;
 using Idiomas.Core.Application.UseCase.AuthCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
@@ -8,6 +8,7 @@ using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using System.Net;
 
 namespace Idiomas.Tests.Core.Application.UseCase.AuthCase;
 
@@ -92,7 +93,7 @@ public class ForgotPasswordTest
     }
 
     [Fact]
-    public async Task Execute_ThrowsApiExceptionWhenActiveTokenAlreadyExists()
+    public async Task Execute_ThrowsPasswordResetRequestActiveExceptionWhenActiveTokenAlreadyExists()
     {
         var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com", true);
         var credential = new UserCredential("cred-1", user.Id, AuthProvider.Local, "hashed", null);
@@ -114,9 +115,12 @@ public class ForgotPasswordTest
 
         var dto = new ForgotPasswordDTO("joao@example.com");
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => sut.Execute(dto));
+        var exception = await Assert.ThrowsAsync<PasswordResetRequestActiveException>(() => sut.Execute(dto));
 
-        Assert.Equal(System.Net.HttpStatusCode.Conflict, exception.StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, exception.StatusCode);
+        Assert.Equal("auth:password-reset-request-active", exception.ErrorCode);
+        Assert.Equal("Password reset request active", exception.Title);
+        Assert.Equal("An active password reset request already exists. Check your email or wait for it to expire.", exception.Detail);
         this._tokenRepositoryMock.Verify(repository => repository.Insert(It.IsAny<PasswordResetToken>()), Times.Never);
         this._emailServiceMock.Verify(service => service.SendAsync(It.IsAny<EmailMessage>()), Times.Never);
     }

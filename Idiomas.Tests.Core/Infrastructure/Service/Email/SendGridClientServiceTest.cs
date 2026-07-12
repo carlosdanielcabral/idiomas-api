@@ -1,5 +1,5 @@
 using System.Net;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Infrastructure;
 using Idiomas.Core.Infrastructure.Service.Email;
 using Idiomas.Core.Interface.Service;
 using Microsoft.Extensions.Configuration;
@@ -43,7 +43,7 @@ public class SendGridClientServiceTest
     }
 
     [Fact]
-    public async Task SendAsync_ThrowsApiExceptionWhenSendGridFails()
+    public async Task SendAsync_ThrowsEmailSendFailedException_WhenSendGridFails()
     {
         IConfiguration config = this.BuildConfiguration();
 
@@ -57,7 +57,12 @@ public class SendGridClientServiceTest
 
         var message = new EmailMessage("user@example.com", "Subject", "<p>Body</p>");
 
-        await Assert.ThrowsAsync<ApiException>(() => service.SendAsync(message));
+        var exception = await Assert.ThrowsAsync<EmailSendFailedException>(() => service.SendAsync(message));
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, exception.StatusCode);
+        Assert.Equal("infrastructure:email-send-failed", exception.ErrorCode);
+        Assert.Equal("Email send failed", exception.Title);
+        Assert.Equal("Failed to send email to 'user@example.com'.", exception.Detail);
     }
 
     [Fact]

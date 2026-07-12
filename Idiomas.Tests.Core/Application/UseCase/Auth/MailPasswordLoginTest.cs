@@ -1,6 +1,6 @@
 using System.Net;
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Auth;
 using Idiomas.Core.Application.UseCase.AuthCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
@@ -55,7 +55,7 @@ public class MailPasswordLoginTest
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowApiException_WhenEmailDoesNotExist()
+    public async Task Execute_ShouldThrowInvalidCredentialsException_WhenEmailDoesNotExist()
     {
         MailPasswordLoginDTO loginDto = new("wrong@example.com", "password123");
 
@@ -63,14 +63,16 @@ public class MailPasswordLoginTest
             .Setup(repository => repository.GetByEmail(loginDto.Email))
             .ReturnsAsync((User?)null);
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(loginDto));
+        var exception = await Assert.ThrowsAsync<InvalidCredentialsException>(() => this._sut.Execute(loginDto));
 
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
-        Assert.Equal("Email ou senha inválidos", exception.Message);
+        Assert.Equal("auth:invalid-credentials", exception.ErrorCode);
+        Assert.Equal("Invalid credentials", exception.Title);
+        Assert.Equal("The email or password is invalid.", exception.Detail);
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowApiException_WhenPasswordIsInvalid()
+    public async Task Execute_ShouldThrowInvalidCredentialsException_WhenPasswordIsInvalid()
     {
         MailPasswordLoginDTO loginDto = new("test@example.com", "wrongpassword");
         User user = new("1", "Test User", "test@example.com", true);
@@ -88,14 +90,16 @@ public class MailPasswordLoginTest
             .Setup(hash => hash.Verify(loginDto.Password, credential.PasswordHash!))
             .Returns(false);
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(loginDto));
+        var exception = await Assert.ThrowsAsync<InvalidCredentialsException>(() => this._sut.Execute(loginDto));
 
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
-        Assert.Equal("Email ou senha inválidos", exception.Message);
+        Assert.Equal("auth:invalid-credentials", exception.ErrorCode);
+        Assert.Equal("Invalid credentials", exception.Title);
+        Assert.Equal("The email or password is invalid.", exception.Detail);
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowApiException_WhenUserHasNoLocalCredential()
+    public async Task Execute_ShouldThrowInvalidCredentialsException_WhenUserHasNoLocalCredential()
     {
         MailPasswordLoginDTO loginDto = new("test@example.com", "password123");
         User user = new("1", "Test User", "test@example.com", true);
@@ -108,14 +112,16 @@ public class MailPasswordLoginTest
             .Setup(repository => repository.GetByUserIdAndProvider(user.Id, AuthProvider.Local))
             .ReturnsAsync((UserCredential?)null);
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(loginDto));
+        var exception = await Assert.ThrowsAsync<InvalidCredentialsException>(() => this._sut.Execute(loginDto));
 
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
-        Assert.Equal("Email ou senha inválidos", exception.Message);
+        Assert.Equal("auth:invalid-credentials", exception.ErrorCode);
+        Assert.Equal("Invalid credentials", exception.Title);
+        Assert.Equal("The email or password is invalid.", exception.Detail);
     }
 
     [Fact]
-    public async Task Execute_ShouldThrowApiException_WhenEmailIsNotVerified()
+    public async Task Execute_ShouldThrowEmailNotVerifiedException_WhenEmailIsNotVerified()
     {
         MailPasswordLoginDTO loginDto = new("test@example.com", "password123");
         User user = new("1", "Test User", "test@example.com", false);
@@ -133,9 +139,11 @@ public class MailPasswordLoginTest
             .Setup(hash => hash.Verify(loginDto.Password, credential.PasswordHash!))
             .Returns(true);
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(loginDto));
+        var exception = await Assert.ThrowsAsync<EmailNotVerifiedException>(() => this._sut.Execute(loginDto));
 
         Assert.Equal(HttpStatusCode.Forbidden, exception.StatusCode);
-        Assert.Equal("E-mail não verificado. Verifique sua caixa de entrada.", exception.Message);
+        Assert.Equal("auth:email-not-verified", exception.ErrorCode);
+        Assert.Equal("Email not verified", exception.Title);
+        Assert.Equal("The email has not been verified. Check your inbox to activate your account.", exception.Detail);
     }
 }

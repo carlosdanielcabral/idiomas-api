@@ -1,7 +1,6 @@
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Conversation;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Interface.Repository;
-using System.Net;
 
 namespace Idiomas.Core.Application.UseCase.ConversationCase;
 
@@ -15,16 +14,12 @@ public class GetConversation(IConversationRepository conversationRepository)
 
         if (conversation == null)
         {
-            throw new ApiException(
-                $"Conversation with ID {conversationId} not found.",
-                HttpStatusCode.NotFound);
+            throw new ConversationNotFoundException();
         }
 
         if (conversation.UserId != userId)
         {
-            throw new ApiException(
-                "You do not have permission to access this conversation.",
-                HttpStatusCode.Forbidden);
+            throw new ConversationAccessDeniedException();
         }
 
         return conversation;

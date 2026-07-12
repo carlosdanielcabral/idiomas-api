@@ -1,10 +1,9 @@
 using Idiomas.Core.Application.DTO.Conversation;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Conversation;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
-using System.Net;
 
 namespace Idiomas.Core.Application.UseCase.ConversationCase;
 
@@ -22,11 +21,11 @@ public class SendMessage(
     public async Task<MessageResponse> Execute(string conversationId, SendMessageRequest request, string userId)
     {
         Conversation conversation = await this.GetAndValidateConversation(conversationId, userId);
-        
+
         Message userMessage = this.CreateUserMessage(conversation, request.Content);
 
         string? scenarioDescription = await this.GetScenarioDescription(conversation.ScenarioId);
-        
+
         ConversationLLMResponse llmResponse = await this._llmService.SendMessageAsync(
             conversation,
             request.Content,
@@ -56,23 +55,17 @@ public class SendMessage(
 
         if (conversation == null)
         {
-            throw new ApiException(
-                $"Conversation with ID {conversationId} not found.",
-                HttpStatusCode.NotFound);
+            throw new ConversationNotFoundException();
         }
 
         if (conversation.UserId != userId)
         {
-            throw new ApiException(
-                "You do not have permission to access this conversation.",
-                HttpStatusCode.Forbidden);
+            throw new ConversationAccessDeniedException();
         }
 
         if (!conversation.IsActive)
         {
-            throw new ApiException(
-                "This conversation has ended.",
-                HttpStatusCode.Conflict);
+            throw new ConversationEndedException();
         }
 
         return conversation;
@@ -143,7 +136,7 @@ public class SendMessage(
     {
         if (string.IsNullOrWhiteSpace(content))
         {
-            throw new ApiException("Failed to create message", HttpStatusCode.InternalServerError);
+            throw new MessageCreationFailedException();
         }
     }
 

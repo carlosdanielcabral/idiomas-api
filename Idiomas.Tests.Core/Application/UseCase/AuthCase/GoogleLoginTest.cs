@@ -1,6 +1,6 @@
 using System.Net;
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Auth;
 using Idiomas.Core.Application.UseCase.AuthCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
@@ -44,7 +44,7 @@ public class GoogleLoginTest
     }
 
     [Fact]
-    public async Task Execute_ThrowsApiExceptionWhenEmailIsNotVerified()
+    public async Task Execute_ThrowsGoogleEmailNotVerifiedExceptionWhenEmailIsNotVerified()
     {
         GoogleTokenPayload payload = CreatePayload(emailVerified: false);
 
@@ -54,10 +54,12 @@ public class GoogleLoginTest
 
         var dto = new GoogleLoginDTO("id-token");
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(dto));
+        var exception = await Assert.ThrowsAsync<GoogleEmailNotVerifiedException>(() => this._sut.Execute(dto));
 
         Assert.Equal(HttpStatusCode.Unauthorized, exception.StatusCode);
-        Assert.Equal("Email não verificado pelo Google", exception.Message);
+        Assert.Equal("auth:google-email-not-verified", exception.ErrorCode);
+        Assert.Equal("Google email not verified", exception.Title);
+        Assert.Equal("The email has not been verified by Google.", exception.Detail);
     }
 
     [Fact]
@@ -90,7 +92,7 @@ public class GoogleLoginTest
     }
 
     [Fact]
-    public async Task Execute_ThrowsApiExceptionWhenCredentialExistsButUserDoesNot()
+    public async Task Execute_ThrowsAccountNotFoundExceptionWhenCredentialExistsButUserDoesNot()
     {
         GoogleTokenPayload payload = CreatePayload();
         UserCredential credential = new("cred-1", "user-1", AuthProvider.Google, null, "google-sub-123");
@@ -109,10 +111,12 @@ public class GoogleLoginTest
 
         var dto = new GoogleLoginDTO("id-token");
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(dto));
+        var exception = await Assert.ThrowsAsync<AccountNotFoundException>(() => this._sut.Execute(dto));
 
         Assert.Equal(HttpStatusCode.Unauthorized, exception.StatusCode);
-        Assert.Equal("Conta não encontrada", exception.Message);
+        Assert.Equal("auth:account-not-found", exception.ErrorCode);
+        Assert.Equal("Account not found", exception.Title);
+        Assert.Equal("No account was found for the provided credentials.", exception.Detail);
     }
 
     [Fact]
@@ -188,7 +192,7 @@ public class GoogleLoginTest
     }
 
     [Fact]
-    public async Task Execute_ThrowsApiExceptionWhenLocalAccountNotVerified()
+    public async Task Execute_ThrowsEmailNotVerifiedExceptionWhenLocalAccountNotVerified()
     {
         GoogleTokenPayload payload = CreatePayload();
         User existingUser = new("user-1", "João Silva", "joao@gmail.com", false);
@@ -207,9 +211,11 @@ public class GoogleLoginTest
 
         var dto = new GoogleLoginDTO("id-token");
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => this._sut.Execute(dto));
+        var exception = await Assert.ThrowsAsync<EmailNotVerifiedException>(() => this._sut.Execute(dto));
 
         Assert.Equal(HttpStatusCode.Forbidden, exception.StatusCode);
-        Assert.Equal("E-mail não verificado. Verifique sua caixa de entrada para ativar sua conta.", exception.Message);
+        Assert.Equal("auth:email-not-verified", exception.ErrorCode);
+        Assert.Equal("Email not verified", exception.Title);
+        Assert.Equal("The email has not been verified. Check your inbox to activate your account.", exception.Detail);
     }
 }

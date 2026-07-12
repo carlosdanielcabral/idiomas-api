@@ -1,7 +1,5 @@
-using System.Net;
-
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Validation;
 
 namespace Idiomas.Core.Presentation.Http.Validator.Auth;
 
@@ -11,7 +9,7 @@ public class GoogleLoginValidator : IValidator<GoogleLoginDTO>
     {
         if (string.IsNullOrWhiteSpace(dto.IdToken))
         {
-            throw new ApiException("ID Token é obrigatório", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("idToken");
         }
     }
 }

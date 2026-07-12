@@ -1,8 +1,6 @@
-using System.Net;
 using System.Text.RegularExpressions;
-
 using Idiomas.Application.DTO.File;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Validation;
 
 namespace Idiomas.Core.Presentation.Http.Validator.File;
 
@@ -12,22 +10,22 @@ public partial class RequestFileUploadValidator : IValidator<CreateFileDTO>
     {
         if (string.IsNullOrWhiteSpace(dto.OriginalFilename))
         {
-            throw new ApiException("Nome do arquivo é obrigatório", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("originalFilename");
         }
 
         if (string.IsNullOrWhiteSpace(dto.MimeType))
         {
-            throw new ApiException("Tipo do arquivo é obrigatório", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("mimeType");
         }
 
         if (!MimeTypeRegex().IsMatch(dto.MimeType))
         {
-            throw new ApiException("Tipo do arquivo inválido", HttpStatusCode.BadRequest);
+            throw new FieldInvalidException("mimeType");
         }
 
         if (dto.Size <= 0)
         {
-            throw new ApiException("Tamanho do arquivo deve ser maior que zero", HttpStatusCode.BadRequest);
+            throw new NumberMustBePositiveException("size");
         }
     }
 

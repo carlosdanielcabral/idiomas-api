@@ -1,5 +1,5 @@
 using Idiomas.Core.Application.DTO.User;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.User;
 using Idiomas.Core.Application.Mapper;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
@@ -7,7 +7,6 @@ using Idiomas.Core.Infrastructure.Service.Email;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
 using Microsoft.Extensions.Configuration;
-using System.Net;
 
 namespace Idiomas.Core.Application.UseCase.UserCase;
 
@@ -97,7 +96,7 @@ public class CreateUser(
 
         if (existingUser != null)
         {
-            throw new ApiException("E-mail já cadastrado", HttpStatusCode.Conflict);
+            throw new EmailAlreadyInUseException();
         }
     }
 }

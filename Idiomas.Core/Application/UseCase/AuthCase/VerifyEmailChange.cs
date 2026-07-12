@@ -1,8 +1,7 @@
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Auth;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
-using System.Net;
 
 namespace Idiomas.Core.Application.UseCase.AuthCase;
 
@@ -25,14 +24,14 @@ public class VerifyEmailChange(
 
         if (request is null || !request.IsValid)
         {
-            throw new ApiException("Token inválido ou expirado", HttpStatusCode.BadRequest);
+            throw new TokenInvalidOrExpiredException();
         }
 
         User? user = await this._userRepository.GetById(request.UserId.ToString());
 
         if (user == null)
         {
-            throw new ApiException("Token inválido ou expirado", HttpStatusCode.BadRequest);
+            throw new TokenInvalidOrExpiredException();
         }
 
         user.UpdateEmail(request.NewEmail);

@@ -1,6 +1,4 @@
-using System.Net;
-
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Validation;
 using Idiomas.Core.Presentation.DTO.Conversation;
 
 namespace Idiomas.Core.Presentation.Http.Validator.Conversation;
@@ -13,12 +11,12 @@ public class SendMessageValidator : IValidator<SendMessageRequestDTO>
     {
         if (string.IsNullOrWhiteSpace(dto.Content))
         {
-            throw new ApiException("Conteúdo da mensagem é obrigatório", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("content");
         }
 
         if (dto.Content.Length > MAXIMUM_CONTENT_LENGTH)
         {
-            throw new ApiException($"Conteúdo da mensagem deve ter no máximo {MAXIMUM_CONTENT_LENGTH} caracteres", HttpStatusCode.BadRequest);
+            throw new StringTooLongException("content", MAXIMUM_CONTENT_LENGTH);
         }
     }
 }

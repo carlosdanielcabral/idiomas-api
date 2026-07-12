@@ -1,6 +1,6 @@
 using System.Net;
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Auth;
 using Idiomas.Core.Application.UseCase.AuthCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
@@ -115,7 +115,7 @@ public class ResendVerificationTest
     }
 
     [Fact]
-    public async Task Execute_ThrowsApiExceptionWhenActiveTokenAlreadyExists()
+    public async Task Execute_ThrowsVerificationRequestActiveExceptionWhenActiveTokenAlreadyExists()
     {
         var user = new User(Guid.NewGuid().ToString(), "João", "joao@example.com", false);
         var credential = new UserCredential("cred-1", user.Id, AuthProvider.Local, "hashed", null);
@@ -137,9 +137,12 @@ public class ResendVerificationTest
 
         var dto = new ResendVerificationDTO("joao@example.com");
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => sut.Execute(dto));
+        var exception = await Assert.ThrowsAsync<VerificationRequestActiveException>(() => sut.Execute(dto));
 
         Assert.Equal(HttpStatusCode.Conflict, exception.StatusCode);
+        Assert.Equal("auth:verification-request-active", exception.ErrorCode);
+        Assert.Equal("Verification request active", exception.Title);
+        Assert.Equal("An active verification request already exists. Check your email or wait for it to expire.", exception.Detail);
         this._tokenRepositoryMock.Verify(repository => repository.Insert(It.IsAny<EmailVerificationToken>()), Times.Never);
         this._emailServiceMock.Verify(service => service.SendAsync(It.IsAny<EmailMessage>()), Times.Never);
     }

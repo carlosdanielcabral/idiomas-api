@@ -1,6 +1,4 @@
-using System.Net;
-
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Validation;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Presentation.DTO.Conversation;
 
@@ -12,12 +10,12 @@ public class StartConversationValidator : IValidator<CreateConversationRequestDT
     {
         if (string.IsNullOrWhiteSpace(dto.Language))
         {
-            throw new ApiException("Idioma é obrigatório", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("language");
         }
 
         if (dto.Mode == ConversationMode.Guided && string.IsNullOrWhiteSpace(dto.ScenarioId))
         {
-            throw new ApiException("ScenarioId é obrigatório para conversas guiadas", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("scenarioId");
         }
     }
 }

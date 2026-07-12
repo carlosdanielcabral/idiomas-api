@@ -1,12 +1,11 @@
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Auth;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Service.Email;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
 using Microsoft.Extensions.Configuration;
-using System.Net;
 
 namespace Idiomas.Core.Application.UseCase.AuthCase;
 
@@ -68,7 +67,7 @@ public class ForgotPassword(
 
         if (activeToken != null)
         {
-            throw new ApiException("Já existe uma solicitação de redefinição de senha ativa. Verifique seu email ou aguarde a expiração.", HttpStatusCode.Conflict);
+            throw new PasswordResetRequestActiveException();
         }
     }
 

@@ -1,8 +1,6 @@
-using System.Net;
 using System.Text.RegularExpressions;
-
 using Idiomas.Core.Application.DTO.User;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Validation;
 
 namespace Idiomas.Core.Presentation.Http.Validator.User;
 
@@ -14,22 +12,22 @@ public partial class UpdateUserValidator : IValidator<UpdateUserDTO>
     {
         if (string.IsNullOrWhiteSpace(dto.Name))
         {
-            throw new ApiException("Nome é obrigatório", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("name");
         }
 
         if (string.IsNullOrWhiteSpace(dto.Email))
         {
-            throw new ApiException("Email é obrigatório", HttpStatusCode.BadRequest);
+            throw new FieldRequiredException("email");
         }
 
         if (!EmailRegex().IsMatch(dto.Email))
         {
-            throw new ApiException("Email inválido", HttpStatusCode.BadRequest);
+            throw new FieldInvalidException("email");
         }
 
         if (!string.IsNullOrEmpty(dto.Password) && dto.Password.Length < MINIMUM_PASSWORD_LENGTH)
         {
-            throw new ApiException($"Senha deve ter pelo menos {MINIMUM_PASSWORD_LENGTH} caracteres", HttpStatusCode.BadRequest);
+            throw new StringTooShortException("password", MINIMUM_PASSWORD_LENGTH);
         }
     }
 

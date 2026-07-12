@@ -1,5 +1,4 @@
-using System.Net;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Common;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Domain.Enum.Extensions;
 
@@ -13,7 +12,7 @@ public static class LanguageHelper
         {
             if (isRequired)
             {
-                throw new ApiException("Language is required.", HttpStatusCode.BadRequest);
+                throw new LanguageRequiredException();
             }
 
             return null;
@@ -25,9 +24,7 @@ public static class LanguageHelper
         {
             string availableLanguagesString = LanguageExtensions.GetAvailableLanguagesString();
 
-            throw new ApiException(
-                $"Invalid language '{language}'. Available languages: {availableLanguagesString}",
-                HttpStatusCode.BadRequest);
+            throw new LanguageInvalidException(language, availableLanguagesString);
         }
 
         return parsedLanguage;

@@ -1,12 +1,11 @@
 using Idiomas.Core.Application.DTO.User;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.User;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Service.Email;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
 using Microsoft.Extensions.Configuration;
-using System.Net;
 
 namespace Idiomas.Core.Application.UseCase.UserCase;
 
@@ -37,7 +36,7 @@ public class UpdateUser(
 
         if (currentUser is null)
         {
-            throw new ApiException("Usuário não encontrado", HttpStatusCode.NotFound);
+            throw new UserNotFoundException();
         }
 
         return await this._unitOfWork.ExecuteAsync(async () =>
@@ -73,7 +72,7 @@ public class UpdateUser(
 
         if (existingUser is not null)
         {
-            throw new ApiException("E-mail já cadastrado por outro usuário", HttpStatusCode.Conflict);
+            throw new EmailAlreadyInUseException();
         }
     }
 
@@ -98,7 +97,7 @@ public class UpdateUser(
 
         if (activeRequest != null)
         {
-            throw new ApiException("Já existe uma solicitação de troca de e-mail ativa. Verifique seu email ou aguarde a expiração.", HttpStatusCode.Conflict);
+            throw new EmailChangeRequestActiveException();
         }
     }
 
@@ -125,10 +124,11 @@ public class UpdateUser(
 
         if (credential is null)
         {
-            throw new ApiException("Usuário não possui credencial local", HttpStatusCode.BadRequest);
+            throw new NoLocalCredentialException();
         }
 
         string passwordHash = this._hash.Hash(password);
+
         credential.UpdatePasswordHash(passwordHash);
 
         await this._userCredentialRepository.Update(credential);

@@ -1,9 +1,7 @@
 using Google.Apis.Auth;
-using Idiomas.Core.Application.Error;
-using Idiomas.Core.Infrastructure.Service.Google;
+using Idiomas.Core.Application.Error.Infrastructure;
 using Idiomas.Core.Interface.Service;
 using Microsoft.Extensions.Configuration;
-using System.Net;
 
 namespace Idiomas.Core.Infrastructure.Service.Google;
 
@@ -17,7 +15,7 @@ public class GoogleTokenVerifier(IConfiguration configuration) : IGoogleTokenVer
 
         if (string.IsNullOrEmpty(clientId))
         {
-            throw new ApiException("Configuração do Google ausente", HttpStatusCode.InternalServerError);
+            throw new GoogleConfigurationMissingException();
         }
 
         var settings = new GoogleJsonWebSignature.ValidationSettings
@@ -33,7 +31,7 @@ public class GoogleTokenVerifier(IConfiguration configuration) : IGoogleTokenVer
         }
         catch (Exception)
         {
-            throw new ApiException("Token do Google inválido", HttpStatusCode.Unauthorized);
+            throw new GoogleTokenInvalidException();
         }
     }
 }

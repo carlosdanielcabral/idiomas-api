@@ -1,11 +1,10 @@
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Auth;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Service.Google;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
-using System.Net;
 
 namespace Idiomas.Core.Application.UseCase.AuthCase;
 
@@ -26,7 +25,7 @@ public class GoogleLogin(
 
         if (!payload.EmailVerified)
         {
-            throw new ApiException("Email não verificado pelo Google", HttpStatusCode.Unauthorized);
+            throw new GoogleEmailNotVerifiedException();
         }
 
         UserCredential? credential = await this._userCredentialRepository
@@ -38,7 +37,7 @@ public class GoogleLogin(
 
             if (user == null)
             {
-                throw new ApiException("Conta não encontrada", HttpStatusCode.Unauthorized);
+                throw new AccountNotFoundException();
             }
 
             return user;
@@ -50,7 +49,7 @@ public class GoogleLogin(
         {
             if (!existingUser.CanLogin())
             {
-                throw new ApiException("E-mail não verificado. Verifique sua caixa de entrada para ativar sua conta.", HttpStatusCode.Forbidden);
+                throw new EmailNotVerifiedException();
             }
 
             return await this.LinkGoogleCredential(existingUser.Id, payload);
