@@ -1,5 +1,5 @@
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Auth;
 using Idiomas.Core.Application.UseCase.AuthCase;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
@@ -41,7 +41,7 @@ public class ResetPasswordTest
     }
 
     [Fact]
-    public async Task Execute_ThrowsApiExceptionWhenTokenDoesNotExist()
+    public async Task Execute_ThrowsTokenInvalidOrExpiredExceptionWhenTokenDoesNotExist()
     {
         this._tokenRepositoryMock
             .Setup(repository => repository.GetByTokenHash(It.IsAny<string>()))
@@ -51,13 +51,16 @@ public class ResetPasswordTest
 
         var dto = new ResetPasswordDTO("invalid-token", "newpassword123");
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => useCase.Execute(dto));
+        var exception = await Assert.ThrowsAsync<TokenInvalidOrExpiredException>(() => useCase.Execute(dto));
 
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("auth:token-invalid-or-expired", exception.ErrorCode);
+        Assert.Equal("Token invalid or expired", exception.Title);
+        Assert.Equal("The token is invalid or has expired.", exception.Detail);
     }
 
     [Fact]
-    public async Task Execute_ThrowsApiExceptionWhenTokenIsExpired()
+    public async Task Execute_ThrowsTokenInvalidOrExpiredExceptionWhenTokenIsExpired()
     {
         var token = new PasswordResetToken(Guid.NewGuid(), Guid.NewGuid(), "valid-hash", DateTime.UtcNow.AddHours(-2), DateTime.UtcNow.AddHours(-1));
 
@@ -69,13 +72,16 @@ public class ResetPasswordTest
 
         var dto = new ResetPasswordDTO("valid-token", "newpassword123");
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => useCase.Execute(dto));
+        var exception = await Assert.ThrowsAsync<TokenInvalidOrExpiredException>(() => useCase.Execute(dto));
 
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("auth:token-invalid-or-expired", exception.ErrorCode);
+        Assert.Equal("Token invalid or expired", exception.Title);
+        Assert.Equal("The token is invalid or has expired.", exception.Detail);
     }
 
     [Fact]
-    public async Task Execute_ThrowsApiExceptionWhenTokenIsAlreadyUsed()
+    public async Task Execute_ThrowsTokenInvalidOrExpiredExceptionWhenTokenIsAlreadyUsed()
     {
         var token = new PasswordResetToken(Guid.NewGuid(), Guid.NewGuid(), "valid-hash", DateTime.UtcNow.AddHours(-2), DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddMinutes(-5));
 
@@ -87,13 +93,16 @@ public class ResetPasswordTest
 
         var dto = new ResetPasswordDTO("valid-token", "newpassword123");
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => useCase.Execute(dto));
+        var exception = await Assert.ThrowsAsync<TokenInvalidOrExpiredException>(() => useCase.Execute(dto));
 
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
+        Assert.Equal("auth:token-invalid-or-expired", exception.ErrorCode);
+        Assert.Equal("Token invalid or expired", exception.Title);
+        Assert.Equal("The token is invalid or has expired.", exception.Detail);
     }
 
     [Fact]
-    public async Task Execute_ThrowsApiExceptionWithGenericMessageWhenUserHasNoLocalCredential()
+    public async Task Execute_ThrowsTokenInvalidOrExpiredExceptionWhenUserHasNoLocalCredential()
     {
         Guid userId = Guid.NewGuid();
         var token = new PasswordResetToken(Guid.NewGuid(), userId, "valid-hash", DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
@@ -115,10 +124,12 @@ public class ResetPasswordTest
 
         var dto = new ResetPasswordDTO("valid-token", "newpassword123");
 
-        var exception = await Assert.ThrowsAsync<ApiException>(() => useCase.Execute(dto));
+        var exception = await Assert.ThrowsAsync<TokenInvalidOrExpiredException>(() => useCase.Execute(dto));
 
         Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
-        Assert.Equal("Token inválido ou expirado", exception.Message);
+        Assert.Equal("auth:token-invalid-or-expired", exception.ErrorCode);
+        Assert.Equal("Token invalid or expired", exception.Title);
+        Assert.Equal("The token is invalid or has expired.", exception.Detail);
     }
 
     [Fact]

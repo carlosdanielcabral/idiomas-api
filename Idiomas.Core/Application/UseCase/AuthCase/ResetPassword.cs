@@ -1,10 +1,9 @@
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Auth;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
-using System.Net;
 
 namespace Idiomas.Core.Application.UseCase.AuthCase;
 
@@ -31,14 +30,14 @@ public class ResetPassword(
 
         if (token is null || !token.IsValid)
         {
-            throw new ApiException("Token inválido ou expirado", HttpStatusCode.BadRequest);
+            throw new TokenInvalidOrExpiredException();
         }
 
         User? user = await this._userRepository.GetById(token.UserId.ToString());
 
         if (user == null)
         {
-            throw new ApiException("Token inválido ou expirado", HttpStatusCode.BadRequest);
+            throw new TokenInvalidOrExpiredException();
         }
 
         UserCredential? credential = await this._userCredentialRepository
@@ -46,7 +45,7 @@ public class ResetPassword(
 
         if (credential == null)
         {
-            throw new ApiException("Token inválido ou expirado", HttpStatusCode.BadRequest);
+            throw new TokenInvalidOrExpiredException();
         }
 
         string passwordHash = this._hash.Hash(dto.NewPassword);

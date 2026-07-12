@@ -1,10 +1,9 @@
 using Idiomas.Core.Application.DTO.Auth;
-using Idiomas.Core.Application.Error;
+using Idiomas.Core.Application.Error.Auth;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
-using System.Net;
 
 namespace Idiomas.Core.Application.UseCase.AuthCase;
 
@@ -23,7 +22,7 @@ public class MailPasswordLogin(
 
         if (user == null)
         {
-            throw new ApiException("Email ou senha inválidos", HttpStatusCode.BadRequest);
+            throw new InvalidCredentialsException();
         }
 
         UserCredential? credential = await this._userCredentialRepository
@@ -31,19 +30,19 @@ public class MailPasswordLogin(
 
         if (credential == null)
         {
-            throw new ApiException("Email ou senha inválidos", HttpStatusCode.BadRequest);
+            throw new InvalidCredentialsException();
         }
 
         bool isPasswordValid = this._hash.Verify(dto.Password, credential.PasswordHash!);
 
         if (!isPasswordValid)
         {
-            throw new ApiException("Email ou senha inválidos", HttpStatusCode.BadRequest);
+            throw new InvalidCredentialsException();
         }
 
         if (!user.CanLogin())
         {
-            throw new ApiException("E-mail não verificado. Verifique sua caixa de entrada.", HttpStatusCode.Forbidden);
+            throw new EmailNotVerifiedException();
         }
 
         return user;
