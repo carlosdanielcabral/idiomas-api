@@ -107,6 +107,12 @@ The API will be available at:
 http://localhost:5076
 ```
 
+The Mailpit web UI, used to inspect emails sent by the application, will be available at:
+
+```
+http://localhost:8025
+```
+
 ---
 
 ### 💻 Running Locally (Without Docker)
