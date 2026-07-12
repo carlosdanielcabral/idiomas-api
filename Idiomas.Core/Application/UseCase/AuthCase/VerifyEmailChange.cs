@@ -21,7 +21,7 @@ public class VerifyEmailChange(
 
         EmailChangeRequest? request = await this._requestRepository.GetByTokenHash(tokenHash);
 
-        if (request == null || request.IsExpired || request.IsUsed)
+        if (request is null || !request.IsValid)
         {
             throw new ApiException("Token inválido ou expirado", HttpStatusCode.BadRequest);
         }
@@ -33,9 +33,9 @@ public class VerifyEmailChange(
             throw new ApiException("Token inválido ou expirado", HttpStatusCode.BadRequest);
         }
 
-        User updatedUser = new(user.Id, user.Name, request.NewEmail, user.IsEmailVerified);
+        user.UpdateEmail(request.NewEmail);
 
-        await this._userRepository.Update(updatedUser);
+        await this._userRepository.Update(user);
 
         await this._requestRepository.MarkAsUsed(request);
     }

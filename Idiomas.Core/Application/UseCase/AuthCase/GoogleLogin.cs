@@ -2,7 +2,6 @@ using Idiomas.Core.Application.DTO.Auth;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Domain.Entity;
 using Idiomas.Core.Domain.Enum;
-using Idiomas.Core.Infrastructure.Helper;
 using Idiomas.Core.Infrastructure.Service.Google;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
@@ -49,7 +48,7 @@ public class GoogleLogin(
 
         if (existingUser != null)
         {
-            if (!existingUser.IsEmailVerified)
+            if (!existingUser.CanLogin())
             {
                 throw new ApiException("E-mail não verificado. Verifique sua caixa de entrada para ativar sua conta.", HttpStatusCode.Forbidden);
             }
@@ -64,8 +63,7 @@ public class GoogleLogin(
     {
         await using IDatabaseTransaction transaction = await this._transactionManager.BeginTransactionAsync();
 
-        UserCredential credential = new(
-            UUIDGenerator.Generate(),
+        UserCredential credential = UserCredential.Create(
             userId,
             AuthProvider.Google,
             null,
@@ -85,12 +83,11 @@ public class GoogleLogin(
     {
         await using IDatabaseTransaction transaction = await this._transactionManager.BeginTransactionAsync();
 
-        User user = new(UUIDGenerator.Generate(), payload.Name, payload.Email, true);
+        User user = User.Create(payload.Name, payload.Email, true);
 
         User createdUser = await this._userRepository.Insert(user);
 
-        UserCredential credential = new(
-            UUIDGenerator.Generate(),
+        UserCredential credential = UserCredential.Create(
             createdUser.Id,
             AuthProvider.Google,
             null,

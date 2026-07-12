@@ -27,7 +27,7 @@ public class ResetPassword(
 
         PasswordResetToken? token = await this._tokenRepository.GetByTokenHash(tokenHash);
 
-        if (token == null || token.IsExpired || token.IsUsed)
+        if (token is null || !token.IsValid)
         {
             throw new ApiException("Token inválido ou expirado", HttpStatusCode.BadRequest);
         }

@@ -17,9 +17,9 @@ public class CreateUserTest
     private readonly Mock<IUserCredentialRepository> _userCredentialRepositoryMock;
     private readonly Mock<IEmailVerificationTokenRepository> _emailVerificationTokenRepositoryMock;
     private readonly Mock<IHash> _hashMock;
-    private readonly Mock<ITokenHasher> _tokenHasherMock;
+    private readonly Mock<ITokenGenerator> _tokenGeneratorMock;
     private readonly Mock<IEmailService> _emailServiceMock;
-    private readonly Mock<EmailTemplateLoader> _templateLoaderMock;
+    private readonly Mock<EmailMessageBuilder> _emailMessageBuilderMock;
     private readonly Mock<IConfiguration> _configurationMock;
     private readonly Mock<ITransactionManager> _transactionManagerMock;
     private readonly Mock<IDatabaseTransaction> _databaseTransactionMock;
@@ -31,9 +31,9 @@ public class CreateUserTest
         this._userCredentialRepositoryMock = new Mock<IUserCredentialRepository>();
         this._emailVerificationTokenRepositoryMock = new Mock<IEmailVerificationTokenRepository>();
         this._hashMock = new Mock<IHash>();
-        this._tokenHasherMock = new Mock<ITokenHasher>();
+        this._tokenGeneratorMock = new Mock<ITokenGenerator>();
         this._emailServiceMock = new Mock<IEmailService>();
-        this._templateLoaderMock = new Mock<EmailTemplateLoader>(Path.Combine(Path.GetTempPath(), "fake"));
+        this._emailMessageBuilderMock = new Mock<EmailMessageBuilder>(new EmailTemplateLoader(Path.Combine(Path.GetTempPath(), "fake")));
         this._configurationMock = new Mock<IConfiguration>();
         this._transactionManagerMock = new Mock<ITransactionManager>();
         this._databaseTransactionMock = new Mock<IDatabaseTransaction>();
@@ -43,19 +43,19 @@ public class CreateUserTest
             .ReturnsAsync(this._databaseTransactionMock.Object);
 
         this._configurationMock.SetupGet(config => config["FrontendUrl"]).Returns("https://app.idiomas.com");
-        this._tokenHasherMock.Setup(hasher => hasher.Hash(It.IsAny<string>())).Returns("hashed-token");
-        this._templateLoaderMock
-            .Setup(loader => loader.Load(It.IsAny<string>(), It.IsAny<IEnumerable<EmailTemplatePlaceholder>>()))
-            .Returns("<html>email</html>");
+        this._tokenGeneratorMock.Setup(generator => generator.Generate()).Returns(new TokenPair("raw-token", "hashed-token"));
+        this._emailMessageBuilderMock
+            .Setup(builder => builder.Build(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<EmailTemplatePlaceholder[]>()))
+            .Returns(new EmailMessage("test@example.com", "subject", "<html>email</html>"));
 
         this._sut = new CreateUser(
             this._userRepositoryMock.Object,
             this._userCredentialRepositoryMock.Object,
             this._emailVerificationTokenRepositoryMock.Object,
             this._hashMock.Object,
-            this._tokenHasherMock.Object,
+            this._tokenGeneratorMock.Object,
             this._emailServiceMock.Object,
-            this._templateLoaderMock.Object,
+            this._emailMessageBuilderMock.Object,
             this._transactionManagerMock.Object,
             this._configurationMock.Object
         );

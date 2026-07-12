@@ -33,12 +33,11 @@ public class UserMappingExtensionTest
     }
 
     [Fact]
-    public void ToCredentialEntity_MapsCorrectly()
+    public void Create_WithLocalProvider_CreatesCorrectly()
     {
-        CreateUserDTO dto = new("Test User", "test@example.com", "password123");
         string userId = Guid.NewGuid().ToString();
 
-        UserCredential credential = dto.ToCredentialEntity(userId, "hashed-password");
+        UserCredential credential = UserCredential.Create(userId, AuthProvider.Local, "hashed-password");
 
         Assert.Equal(userId, credential.UserId);
         Assert.Equal(AuthProvider.Local, credential.Provider);

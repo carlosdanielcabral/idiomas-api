@@ -1,8 +1,8 @@
-using System.Security.Cryptography;
 using Idiomas.Core.Application.DTO.User;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Application.Mapper;
 using Idiomas.Core.Domain.Entity;
+using Idiomas.Core.Domain.Enum;
 using Idiomas.Core.Infrastructure.Service.Email;
 using Idiomas.Core.Interface.Repository;
 using Idiomas.Core.Interface.Service;
@@ -16,23 +16,19 @@ public class CreateUser(
     IUserCredentialRepository userCredentialRepository,
     IEmailVerificationTokenRepository emailVerificationTokenRepository,
     IHash hash,
-    ITokenHasher tokenHasher,
+    ITokenGenerator tokenGenerator,
     IEmailService emailService,
-    EmailTemplateLoader templateLoader,
+    EmailMessageBuilder emailMessageBuilder,
     ITransactionManager transactionManager,
     IConfiguration configuration)
 {
-    private const int TOKEN_LENGTH = 64;
-
-    private const int TOKEN_EXPIRATION_HOURS = 1;
-
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IUserCredentialRepository _userCredentialRepository = userCredentialRepository;
     private readonly IEmailVerificationTokenRepository _emailVerificationTokenRepository = emailVerificationTokenRepository;
     private readonly IHash _hash = hash;
-    private readonly ITokenHasher _tokenHasher = tokenHasher;
+    private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
     private readonly IEmailService _emailService = emailService;
-    private readonly EmailTemplateLoader _templateLoader = templateLoader;
+    private readonly EmailMessageBuilder _emailMessageBuilder = emailMessageBuilder;
     private readonly ITransactionManager _transactionManager = transactionManager;
     private readonly IConfiguration _configuration = configuration;
 
@@ -64,27 +60,20 @@ public class CreateUser(
     {
         string passwordHash = this._hash.Hash(dto.Password);
 
-        UserCredential credential = dto.ToCredentialEntity(userId, passwordHash);
+        UserCredential credential = UserCredential.Create(userId, AuthProvider.Local, passwordHash);
 
         await this._userCredentialRepository.Insert(credential);
     }
 
     private async Task CreateAndSendVerificationToken(User user)
     {
-        string rawToken = GenerateSecureToken();
-        string tokenHash = this._tokenHasher.Hash(rawToken);
+        TokenPair token = this._tokenGenerator.Generate();
 
-        EmailVerificationToken token = new(
-            Guid.NewGuid(),
-            Guid.Parse(user.Id),
-            tokenHash,
-            DateTime.UtcNow,
-            DateTime.UtcNow.AddHours(TOKEN_EXPIRATION_HOURS)
-        );
+        EmailVerificationToken verificationToken = EmailVerificationToken.Create(user.IdAsGuid, token.TokenHash);
 
-        await this._emailVerificationTokenRepository.Insert(token);
+        await this._emailVerificationTokenRepository.Insert(verificationToken);
 
-        await this.SendVerificationEmail(user, rawToken);
+        await this.SendVerificationEmail(user, token.RawToken);
     }
 
     private async Task SendVerificationEmail(User user, string rawToken)
@@ -92,12 +81,13 @@ public class CreateUser(
         string frontendUrl = this._configuration["FrontendUrl"] ?? throw new InvalidOperationException("FrontendUrl is not configured");
         string verificationLink = $"{frontendUrl}/verify-email?token={rawToken}";
 
-        string htmlBody = this._templateLoader.Load("EmailVerification.html", [
+        EmailMessage emailMessage = this._emailMessageBuilder.Build(
+            "EmailVerification.html",
+            "Verifique seu e-mail",
+            user.Email,
             new EmailTemplatePlaceholder("UserName", user.Name),
             new EmailTemplatePlaceholder("VerificationLink", verificationLink)
-        ]);
-
-        var emailMessage = new EmailMessage(user.Email, "Verifique seu e-mail", htmlBody);
+        );
 
         await this._emailService.SendAsync(emailMessage);
     }
@@ -110,10 +100,5 @@ public class CreateUser(
         {
             throw new ApiException("E-mail já cadastrado", HttpStatusCode.Conflict);
         }
-    }
-
-    private static string GenerateSecureToken()
-    {
-        return RandomNumberGenerator.GetHexString(TOKEN_LENGTH);
     }
 }

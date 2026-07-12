@@ -41,7 +41,7 @@ public class MailPasswordLogin(
             throw new ApiException("Email ou senha inválidos", HttpStatusCode.BadRequest);
         }
 
-        if (!user.IsEmailVerified)
+        if (!user.CanLogin())
         {
             throw new ApiException("E-mail não verificado. Verifique sua caixa de entrada.", HttpStatusCode.Forbidden);
         }

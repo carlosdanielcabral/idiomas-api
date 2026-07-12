@@ -18,15 +18,18 @@ public class ResendVerificationTest
     private readonly Mock<IUserCredentialRepository> _userCredentialRepositoryMock = new();
     private readonly Mock<IEmailVerificationTokenRepository> _tokenRepositoryMock = new();
     private readonly Mock<IEmailService> _emailServiceMock = new();
-    private readonly Mock<EmailTemplateLoader> _templateLoaderMock;
+    private readonly Mock<EmailMessageBuilder> _emailMessageBuilderMock;
     private readonly Mock<IConfiguration> _configurationMock = new();
-    private readonly Mock<ITokenHasher> _tokenHasherMock = new();
+    private readonly Mock<ITokenGenerator> _tokenGeneratorMock = new();
 
     public ResendVerificationTest()
     {
-        this._templateLoaderMock = new Mock<EmailTemplateLoader>(Path.Combine(Path.GetTempPath(), "fake"));
+        this._emailMessageBuilderMock = new Mock<EmailMessageBuilder>(new EmailTemplateLoader(Path.Combine(Path.GetTempPath(), "fake")));
         this._configurationMock.SetupGet(config => config["FrontendUrl"]).Returns("https://app.idiomas.com");
-        this._tokenHasherMock.Setup(hasher => hasher.Hash(It.IsAny<string>())).Returns("hashed-token");
+        this._tokenGeneratorMock.Setup(generator => generator.Generate()).Returns(new TokenPair("raw-token", "hashed-token"));
+        this._emailMessageBuilderMock
+            .Setup(builder => builder.Build(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<EmailTemplatePlaceholder[]>()))
+            .Returns(new EmailMessage("joao@example.com", "subject", "<html>email</html>"));
     }
 
     private ResendVerification CreateSut()
@@ -36,9 +39,9 @@ public class ResendVerificationTest
             this._userCredentialRepositoryMock.Object,
             this._tokenRepositoryMock.Object,
             this._emailServiceMock.Object,
-            this._templateLoaderMock.Object,
+            this._emailMessageBuilderMock.Object,
             this._configurationMock.Object,
-            this._tokenHasherMock.Object
+            this._tokenGeneratorMock.Object
         );
     }
 
@@ -153,10 +156,6 @@ public class ResendVerificationTest
         this._tokenRepositoryMock
             .Setup(repository => repository.GetActiveTokenByUserId(It.IsAny<Guid>()))
             .ReturnsAsync((EmailVerificationToken?)null);
-
-        this._templateLoaderMock
-            .Setup(loader => loader.Load(It.IsAny<string>(), It.IsAny<IEnumerable<EmailTemplatePlaceholder>>()))
-            .Returns("<html>email</html>");
 
         var sut = this.CreateSut();
 

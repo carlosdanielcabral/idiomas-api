@@ -20,6 +20,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IHash, Argon2Hash>();
         services.AddScoped<ITokenHasher, Sha256TokenHasher>();
+        services.AddScoped<ITokenGenerator, SecureTokenGenerator>();
         services.AddScoped<IEncryptionService, AesGcmEncryptionService>(provider =>
         {
             var configuration = provider.GetRequiredService<IConfiguration>();
@@ -48,6 +49,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IEmailService, SendGridClientService>();
+        services.AddScoped<EmailMessageBuilder>();
 
         return services;
     }

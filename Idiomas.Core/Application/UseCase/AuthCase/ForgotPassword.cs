@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Idiomas.Core.Application.DTO.Auth;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Domain.Entity;
@@ -16,21 +15,17 @@ public class ForgotPassword(
     IUserCredentialRepository userCredentialRepository,
     IPasswordResetTokenRepository tokenRepository,
     IEmailService emailService,
-    EmailTemplateLoader templateLoader,
+    EmailMessageBuilder emailMessageBuilder,
     IConfiguration configuration,
-    ITokenHasher tokenHasher)
+    ITokenGenerator tokenGenerator)
 {
-    private const int TOKEN_LENGTH = 64;
-
-    private const int TOKEN_EXPIRATION_HOURS = 1;
-
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IUserCredentialRepository _userCredentialRepository = userCredentialRepository;
     private readonly IPasswordResetTokenRepository _tokenRepository = tokenRepository;
     private readonly IEmailService _emailService = emailService;
-    private readonly EmailTemplateLoader _templateLoader = templateLoader;
+    private readonly EmailMessageBuilder _emailMessageBuilder = emailMessageBuilder;
     private readonly IConfiguration _configuration = configuration;
-    private readonly ITokenHasher _tokenHasher = tokenHasher;
+    private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
 
     public async Task Execute(ForgotPasswordDTO dto)
     {
@@ -49,18 +44,17 @@ public class ForgotPassword(
             return;
         }
 
-        Guid userId = Guid.Parse(user.Id);
+        Guid userId = user.IdAsGuid;
 
         await this.EnsureNoActiveTokenExists(userId);
 
-        string rawToken = GenerateSecureToken();
-        string tokenHash = this._tokenHasher.Hash(rawToken);
+        TokenPair token = this._tokenGenerator.Generate();
 
-        PasswordResetToken token = new(Guid.NewGuid(), userId, tokenHash, DateTime.UtcNow, DateTime.UtcNow.AddHours(TOKEN_EXPIRATION_HOURS));
+        PasswordResetToken resetToken = PasswordResetToken.Create(userId, token.TokenHash);
 
-        await this._tokenRepository.Insert(token);
+        await this._tokenRepository.Insert(resetToken);
 
-        await this.SendPasswordResetEmail(user, rawToken);
+        await this.SendPasswordResetEmail(user, token.RawToken);
     }
 
     private async Task EnsureNoActiveTokenExists(Guid userId)
@@ -78,18 +72,14 @@ public class ForgotPassword(
         string frontendUrl = this._configuration["FrontendUrl"] ?? throw new InvalidOperationException("FrontendUrl is not configured");
         string resetLink = $"{frontendUrl}/reset-password?token={rawToken}";
 
-        string htmlBody = this._templateLoader.Load("PasswordResetEmail.html", [
+        EmailMessage emailMessage = this._emailMessageBuilder.Build(
+            "PasswordResetEmail.html",
+            "Redefinição de senha",
+            user.Email,
             new EmailTemplatePlaceholder("UserName", user.Name),
             new EmailTemplatePlaceholder("ResetLink", resetLink)
-        ]);
-
-        var emailMessage = new EmailMessage(user.Email, "Redefinição de senha", htmlBody);
+        );
 
         await this._emailService.SendAsync(emailMessage);
-    }
-
-    private static string GenerateSecureToken()
-    {
-        return RandomNumberGenerator.GetHexString(TOKEN_LENGTH);
     }
 }

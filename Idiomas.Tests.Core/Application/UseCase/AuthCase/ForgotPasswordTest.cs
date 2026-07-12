@@ -17,15 +17,18 @@ public class ForgotPasswordTest
     private readonly Mock<IUserCredentialRepository> _userCredentialRepositoryMock = new();
     private readonly Mock<IPasswordResetTokenRepository> _tokenRepositoryMock = new();
     private readonly Mock<IEmailService> _emailServiceMock = new();
-    private readonly Mock<EmailTemplateLoader> _templateLoaderMock;
+    private readonly Mock<EmailMessageBuilder> _emailMessageBuilderMock;
     private readonly Mock<IConfiguration> _configurationMock = new();
-    private readonly Mock<ITokenHasher> _tokenHasherMock = new();
+    private readonly Mock<ITokenGenerator> _tokenGeneratorMock = new();
 
     public ForgotPasswordTest()
     {
-        this._templateLoaderMock = new Mock<EmailTemplateLoader>(Path.Combine(Path.GetTempPath(), "fake"));
+        this._emailMessageBuilderMock = new Mock<EmailMessageBuilder>(new EmailTemplateLoader(Path.Combine(Path.GetTempPath(), "fake")));
         this._configurationMock.SetupGet(config => config["FrontendUrl"]).Returns("https://app.idiomas.com");
-        this._tokenHasherMock.Setup(hasher => hasher.Hash(It.IsAny<string>())).Returns("hashed-token");
+        this._tokenGeneratorMock.Setup(generator => generator.Generate()).Returns(new TokenPair("raw-token", "hashed-token"));
+        this._emailMessageBuilderMock
+            .Setup(builder => builder.Build(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<EmailTemplatePlaceholder[]>()))
+            .Returns(new EmailMessage("joao@example.com", "subject", "<html>email</html>"));
     }
 
     private ForgotPassword CreateSut()
@@ -35,9 +38,9 @@ public class ForgotPasswordTest
             this._userCredentialRepositoryMock.Object,
             this._tokenRepositoryMock.Object,
             this._emailServiceMock.Object,
-            this._templateLoaderMock.Object,
+            this._emailMessageBuilderMock.Object,
             this._configurationMock.Object,
-            this._tokenHasherMock.Object
+            this._tokenGeneratorMock.Object
         );
     }
 
@@ -131,17 +134,13 @@ public class ForgotPasswordTest
             .Setup(repository => repository.GetActiveTokenByUserId(It.IsAny<Guid>()))
             .ReturnsAsync((PasswordResetToken?)null);
 
-        this._templateLoaderMock
-            .Setup(loader => loader.Load(It.IsAny<string>(), It.IsAny<IEnumerable<EmailTemplatePlaceholder>>()))
-            .Returns("<html>email</html>");
-
         var sut = this.CreateSut();
 
         var dto = new ForgotPasswordDTO("joao@example.com");
 
         await sut.Execute(dto);
 
-        this._tokenHasherMock.Verify(hasher => hasher.Hash(It.IsAny<string>()), Times.Once);
+        this._tokenGeneratorMock.Verify(generator => generator.Generate(), Times.Once);
         this._tokenRepositoryMock.Verify(repository => repository.GetActiveTokenByUserId(Guid.Parse(user.Id)), Times.Once);
         this._tokenRepositoryMock.Verify(repository => repository.Insert(It.Is<PasswordResetToken>(token =>
             token.UserId == Guid.Parse(user.Id) &&

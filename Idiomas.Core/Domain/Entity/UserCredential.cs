@@ -1,4 +1,5 @@
 using Idiomas.Core.Domain.Enum;
+using Idiomas.Core.Infrastructure.Helper;
 
 namespace Idiomas.Core.Domain.Entity;
 
@@ -14,6 +15,17 @@ public class UserCredential(
     public AuthProvider Provider { get; private set; } = provider;
     public string? PasswordHash { get; private set; } = passwordHash;
     public string? ExternalSubject { get; private set; } = externalSubject;
+
+    public static UserCredential Create(string userId, AuthProvider provider, string? passwordHash, string? externalSubject = null)
+    {
+        return new UserCredential(
+            UUIDGenerator.Generate(),
+            userId,
+            provider,
+            passwordHash,
+            externalSubject
+        );
+    }
 
     public void UpdatePasswordHash(string passwordHash)
     {

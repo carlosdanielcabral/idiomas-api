@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Idiomas.Core.Application.DTO.User;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Domain.Entity;
@@ -16,23 +15,19 @@ public class UpdateUser(
     IUserCredentialRepository userCredentialRepository,
     IEmailChangeRequestRepository emailChangeRequestRepository,
     IHash hash,
-    ITokenHasher tokenHasher,
+    ITokenGenerator tokenGenerator,
     IEmailService emailService,
-    EmailTemplateLoader templateLoader,
+    EmailMessageBuilder emailMessageBuilder,
     ITransactionManager transactionManager,
     IConfiguration configuration)
 {
-    private const int TOKEN_LENGTH = 64;
-
-    private const int TOKEN_EXPIRATION_HOURS = 1;
-
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IUserCredentialRepository _userCredentialRepository = userCredentialRepository;
     private readonly IEmailChangeRequestRepository _emailChangeRequestRepository = emailChangeRequestRepository;
     private readonly IHash _hash = hash;
-    private readonly ITokenHasher _tokenHasher = tokenHasher;
+    private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
     private readonly IEmailService _emailService = emailService;
-    private readonly EmailTemplateLoader _templateLoader = templateLoader;
+    private readonly EmailMessageBuilder _emailMessageBuilder = emailMessageBuilder;
     private readonly ITransactionManager _transactionManager = transactionManager;
     private readonly IConfiguration _configuration = configuration;
 
@@ -47,13 +42,11 @@ public class UpdateUser(
 
         await using IDatabaseTransaction transaction = await this._transactionManager.BeginTransactionAsync();
 
-        User updatedUser = await this.UpdateUserProfile(userId, dto, currentUser);
+        currentUser.UpdateProfile(dto.Name);
 
-        if (this.IsEmailChanging(dto, currentUser))
+        if (currentUser.IsEmailChanging(dto.Email))
         {
-            await this.ValidateNewEmail(dto.Email);
-
-            await this.CreateEmailChangeRequest(currentUser, dto.Email);
+            await this.ChangeUserEmail(currentUser, dto.Email);
         }
 
         if (!string.IsNullOrEmpty(dto.Password))
@@ -61,21 +54,20 @@ public class UpdateUser(
             await this.UpdateUserPassword(userId, dto.Password);
         }
 
+        User updatedUser = await this._userRepository.Update(currentUser);
+
         await transaction.CommitAsync();
 
         return updatedUser;
     }
 
-    private async Task<User> UpdateUserProfile(string userId, UpdateUserDTO dto, User currentUser)
+    private async Task ChangeUserEmail(User currentUser, string newEmail)
     {
-        User updatedUser = new(userId, dto.Name, currentUser.Email, currentUser.IsEmailVerified);
+        await this.ValidateNewEmail(newEmail);
 
-        return await this._userRepository.Update(updatedUser);
-    }
+        await this.CreateEmailChangeRequest(currentUser, newEmail);
 
-    private bool IsEmailChanging(UpdateUserDTO dto, User currentUser)
-    {
-        return !string.Equals(dto.Email, currentUser.Email, StringComparison.OrdinalIgnoreCase);
+        currentUser.UpdateEmail(newEmail);
     }
 
     private async Task ValidateNewEmail(string newEmail)
@@ -90,25 +82,17 @@ public class UpdateUser(
 
     private async Task CreateEmailChangeRequest(User currentUser, string newEmail)
     {
-        Guid userId = Guid.Parse(currentUser.Id);
+        Guid userId = currentUser.IdAsGuid;
 
         await this.EnsureNoActiveChangeRequestExists(userId);
 
-        string rawToken = GenerateSecureToken();
-        string tokenHash = this._tokenHasher.Hash(rawToken);
+        TokenPair token = this._tokenGenerator.Generate();
 
-        EmailChangeRequest request = new(
-            Guid.NewGuid(),
-            userId,
-            newEmail,
-            tokenHash,
-            DateTime.UtcNow,
-            DateTime.UtcNow.AddHours(TOKEN_EXPIRATION_HOURS)
-        );
+        EmailChangeRequest request = EmailChangeRequest.Create(userId, newEmail, token.TokenHash);
 
         await this._emailChangeRequestRepository.Insert(request);
 
-        await this.SendEmailChangeConfirmation(newEmail, currentUser.Name, rawToken);
+        await this.SendEmailChangeConfirmation(newEmail, currentUser.Name, token.RawToken);
     }
 
     private async Task EnsureNoActiveChangeRequestExists(Guid userId)
@@ -126,12 +110,13 @@ public class UpdateUser(
         string frontendUrl = this._configuration["FrontendUrl"] ?? throw new InvalidOperationException("FrontendUrl is not configured");
         string confirmationLink = $"{frontendUrl}/verify-email-change?token={rawToken}";
 
-        string htmlBody = this._templateLoader.Load("EmailChangeConfirmation.html", [
+        EmailMessage emailMessage = this._emailMessageBuilder.Build(
+            "EmailChangeConfirmation.html",
+            "Confirme seu novo e-mail",
+            newEmail,
             new EmailTemplatePlaceholder("UserName", userName),
             new EmailTemplatePlaceholder("ConfirmationLink", confirmationLink)
-        ]);
-
-        var emailMessage = new EmailMessage(newEmail, "Confirme seu novo e-mail", htmlBody);
+        );
 
         await this._emailService.SendAsync(emailMessage);
     }
@@ -150,10 +135,5 @@ public class UpdateUser(
         credential.UpdatePasswordHash(passwordHash);
 
         await this._userCredentialRepository.Update(credential);
-    }
-
-    private static string GenerateSecureToken()
-    {
-        return RandomNumberGenerator.GetHexString(TOKEN_LENGTH);
     }
 }

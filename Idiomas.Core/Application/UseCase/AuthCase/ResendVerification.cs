@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Idiomas.Core.Application.DTO.Auth;
 using Idiomas.Core.Application.Error;
 using Idiomas.Core.Domain.Entity;
@@ -16,21 +15,17 @@ public class ResendVerification(
     IUserCredentialRepository userCredentialRepository,
     IEmailVerificationTokenRepository tokenRepository,
     IEmailService emailService,
-    EmailTemplateLoader templateLoader,
+    EmailMessageBuilder emailMessageBuilder,
     IConfiguration configuration,
-    ITokenHasher tokenHasher)
+    ITokenGenerator tokenGenerator)
 {
-    private const int TOKEN_LENGTH = 64;
-
-    private const int TOKEN_EXPIRATION_HOURS = 1;
-
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IUserCredentialRepository _userCredentialRepository = userCredentialRepository;
     private readonly IEmailVerificationTokenRepository _tokenRepository = tokenRepository;
     private readonly IEmailService _emailService = emailService;
-    private readonly EmailTemplateLoader _templateLoader = templateLoader;
+    private readonly EmailMessageBuilder _emailMessageBuilder = emailMessageBuilder;
     private readonly IConfiguration _configuration = configuration;
-    private readonly ITokenHasher _tokenHasher = tokenHasher;
+    private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
 
     public async Task Execute(ResendVerificationDTO dto)
     {
@@ -54,24 +49,17 @@ public class ResendVerification(
             return;
         }
 
-        Guid userId = Guid.Parse(user.Id);
+        Guid userId = user.IdAsGuid;
 
         await this.EnsureNoActiveTokenExists(userId);
 
-        string rawToken = GenerateSecureToken();
-        string tokenHash = this._tokenHasher.Hash(rawToken);
+        TokenPair token = this._tokenGenerator.Generate();
 
-        EmailVerificationToken token = new(
-            Guid.NewGuid(),
-            userId,
-            tokenHash,
-            DateTime.UtcNow,
-            DateTime.UtcNow.AddHours(TOKEN_EXPIRATION_HOURS)
-        );
+        EmailVerificationToken verificationToken = EmailVerificationToken.Create(userId, token.TokenHash);
 
-        await this._tokenRepository.Insert(token);
+        await this._tokenRepository.Insert(verificationToken);
 
-        await this.SendVerificationEmail(user, rawToken);
+        await this.SendVerificationEmail(user, token.RawToken);
     }
 
     private async Task EnsureNoActiveTokenExists(Guid userId)
@@ -89,18 +77,14 @@ public class ResendVerification(
         string frontendUrl = this._configuration["FrontendUrl"] ?? throw new InvalidOperationException("FrontendUrl is not configured");
         string verificationLink = $"{frontendUrl}/verify-email?token={rawToken}";
 
-        string htmlBody = this._templateLoader.Load("EmailVerification.html", [
+        EmailMessage emailMessage = this._emailMessageBuilder.Build(
+            "EmailVerification.html",
+            "Verifique seu e-mail",
+            user.Email,
             new EmailTemplatePlaceholder("UserName", user.Name),
             new EmailTemplatePlaceholder("VerificationLink", verificationLink)
-        ]);
-
-        var emailMessage = new EmailMessage(user.Email, "Verifique seu e-mail", htmlBody);
+        );
 
         await this._emailService.SendAsync(emailMessage);
-    }
-
-    private static string GenerateSecureToken()
-    {
-        return RandomNumberGenerator.GetHexString(TOKEN_LENGTH);
     }
 }
