@@ -47,4 +47,4 @@ jobs:
         name: build-artifacts
     
     - name: Run tests
-      run: dotnet test Idiomas.sln --configuration Release --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal
