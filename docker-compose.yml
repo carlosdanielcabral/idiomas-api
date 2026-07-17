@@ -37,12 +37,23 @@ services:
   migration:
     build:
       context: ./Idiomas.Core
-      target: build
+      dockerfile: Infrastructure/Database/Docker/Dockerfile.migration
     container_name: idiomas-migration
     depends_on:
       database:
         condition: service_healthy
-    entrypoint: ["sh", "-c", "echo 'Waiting for database...' && sleep 30 && echo 'Testing connection...' && dotnet ef database update --context ApplicationContext --verbose 2>&1 || echo 'Migration failed, exiting'"]
+    env_file:
+      - .env
+    volumes:
+      - ./Idiomas.Core:/source
+    networks:
+      - idiomas-network
+
+  test:
+    build:
+      context: .
+      dockerfile: ./Idiomas.Tests.Core/Dockerfile.test
+    container_name: idiomas-test
     env_file:
       - .env
     networks:
