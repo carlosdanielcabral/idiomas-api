@@ -58,7 +58,7 @@
 Before you begin, make sure you have the following installed and configured:
 
 - [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/) (for local development without Docker)
+- [.NET 9.0 SDK](https://dotnet.microsoft.com/) (optional — only needed for local development without Docker; migrations and tests can run via Docker)
 - Azure Storage account (for file storage features)
 - Gemini API key (for AI conversation features)
 - Google OAuth Client ID (for "Sign in with Google")
@@ -110,6 +110,8 @@ This will start four services:
 | `database` | SQL Server database |
 | `migration` | Database migration service |
 | `mailpit` | Local SMTP server used to send and inspect emails in development (see [Email & Mailpit](#-email--mailpit)) |
+
+There is also a `test` service for running the test suite without the .NET SDK installed locally.
 
 #### 4. Verify the application
 
@@ -282,21 +284,50 @@ When an exception is thrown, the API returns an RFC 7807 `ProblemDetails` JSON r
 
 When using Docker Compose, migrations run automatically via the `migration` service.
 
-### Run migrations manually
+The `migration` service can also be invoked manually to create, apply or roll back migrations, without requiring the .NET SDK on the host machine.
+
+### Apply migrations
 
 ```bash
-cd Idiomas.Core
-dotnet ef database update --context ApplicationContext
+docker compose run --rm migration migrate
 ```
 
 ### Create a new migration
 
 ```bash
+docker compose run --rm migration create <MigrationName>
+```
+
+### Roll back to a specific migration
+
+```bash
+docker compose run --rm migration rollback <TargetMigration>
+```
+
+You can still run these commands locally if the .NET SDK is installed:
+
+```bash
+cd Idiomas.Core
+dotnet ef database update --context ApplicationContext
 dotnet ef migrations add <MigrationName> --context ApplicationContext
 ```
 
 
 ## Running Tests
+
+The test suite can be executed through Docker without the .NET SDK installed locally:
+
+```bash
+docker compose run --rm test
+```
+
+To run a specific test or test class, pass a filter to `dotnet test`:
+
+```bash
+docker compose run --rm test --filter "FullyQualifiedName~UserRepositoryTest"
+```
+
+Alternatively, if the .NET SDK is installed locally:
 
 ```bash
 cd Idiomas.Tests.Core
