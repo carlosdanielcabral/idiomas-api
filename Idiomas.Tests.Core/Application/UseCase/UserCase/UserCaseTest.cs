@@ -40,7 +40,7 @@ public class CreateUserTest
             .Setup(unitOfWork => unitOfWork.ExecuteAsync(It.IsAny<Func<Task<User>>>()))
             .Returns((Func<Task<User>> operation) => operation());
 
-        this._configurationMock.SetupGet(config => config["FrontendUrl"]).Returns("https://app.idiomas.com");
+        this._configurationMock.SetupGet(config => config["API_URL"]).Returns("https://app.idiomas.com");
         this._tokenGeneratorMock.Setup(generator => generator.Generate()).Returns(new TokenPair("raw-token", "hashed-token"));
         this._emailMessageBuilderMock
             .Setup(builder => builder.Build(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<EmailTemplatePlaceholder[]>()))
