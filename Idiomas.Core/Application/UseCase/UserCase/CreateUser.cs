@@ -76,8 +76,8 @@ public class CreateUser(
 
     private async Task SendVerificationEmail(User user, string rawToken)
     {
-        string frontendUrl = this._configuration["FrontendUrl"] ?? throw new InvalidOperationException("FrontendUrl is not configured");
-        string verificationLink = $"{frontendUrl}/verify-email?token={rawToken}";
+        string apiUrl = this._configuration["API_URL"] ?? throw new InvalidOperationException("API_URL is not configured");
+        string verificationLink = $"{apiUrl}/verify-email?token={rawToken}";
 
         EmailMessage emailMessage = this._emailMessageBuilder.Build(
             "EmailVerification.html",
